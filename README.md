@@ -15,7 +15,7 @@ Every claim carries an *exhibit*: the exact SQL that ran, its result hash, and a
 
 Outputs are **data-quality findings on public filings, not investment advice.**
 
-## Status (Day 1)
+## Status (Day 2)
 
 Working now, with `SAMPLE_MODE=true` (default):
 
@@ -26,11 +26,21 @@ npm run cli -- rerun <exhibit_id>
 npm run cli -- replay <case_id>
 ```
 
-This prints a metric series and five exhibits (catalog, describe, SQL, profile, history). `rerun` re-executes stored SQL and diffs the result hash.
+The investigator walks six rungs: catalog → describe → `INFER SQLTABLE` lineage → baseline onset → five hypotheses → evidence. It writes 14 exhibits and prints a hypothesis table.
 
-Live Zetaris + NVIDIA loops, lineage, evidence gates, writeback, memory, evals, and the case viewer land on later days.
+On the committed sample:
 
-The Day 1 cassette is a **labelled** replay of the same tool path. Replace it after the first live Zetaris recording. It is not a hardcoded verdict.
+| Finding | Exhibit |
+|---|---|
+| Reported Manufacturing FY2018 is **1.89x** FY2017 (+$1.3T), outside the 0.67–1.5x band | metric history + baseline |
+| **322 duplicate rows** across the seven `edgar.*_revenue_table` tables; FY2018 holds 100 rows over 32 distinct period-end dates | duplication + bucket profile |
+| Apple's 11 `Revenues` facts all land in **fiscal_year 2018**, contributing **$1.21T of the $1.30T jump**; Target's `Revenues` concept stops in 2014 | per-company coverage + SEC companyconcept |
+| After one value per `(cik, annual period)`, Manufacturing is **1.125x** (+$49.6B), with **12/12** SEC frames parity within 0.5% | corrected series + SEC frames |
+| Tesla's short history and an ingestion gap are **eliminated**, not blamed | coverage + SEC count |
+
+The verdict gates, critic and repair land on Day 3. The Day-2 output is an evidence-backed hypothesis table, not an adjudication.
+
+The `SAMPLE_MODE` cassette is a **labelled replay** built from the committed SEC companyconcept/frames sample in `fixtures/edgar/`; replace it after the first live Zetaris recording. It is not a hardcoded verdict. The planner is deterministic when no NIM key is set.
 
 ## Setup
 
@@ -46,16 +56,17 @@ SAMPLE_MODE=true npm run cli -- investigate "is this jump real?"
 Docker (SAMPLE_MODE):
 
 ```bash
-docker compose -f docker/compose.yml up
+docker compose -f docker/compose.yml up --build
 ```
 
 ## Where each sponsor technology is used
 
 | Technology | Where it is used |
 |---|---|
-| **Zetaris** | All fact queries go through the REST SQL editor (`packages/tools`). Lineage inference, USL keys/DQ, schemastore views, and writeback are Day 2–4. The naive metric fixture is `analytics/sector_revenue_by_year.sql`. |
-| **Meterless** | World Model (lineage graph), H-MEM (case memory), Markovian (bounded context), Scout Intent (signed write contracts). Scaffolded under `packages/engines`. |
-| **NVIDIA Nemotron** | Lead/repair, critic, scout/scribe, embeddings, content-safety guard. Client lands with the investigator loop. |
+| **Zetaris** | All fact queries go through the REST SQL editor (`packages/tools`). `INFER SQLTABLE SOURCES/COLUMNS` builds the case lineage graph. USL keys/DQ, schemastore views, and writeback are Day 3–4. The naive metric fixture is `analytics/sector_revenue_by_year.sql`. |
+| **Meterless** | World Model (lineage graph), H-MEM (case memory), Markovian (bounded context), Scout Intent (signed write contracts). `packages/core/src/world-model.ts` is a local implementation of the node/edge contract; the vendored engines land under `packages/engines`. |
+| **NVIDIA Nemotron** | NIM client with retries, typed tool calls, and a per-case spend ledger (`packages/llm`). Model IDs are configured, never guessed. The deterministic evidence path runs without a key; the model planner attaches at the hypothesis step. |
+| **SEC EDGAR** | Independent second channel (`packages/tools/src/second-channel.ts`): companyconcept and frames APIs, rate-limited, with a contact User-Agent. |
 | **Cursor** | All implementation in Agent mode. Project rules live in `.cursor/rules/`. |
 
 ## Layout
@@ -63,14 +74,14 @@ docker compose -f docker/compose.yml up
 ```
 apps/cli/            investigate | rerun | replay
 apps/web/            case viewer (Day 5)
-packages/core/       exhibits, traces, cassettes, state machine
-packages/tools/      Zetaris client + SQL guard + D1 tools
-packages/agents/     multi-agent loop (later)
-packages/llm/        NIM + budget (later)
+packages/core/       exhibits, traces, cassettes, state machine, world-model
+packages/tools/      Zetaris client, SQL guard, lineage, SEC second channel
+packages/agents/     deterministic investigator + hypothesis evidence rules
+packages/llm/        NIM client + spend budget
 packages/engines/    Meterless engines (later)
 analytics/           declared metric-view SQL
+fixtures/edgar/      small SEC companyconcept/frames sample
 fixtures/cassettes/  labelled SAMPLE_MODE recordings
-evals/
 ```
 
 ## Hygiene
@@ -78,3 +89,4 @@ evals/
 - Secrets stay in `.env.local`
 - `EXHIBIT_A_BLUEPRINT.md` is private planning notes and is gitignored
 - Investigation SQL is read-only unless a signed, approved write contract exists
+- `npm test` and `npm run typecheck` must pass before a push

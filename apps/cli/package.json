@@ -7,6 +7,7 @@
     "exhibit-a": "./src/index.ts"
   },
   "dependencies": {
+    "@exhibit-a/agents": "workspace:*",
     "@exhibit-a/core": "workspace:*",
     "@exhibit-a/tools": "workspace:*"
   }

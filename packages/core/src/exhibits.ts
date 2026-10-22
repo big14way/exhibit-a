@@ -16,6 +16,7 @@ export function createExhibit(input: {
   source: string;
   transport: string;
   title: string;
+  tool?: string;
   sql?: string;
   args?: unknown;
   result: SqlResult | Record<string, unknown>;
@@ -31,6 +32,7 @@ export function createExhibit(input: {
     source: input.source,
     transport: input.transport,
     title: input.title,
+    tool: input.tool,
     sql: input.sql,
     sql_sha256,
     args: input.args,
@@ -71,7 +73,7 @@ export function findExhibit(root: string, exhibitId: string): Exhibit | undefine
 export function asSqlResult(
   columns: string[],
   rows: unknown[][],
-  cap = 200,
+  cap = 500,
 ): SqlResult {
   const truncated = rows.length > cap;
   const sliced = truncated ? rows.slice(0, cap) : rows;

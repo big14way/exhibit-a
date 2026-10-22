@@ -11,7 +11,7 @@ export function writeTrace(root: string, line: TraceLine): void {
   mkdirSync(dirname(path), { recursive: true });
   const payload = `${JSON.stringify(line)}\n`;
   appendFileSync(path, payload, "utf8");
-  process.stdout.write(payload);
+  if (process.env.EXHIBIT_A_QUIET !== "1") process.stdout.write(payload);
 }
 
 export function emitTrace(

@@ -1,6 +1,7 @@
 -- Declared naive analyst fixture. Anomalies are not planted; they come from
 -- how SEC companyconcept facts behave when summed by filing fiscal_year.
--- Do not replace this view in place. Corrections go to exhibit_a.*_v2.
+-- The dashboard window is FY2016-FY2019. Do not replace this view in place;
+-- corrections go to exhibit_a.*_v2.
 
 CREATE OR REPLACE SCHEMASTORE VIEW analytics.sector_revenue_by_year AS
 SELECT
@@ -24,4 +25,5 @@ FROM (
 ) f
 LEFT JOIN sic_edgar_usl s
   ON s.cik = f.cik
+WHERE f.fiscal_year BETWEEN 2016 AND 2019
 GROUP BY s.sic_division, f.fiscal_year

@@ -1,9 +1,18 @@
+name: exhibit-a
+
 services:
   exhibit-a:
-    image: node:20-bookworm
-    working_dir: /app
-    volumes:
-      - ..:/app
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     environment:
       SAMPLE_MODE: "true"
-    command: ["npm", "run", "cli", "--", "investigate", "is the FY2018 jump real?", "--metric", "analytics.sector_revenue_by_year"]
+    command:
+      - npm
+      - run
+      - cli
+      - --
+      - investigate
+      - is the FY2018 jump real?
+      - --metric
+      - analytics.sector_revenue_by_year

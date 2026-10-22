@@ -35,7 +35,7 @@ export class ZetarisClient {
       queryId: randomUUID(),
       sql: guarded,
       source: "SqlEditor",
-      limit: opts.limit ?? 200,
+      limit: opts.limit ?? 500,
     };
     const res = await fetch(url, {
       method: "POST",

@@ -1,0 +1,82 @@
+{
+  "frames": [
+    {
+      "frame": "CY2017",
+      "concept": "Revenues",
+      "unit": "USD",
+      "source_url": "https://data.sec.gov/api/xbrl/frames/us-gaap/Revenues/USD/CY2017.json",
+      "count": 6,
+      "rows": [
+        {
+          "cik": "0000037996",
+          "entity_name": "FORD MOTOR CO",
+          "value_usd": 156776000000
+        },
+        {
+          "cik": "0000051143",
+          "entity_name": "INTERNATIONAL BUSINESS MACHINES CORPORATION",
+          "value_usd": 79139000000
+        },
+        {
+          "cik": "0000104169",
+          "entity_name": "Walmart Inc.",
+          "value_usd": 500343000000
+        },
+        {
+          "cik": "0000320193",
+          "entity_name": "Apple Inc.",
+          "value_usd": 229234000000
+        },
+        {
+          "cik": "0001318605",
+          "entity_name": "Tesla, Inc.",
+          "value_usd": 11759000000
+        },
+        {
+          "cik": "0001341439",
+          "entity_name": "Oracle Corporation",
+          "value_usd": 39383000000
+        }
+      ]
+    },
+    {
+      "frame": "CY2018",
+      "concept": "Revenues",
+      "unit": "USD",
+      "source_url": "https://data.sec.gov/api/xbrl/frames/us-gaap/Revenues/USD/CY2018.json",
+      "count": 6,
+      "rows": [
+        {
+          "cik": "0000037996",
+          "entity_name": "FORD MOTOR CO",
+          "value_usd": 160338000000
+        },
+        {
+          "cik": "0000051143",
+          "entity_name": "INTERNATIONAL BUSINESS MACHINES CORPORATION",
+          "value_usd": 79591000000
+        },
+        {
+          "cik": "0000104169",
+          "entity_name": "Walmart Inc.",
+          "value_usd": 514405000000
+        },
+        {
+          "cik": "0000320193",
+          "entity_name": "Apple Inc.",
+          "value_usd": 265595000000
+        },
+        {
+          "cik": "0001318605",
+          "entity_name": "Tesla, Inc.",
+          "value_usd": 21461000000
+        },
+        {
+          "cik": "0001341439",
+          "entity_name": "Oracle Corporation",
+          "value_usd": 39506000000
+        }
+      ]
+    }
+  ]
+}

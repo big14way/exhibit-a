@@ -3,7 +3,6 @@ import { mkdirSync, writeFileSync, existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  advance,
   findExhibit,
   loadCassette,
   loadExhibits,
@@ -12,27 +11,20 @@ import {
   type CaseState,
   type Cassette,
 } from "@exhibit-a/core";
-import {
-  catalogSearch,
-  createRuntime,
-  describeObject,
-  fromEnv,
-  metricHistory,
-  profileColumn,
-  runSql,
-  ZetarisClient,
-} from "@exhibit-a/tools";
+import { createRuntime, fromEnv, rerunExhibit, ZetarisClient } from "@exhibit-a/tools";
+import { runInvestigation } from "@exhibit-a/agents";
 import { isSampleMode, loadEnv } from "./env.ts";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const DEFAULT_METRIC = "analytics.sector_revenue_by_year";
-const DEFAULT_CASSETTE = resolve(ROOT, "fixtures/cassettes/d1-metric-series.json");
+const DEFAULT_CASSETTE = resolve(ROOT, "fixtures/cassettes/d2-edgar-investigation.json");
+const DEFAULT_VIEW_SQL = resolve(ROOT, "analytics/sector_revenue_by_year.sql");
 
 function usage(): never {
   console.error(`Exhibit A — data-quality findings, not investment advice.
 
 Usage:
-  exhibit-a investigate "<question>" [--metric <view>] [--cassette <path>]
+  exhibit-a investigate "<question>" [--metric <view>] [--cassette <path>] [--grain <column>]
   exhibit-a rerun <exhibit_id>
   exhibit-a replay <case_id>
   exhibit-a bootstrap-metric
@@ -62,10 +54,12 @@ function takeFlag(args: string[], name: string): string | undefined {
 async function investigate(argv: string[]): Promise<void> {
   const metric = takeFlag(argv, "--metric") ?? DEFAULT_METRIC;
   const cassettePath = takeFlag(argv, "--cassette") ?? DEFAULT_CASSETTE;
+  const grain = takeFlag(argv, "--grain") ?? "fiscal_year";
   const question = argv.filter((a) => !a.startsWith("--")).join(" ").trim()
     || `is the movement in ${metric} real?`;
   const sampleMode = isSampleMode();
   const cassette: Cassette | undefined = sampleMode ? loadCassette(cassettePath) : undefined;
+  const viewSql = readFileSync(DEFAULT_VIEW_SQL, "utf8").trim();
 
   const state: CaseState = {
     id: newId("case"),
@@ -92,26 +86,47 @@ async function investigate(argv: string[]): Promise<void> {
     cassette,
   });
 
-  let current = advance(state, "SCOPING");
-  const catalog = await catalogSearch(rt, metric);
-  const described = await describeObject(rt, metric);
-  const adHoc = await runSql(rt, `SELECT * FROM ${metric}`);
-  const profiled = await profileColumn(rt, metric, "revenue_usd", "fiscal_year");
-  current = advance(current, "LINEAGE");
-  current = advance(current, "BASELINED");
-  const history = await metricHistory(rt, metric, "fiscal_year");
-
-  current.exhibits = [catalog, described, adHoc, profiled, history].map((x) => x.exhibit);
+  const current = await runInvestigation({
+    root: ROOT,
+    state,
+    rt,
+    viewSql,
+    grain,
+  });
   persistState(current);
 
   console.log(`\ncase ${current.id}  stage ${current.stage}  metric ${metric}`);
-  console.log("metric series:");
-  printTable(history.result.columns, history.result.rows as unknown[][]);
+  if (current.baseline?.onset) {
+    const onset = current.baseline.onset;
+    console.log(`symptom: ${current.baseline.explanation}`);
+    console.log(
+      `walked:  ${onset.prior_period} ${formatUsd(onset.prior_value)} -> ${onset.period} ${formatUsd(onset.value)}`,
+    );
+  } else {
+    console.log(`symptom: ${current.baseline?.explanation ?? "not baselined"}`);
+  }
+
+  console.log("\nmetric series:");
+  const table = metricTable(current);
+  printTable(table.columns, table.rows);
+
+  console.log("\nhypotheses:");
+  for (const hypothesis of current.hypotheses) {
+    const share = hypothesis.share === undefined ? "" : `  share ${(hypothesis.share * 100).toFixed(1)}%`;
+    console.log(`  [${hypothesis.status.padEnd(10)}] ${hypothesis.cause}${share}`);
+    console.log(`      ${hypothesis.note ?? hypothesis.statement}`);
+    console.log(`      exhibits: ${hypothesis.exhibit_ids.join(", ")}`);
+  }
+
   console.log("\nexhibits:");
   for (const ex of current.exhibits) {
-    console.log(`  ${ex.id}  ${ex.kind.padEnd(10)}  ${ex.title}  sha ${ex.result_sha256.slice(0, 12)}  ${ex.rerun}`);
+    console.log(`  ${ex.id}  ${ex.kind.padEnd(14)}  ${ex.title}  sha ${ex.result_sha256.slice(0, 12)}  ${ex.rerun}`);
   }
   console.log(`\n${current.exhibits.length} exhibits written to logs/${current.id}/`);
+
+  const confirmed = current.hypotheses.filter((row) => row.status === "confirmed").length;
+  const eliminated = current.hypotheses.filter((row) => row.status === "eliminated").length;
+  console.log(`${confirmed} confirmed, ${eliminated} eliminated, ${current.hypotheses.filter((row) => row.status === "open").length} open. Verdict gates land on Day 3.`);
 }
 
 async function rerun(exhibitId?: string): Promise<void> {
@@ -119,10 +134,6 @@ async function rerun(exhibitId?: string): Promise<void> {
   const exhibit = findExhibit(ROOT, exhibitId);
   if (!exhibit) {
     console.error(`exhibit not found: ${exhibitId}`);
-    process.exit(1);
-  }
-  if (!exhibit.sql) {
-    console.error("exhibit has no SQL to re-run");
     process.exit(1);
   }
   const sampleMode = isSampleMode();
@@ -134,12 +145,11 @@ async function rerun(exhibitId?: string): Promise<void> {
     cassette,
   });
   rt.agent = "Rerun";
-  const again = await runSql(rt, exhibit.sql);
-  const same = again.exhibit.result_sha256 === exhibit.result_sha256;
-  console.log(`original ${exhibit.result_sha256}`);
-  console.log(`rerun    ${again.exhibit.result_sha256}`);
-  console.log(same ? "MATCH" : "DRIFT");
-  process.exit(same ? 0 : 1);
+  const again = await rerunExhibit(rt, exhibit);
+  console.log(`original ${again.original}`);
+  console.log(`rerun    ${again.rerun}`);
+  console.log(again.same ? "MATCH" : "DRIFT");
+  process.exit(again.same ? 0 : 1);
 }
 
 async function replay(caseId?: string): Promise<void> {
@@ -189,6 +199,21 @@ function persistState(state: CaseState): void {
 function printTable(columns: string[], rows: unknown[][]): void {
   console.log(columns.join("\t"));
   for (const row of rows) console.log(row.map((c) => String(c)).join("\t"));
+}
+
+function metricTable(state: CaseState): { columns: string[]; rows: unknown[][] } {
+  const exhibit = state.exhibits.find((row) => row.tool === "metric_history");
+  if (!exhibit) return { columns: [], rows: [] };
+  const result = exhibit.result as { columns?: string[]; rows?: unknown[][] };
+  return { columns: result.columns ?? [], rows: result.rows ?? [] };
+}
+
+function formatUsd(value: number): string {
+  const sign = value < 0 ? "-" : "";
+  const abs = Math.abs(value);
+  if (abs >= 1e9) return `${sign}$${(abs / 1e9).toFixed(1)}B`;
+  if (abs >= 1e6) return `${sign}$${(abs / 1e6).toFixed(1)}M`;
+  return `${sign}$${abs.toFixed(0)}`;
 }
 
 main().catch((err) => {

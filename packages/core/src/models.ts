@@ -52,6 +52,7 @@ export type Exhibit = {
   source: string;
   transport: string;
   title: string;
+  tool?: string;
   sql?: string;
   sql_sha256?: string;
   args?: unknown;
@@ -65,8 +66,64 @@ export type Exhibit = {
 export type Hypothesis = {
   id: string;
   statement: string;
+  cause: string;
+  blamed: string[];
   status: "open" | "confirmed" | "eliminated";
   exhibit_ids: string[];
+  note?: string;
+  share?: number;
+};
+
+export type LineageSource = {
+  source_table: string;
+  source_kind: string;
+};
+
+export type LineageColumn = {
+  target_column: string;
+  source_table: string;
+  source_column: string;
+};
+
+export type LineageEdge = {
+  from: string;
+  to: string;
+  kind: "source" | "column";
+  column?: string;
+};
+
+export type LineageGraph = {
+  case_id: string;
+  view: string;
+  built_at: string;
+  nodes: string[];
+  edges: LineageEdge[];
+  sources: LineageSource[];
+  columns: LineageColumn[];
+};
+
+export type BaselinePoint = {
+  segment: string;
+  period: number | string;
+  value: number;
+};
+
+export type BaselineComparison = {
+  metric: string;
+  grain: string;
+  band: { lo: number; hi: number };
+  onset?: {
+    segment: string;
+    period: number | string;
+    prior_period: number | string;
+    value: number;
+    prior_value: number;
+    ratio: number;
+    delta: number;
+  };
+  segments: number;
+  periods: number;
+  explanation: string;
 };
 
 export type CauseShare = {
@@ -112,6 +169,7 @@ export type CaseState = {
   cassette_recorded_at?: string;
   exhibits: Exhibit[];
   hypotheses: Hypothesis[];
+  baseline?: BaselineComparison;
   verdict?: Verdict;
   error?: string;
 };
