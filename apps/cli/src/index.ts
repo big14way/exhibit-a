@@ -3,16 +3,24 @@ import { mkdirSync, writeFileSync, existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  executeWriteContract,
   findExhibit,
   loadCassette,
   loadExhibits,
   newId,
   sampleBanner,
+  signContract,
   summarizeVerdict,
   type CaseState,
   type Cassette,
 } from "@exhibit-a/core";
-import { createRuntime, fromEnv, rerunExhibit, ZetarisClient } from "@exhibit-a/tools";
+import {
+  createRuntime,
+  fromEnv,
+  repairContractSecret,
+  rerunExhibit,
+  ZetarisClient,
+} from "@exhibit-a/tools";
 import { runInvestigation } from "@exhibit-a/agents";
 import { isSampleMode, loadEnv } from "./env.ts";
 
@@ -228,8 +236,29 @@ async function bootstrapMetric(): Promise<void> {
     throw new Error("live bootstrap needs ZETARIS_REST_URL and ZETARIS_API_KEY");
   }
   const client = new ZetarisClient(cfg);
-  await client.runSql(sql, { mode: "write" });
-  console.log("applied analytics.sector_revenue_by_year");
+  const statement = sql.trim().replace(/;+\s*$/, "");
+  const secret = repairContractSecret(false);
+  const contract = signContract(
+    {
+      case_id: newId("bootstrap"),
+      intent: "Operator bootstrap of the declared analytics metric view",
+      scope: ["analytics.sector_revenue_by_year"],
+      statements: [statement],
+      cost_ceiling: 0,
+      ttl_ms: 5 * 60 * 1000,
+      signer: "OperatorCLI",
+      approved: true,
+      approved_by: "operator:cli",
+    },
+    secret,
+  );
+  await executeWriteContract(
+    contract,
+    secret,
+    (sqlText) => client.runSql(sqlText, { mode: "write" }),
+    { requireApproved: true, scope: "analytics.sector_revenue_by_year" },
+  );
+  console.log(`applied analytics.sector_revenue_by_year (contract ${contract.id})`);
 }
 
 function persistState(state: CaseState): void {

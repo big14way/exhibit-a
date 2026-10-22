@@ -68,7 +68,7 @@ The `SAMPLE_MODE` cassette is a **labelled replay** built from the committed SEC
 - Node 20+
 - `SAMPLE_MODE=true` needs no external services.
 - For live mode, copy `.env.example` to `.env.local` (gitignored, mode 600), set `SAMPLE_MODE=false`, and fill `ZETARIS_REST_URL`, `ZETARIS_API_KEY`, `ZETARIS_ORG_ID`, `ZETARIS_SIC_TABLE`, `EXHIBIT_A_CONTRACT_SECRET`, and `SEC_USER_AGENT`.
-- Live Zetaris needs the EDGAR tables loaded and the `analytics.sector_revenue_by_year` / `edgar.sic_edgar_usl` schema-store views created. The onboarding recipe is in Zetaris `getting-started`.
+- Live Zetaris needs the EDGAR tables loaded and the `analytics.sector_revenue_by_year` / `edgar.sic_edgar_usl` schema-store views created. The onboarding recipe is in Zetaris `getting-started`. `npm run cli -- bootstrap-metric` applies the declared metric view as an operator-approved, signed bootstrap write; the repair path never modifies it.
 - Zetaris runs separately; this repo does not embed the platform.
 - No local GPU.
 
