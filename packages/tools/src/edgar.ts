@@ -89,12 +89,15 @@ GROUP BY fiscal_year
 ORDER BY fiscal_year`;
 }
 
-export function canonicalFactsSql(): string {
+export function canonicalFactsSql(sicTable = "sic_edgar_usl"): string {
+  if (!/^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)?$/.test(sicTable)) {
+    throw new Error(`invalid SIC table name: ${sicTable}`);
+  }
   return `SELECT s.sic_division, f.cik, f.period_start, f.period_end, f.period_frame, f.value_usd, f.filed_date
 FROM (
   ${unionFactsSql()}
 ) f
-LEFT JOIN sic_edgar_usl s ON s.cik = f.cik
+LEFT JOIN ${sicTable} s ON s.cik = f.cik
 ORDER BY f.cik, f.period_end, f.filed_date`;
 }
 

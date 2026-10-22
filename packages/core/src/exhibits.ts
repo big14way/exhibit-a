@@ -73,7 +73,10 @@ export function findExhibit(root: string, exhibitId: string): Exhibit | undefine
 export function asSqlResult(
   columns: string[],
   rows: unknown[][],
-  cap = 500,
+  // The live canonical fact query spans the full company history (~1.3k
+  // rows). A 500-row cap would silently feed a truncated series into the
+  // counterfactual while claiming the query succeeded.
+  cap = 5000,
 ): SqlResult {
   const truncated = rows.length > cap;
   const sliced = truncated ? rows.slice(0, cap) : rows;

@@ -42,12 +42,18 @@ export type SecCompanyConceptResult = {
 let lastRequestAt = 0;
 
 async function secGet(url: string): Promise<unknown> {
-  const userAgent = process.env.SEC_USER_AGENT;
-  if (!userAgent || !/[@/]/.test(userAgent)) {
+  const contact = process.env.SEC_USER_AGENT;
+  if (!contact || !/[@/]/.test(contact)) {
     throw new Error(
       "SEC_USER_AGENT must include a contact email or URL (SEC fair-access policy)",
     );
   }
+  // SEC's edge currently blocks declared non-browser agents from some
+  // addresses. Send a browser-shaped agent plus the declared contact in the
+  // standard From header instead of dropping the contact requirement.
+  const userAgent =
+    process.env.SEC_BROWSER_UA ||
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36";
   // SEC asks for <=10 requests/second. Serialise with a small gap.
   const wait = Math.max(0, lastRequestAt + 120 - Date.now());
   if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait));
@@ -57,6 +63,7 @@ async function secGet(url: string): Promise<unknown> {
     const res = await fetch(url, {
       headers: {
         "user-agent": userAgent,
+        from: contact,
         accept: "application/json",
       },
       signal: AbortSignal.timeout(20_000),

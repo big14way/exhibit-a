@@ -35,7 +35,9 @@ export class ZetarisClient {
       queryId: randomUUID(),
       sql: guarded,
       source: "SqlEditor",
-      limit: opts.limit ?? 500,
+      // The canonical fact query spans the full company history; 500 rows
+      // truncates it on a live instance and silently drops annual facts.
+      limit: opts.limit ?? 5000,
     };
     const res = await fetch(url, {
       method: "POST",
@@ -83,7 +85,7 @@ function normalizeRun(raw: Record<string, unknown>): ZetarisRunResult {
 }
 
 function extractColumns(raw: Record<string, unknown>): string[] {
-  const schema = raw.schema ?? raw.columns ?? raw.columnNames;
+  const schema = raw.schema ?? raw.columns ?? raw.columnNames ?? raw.headers;
   if (Array.isArray(schema)) {
     return schema.map((item) => {
       if (typeof item === "string") return item;

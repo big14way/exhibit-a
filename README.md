@@ -15,9 +15,12 @@ Every claim carries an *exhibit*: the exact SQL that ran, its result hash, and a
 
 Outputs are **data-quality findings on public filings, not investment advice.**
 
-## Status (Day 3 verdict layer)
+## Status (Day 3 verdict layer; live path verified)
 
-Working now, with `SAMPLE_MODE=true` (default):
+Working in two modes:
+
+- `SAMPLE_MODE=true` (default) replays the committed cassette; no Zetaris, NVIDIA, or GPU required.
+- `SAMPLE_MODE=false` runs the same investigator against a local Zetaris instance.
 
 ```bash
 npm install
@@ -39,22 +42,39 @@ On the committed sample:
 | Corrected Manufacturing is **1.125x** (+$49.6B), with **12/12** SEC frames parity within 0.5% | corrected series + SEC frames |
 | Tesla's short history and an ingestion gap are **eliminated**, not blamed | coverage + SEC count |
 
-**Verdict: `MIXED (filing_year_duplication=96.2%, real_change=3.8%)`, gate pass, unexplained 0.0%.**
+**Sample verdict: `MIXED (filing_year_duplication=96.2%, real_change=3.8%)`, gate pass, unexplained 0.0%.**
 
-The model critic is skipped without a NIM key, and the code gate is final: no model prose can promote a cause. The verifier, repair proposal and shadow view land next. The output is an adjudication on data quality, not investment advice.
+### Live Zetaris verification
 
-The `SAMPLE_MODE` cassette is a **labelled replay** built from the committed SEC companyconcept/frames sample in `fixtures/edgar/`; replace it after the first live Zetaris recording. It is not a hardcoded verdict. The planner is deterministic when no NIM key is set.
+The same investigation has been run end to end with `SAMPLE_MODE=false` against a local Zetaris instance:
+
+- 15 exhibits, 3 confirmed, 2 eliminated, 0 open.
+- Live metric values match the sample: Manufacturing FY2017 **$1,455.9B** → FY2018 **$2,750.9B**.
+- The live canonical query returns **1,298 fact rows**. The seven `SEC_DATA.*_revenue_facts` inputs hold **936 duplicate rows** across full history; FY2018 holds **100 rows over 32 period ends**.
+- SEC frames parity is **12/12** within 0.5%.
+- Live verdict: **`MIXED (filing_year_duplication=96.2%, real_change=3.8%)`**, gate pass, unexplained 0.0%.
+
+Live `INFER SQLTABLE` resolves the `edgar.*` schema-store views down to seven `SEC_DATA.*_revenue_facts` source tables; the world model has 8 nodes / 7 edges. Column-level lineage from the live parser is coarser (`parent` is null), so the gate uses source-level lineage.
+
+The NIM client and spend ledger are in `packages/llm`, but the deterministic evidence path does not call a model yet. Without `NVIDIA_API_KEY` plus `NIM_CRITIC_MODEL`/`NIM_LEAD_MODEL`, the critic checkpoint is marked skipped; the code gate is final either way. The verifier, repair proposal and shadow view land next. The output is an adjudication on data quality, not investment advice.
+
+The `SAMPLE_MODE` cassette is a **labelled replay** built from the committed SEC companyconcept/frames sample in `fixtures/edgar/`. It remains the deterministic fixture replay; the live run is kept in gitignored `logs/` because live and sample SQL forms differ. It is not a hardcoded verdict. The planner is deterministic when no NIM model is configured.
 
 ## Setup
 
 - Node 20+
-- Copy `.env.example` to `.env.local` for live mode (`SAMPLE_MODE=false`, Zetaris URL and key)
-- Zetaris runs separately; this repo does not embed the platform
-- No local GPU
+- `SAMPLE_MODE=true` needs no external services.
+- For live mode, copy `.env.example` to `.env.local` (gitignored, mode 600), set `SAMPLE_MODE=false`, and fill `ZETARIS_REST_URL`, `ZETARIS_API_KEY`, `ZETARIS_ORG_ID`, `ZETARIS_SIC_TABLE`, and `SEC_USER_AGENT`.
+- Live Zetaris needs the EDGAR tables loaded and the `analytics.sector_revenue_by_year` / `edgar.sic_edgar_usl` schema-store views created. The onboarding recipe is in Zetaris `getting-started`.
+- Zetaris runs separately; this repo does not embed the platform.
+- No local GPU.
 
 ```bash
 SAMPLE_MODE=true npm run cli -- investigate "is this jump real?"
+SAMPLE_MODE=false npm run cli -- investigate "is the FY2018 jump real?"
 ```
+
+SEC's edge currently rejects some declared non-browser agents. The live second channel sends a browser-shaped `SEC_BROWSER_UA` (or a default) and keeps the required contact in the `From` header from `SEC_USER_AGENT`.
 
 Docker (SAMPLE_MODE):
 
@@ -66,10 +86,10 @@ docker compose -f docker/compose.yml up --build
 
 | Technology | Where it is used |
 |---|---|
-| **Zetaris** | All fact queries go through the REST SQL editor (`packages/tools`). `INFER SQLTABLE SOURCES/COLUMNS` builds the case lineage graph. USL keys/DQ, schemastore views, and writeback are later. The naive metric fixture is `analytics/sector_revenue_by_year.sql`. |
+| **Zetaris** | All fact queries go through the REST SQL editor (`packages/tools`). `INFER SQLTABLE SOURCES/COLUMNS` builds the case lineage graph; live `INFER` resolves schema-store views to `SEC_DATA.*`. Schemastore views are used live; USL keys/DQ and writeback are later. The naive metric fixture is `analytics/sector_revenue_by_year.sql`. |
 | **Meterless** | World Model (lineage graph), H-MEM (case memory), Markovian (bounded context), Scout Intent (signed write contracts). `packages/core/src/world-model.ts` is a local implementation of the node/edge contract; the vendored engines land under `packages/engines`. |
-| **NVIDIA Nemotron** | NIM client with retries, typed tool calls, and a per-case spend ledger (`packages/llm`). Model IDs are configured, never guessed. The deterministic evidence path runs without a key; the model planner attaches at the hypothesis step. |
-| **SEC EDGAR** | Independent second channel (`packages/tools/src/second-channel.ts`): companyconcept and frames APIs, rate-limited, with a contact User-Agent. |
+| **NVIDIA Nemotron** | NIM client with retries, typed tool calls, and a per-case spend ledger (`packages/llm`). Model IDs are configured, never guessed. The deterministic evidence path runs without a key; model critique is optional and not required for a verdict. |
+| **SEC EDGAR** | Independent second channel (`packages/tools/src/second-channel.ts`): companyconcept and frames APIs, rate-limited, with a browser-shaped User-Agent and declared `From` contact. |
 | **Cursor** | All implementation in Agent mode. Project rules live in `.cursor/rules/`. |
 
 ## Layout
@@ -89,7 +109,7 @@ fixtures/cassettes/  labelled SAMPLE_MODE recordings
 
 ## Hygiene
 
-- Secrets stay in `.env.local`
+- Secrets stay in `.env.local` (gitignored, mode 600)
 - `EXHIBIT_A_BLUEPRINT.md` is private planning notes and is gitignored
 - Investigation SQL is read-only unless a signed, approved write contract exists
 - `npm test` and `npm run typecheck` must pass before a push

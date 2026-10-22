@@ -20,7 +20,9 @@ export async function describeObject(
   rt: ToolRuntime,
   obj: string,
 ): Promise<{ exhibit: Exhibit; result: SqlResult }> {
-  const sql = `DESCRIBE DATASOURCE TABLE ${obj}`;
+  // The fixture cassette was recorded with Zetaris's datasource-table form.
+  // Live schema-store views are described with plain Spark DESCRIBE.
+  const sql = rt.sampleMode ? `DESCRIBE DATASOURCE TABLE ${obj}` : `DESCRIBE ${obj}`;
   return executeSqlTool({
     rt,
     tool: "describe",

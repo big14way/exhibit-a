@@ -47,7 +47,13 @@ export function adjudicate(input: {
   const artifactClaim = {
     cause: "filing_year_duplication",
     kind: "artifact" as const,
-    blamed: [...EDGAR_COMPANIES.map((company) => company.table), input.state.metric],
+    // Live INFER resolves the edgar schema-store views to their raw SEC
+    // tables, while the recorded sample keeps the edgar view names.
+    blamed: [
+      ...EDGAR_COMPANIES.map((company) => company.table),
+      input.state.metric,
+      "SEC_DATA.*",
+    ],
     exhibit_ids: [
       ...(artifactHypothesis?.exhibit_ids ?? []),
       ...secondChannels,
@@ -75,12 +81,16 @@ export function adjudicate(input: {
     });
   }
 
+  const critiqueConfigured = Boolean(
+    process.env.NVIDIA_API_KEY &&
+      (process.env.NIM_CRITIC_MODEL ?? process.env.NIM_LEAD_MODEL),
+  );
   const notes = [
     "Concept switch / missing history is confirmed as a data-quality finding but carries no separate share: deduplicating by period recovers Apple's prior-year facts, so it does not add to the reported jump.",
     "Tesla short history and an ingestion gap were eliminated with exhibits, not left as possibilities.",
-    process.env.NVIDIA_API_KEY
-      ? "Defense Counsel model critique was available; the code gate below is still final."
-      : "Defense Counsel model critique did not run (no NVIDIA_API_KEY); the code gate is final and no model prose can promote a cause.",
+    critiqueConfigured
+      ? "Defense Counsel model critique is configured; the deterministic code gate is final."
+      : "Defense Counsel model critique did not run (no NVIDIA_API_KEY or NIM model); the code gate is final and no model prose can promote a cause.",
     input.state.sample_mode
       ? "SAMPLE_MODE: tool results replayed from the labelled cassette; no live inference."
       : "Live mode.",

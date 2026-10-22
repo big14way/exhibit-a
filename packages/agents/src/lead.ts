@@ -83,7 +83,13 @@ export async function runInvestigation(
   const coverageResult = await runSql(rt, companyBucketsSql(), "company coverage by fiscal year");
   const duplicationResult = await runSql(rt, duplicationSql(), "duplicate rows per company");
   const bucketResult = await runSql(rt, bucketSql(), "fiscal-year bucket profile");
-  const canonicalResult = await runSql(rt, canonicalFactsSql(), "annual fact rows for the corrected series");
+  const canonicalResult = await runSql(
+    rt,
+    canonicalFactsSql(
+      rt.sampleMode ? undefined : process.env.ZETARIS_SIC_TABLE || undefined,
+    ),
+    "annual fact rows for the corrected series",
+  );
   const canonical = canonicalSeries(rt, canonicalResult);
   exhibits.push(
     coverageResult.exhibit,
@@ -155,6 +161,10 @@ export async function runInvestigation(
   if (cf) exhibits.push(cf.exhibit);
 
   state = advance(state, "CRITIQUED");
+  const critiqueConfigured = Boolean(
+    process.env.NVIDIA_API_KEY &&
+      (process.env.NIM_CRITIC_MODEL ?? process.env.NIM_LEAD_MODEL),
+  );
   emitTrace(input.root, {
     case_id: state.id,
     agent_name: "DefenseCounsel",
@@ -162,9 +172,9 @@ export async function runInvestigation(
     input_summary: cf
       ? `counterfactual explains ${(cf.result.explained_share * 100).toFixed(1)}%`
       : "no counterfactual available",
-    output_summary: process.env.NVIDIA_API_KEY
-      ? "model critique available; code gate is final"
-      : "model critique skipped (no key); code gate is final",
+    output_summary: critiqueConfigured
+      ? "model critique configured; code gate is final"
+      : "model critique skipped (no key or model); code gate is final",
     status: "success",
     latency_ms: 0,
     exhibit_ids: cf ? [cf.exhibit.id] : [],

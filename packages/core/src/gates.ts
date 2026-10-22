@@ -64,9 +64,13 @@ export function confirmCause(claim: CauseClaim, ctx: GateContext): GateResult {
     if (!ctx.graph) {
       failures.push({ rule: "located", detail: "no lineage graph was built for this case" });
     } else {
+      // The symptom view itself is not a cause. Require a real upstream
+      // source so an empty graph cannot pass by blaming the metric.
       const located = claim.blamed.some((name) =>
         expandWildcard(name, ctx.graph as LineageGraph).some(
-          (node) => node === ctx.graph?.view || graphUpstream(ctx.graph as LineageGraph, node, ctx.graph?.view ?? ""),
+          (node) =>
+            node !== ctx.graph?.view &&
+            graphUpstream(ctx.graph as LineageGraph, node, ctx.graph?.view ?? ""),
         ),
       );
       if (!located) {

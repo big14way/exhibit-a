@@ -112,6 +112,18 @@ test("an artifact with no lineage graph is downgraded", () => {
   assert.ok(gate.failures.some((failure) => failure.rule.endsWith("located")));
 });
 
+test("an artifact that blames only the symptom view fails the located rule", () => {
+  const { gate } = buildVerdict({
+    causes: [claim({ blamed: ["analytics.sector_revenue_by_year"] })],
+    exhibits: [counterfactual, secondChannel, history],
+    graph: GRAPH,
+    band: { lo: 0.67, hi: 1.5 },
+    symptom: symptom(),
+  });
+  assert.equal(gate.ok, false);
+  assert.ok(gate.failures.some((failure) => failure.rule.endsWith("located")));
+});
+
 test("an artifact blamed on an unrelated table fails the located rule", () => {
   const { gate } = buildVerdict({
     causes: [claim({ blamed: ["edgar.unknown_table"] })],

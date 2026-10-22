@@ -10,10 +10,28 @@ export function lineageColumnsSql(viewSql: string): string {
   return `INFER SQLTABLE COLUMNS SPEC ${viewSql}`;
 }
 
+/**
+ * `INFER SQLTABLE` parses a query, not a `CREATE SCHEMASTORE VIEW`
+ * declaration. Keep the fixture and its cassette stable; for live mode,
+ * extract the SELECT body and point the unqualified SIC table at the
+ * schema-store copy that actually exists in the local instance.
+ */
+export function normalizeViewDeclaration(
+  viewSql: string,
+  sicTable = "edgar.sic_edgar_usl",
+): string {
+  const declaration = viewSql.match(
+    /CREATE\s+(?:OR\s+REPLACE\s+)?SCHEMASTORE\s+VIEW\s+[^\n]+?\s+AS\s+([\s\S]+)$/i,
+  );
+  const query = (declaration?.[1] ?? viewSql).trim();
+  return query.replace(/(?<!\.)\bsic_edgar_usl\b/g, sicTable);
+}
+
 export function parseLineageSources(result: SqlResult): LineageSource[] {
   const tableIndex = Math.max(
     result.columns.indexOf("source_table"),
     result.columns.indexOf("table"),
+    result.columns.indexOf("datasource"),
   );
   const kindIndex = Math.max(
     result.columns.indexOf("source_kind"),
@@ -51,8 +69,14 @@ export async function inferLineage(
   view: string,
   viewSql: string,
 ): Promise<{ exhibits: Exhibit[]; graph: LineageGraph }> {
-  const sourcesSql = lineageSourcesSql(viewSql);
-  const columnsSql = lineageColumnsSql(viewSql);
+  const effectiveViewSql = rt.sampleMode
+    ? viewSql
+    : normalizeViewDeclaration(
+        viewSql,
+        process.env.ZETARIS_SIC_TABLE || "edgar.sic_edgar_usl",
+      );
+  const sourcesSql = lineageSourcesSql(effectiveViewSql);
+  const columnsSql = lineageColumnsSql(effectiveViewSql);
 
   const sources = await executeSqlTool({
     rt,
