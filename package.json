@@ -10,10 +10,13 @@
   },
   "scripts": {
     "exhibit-a": "tsx apps/cli/src/index.ts",
+    "cli": "tsx apps/cli/src/index.ts",
     "investigate": "tsx apps/cli/src/index.ts investigate",
     "rerun": "tsx apps/cli/src/index.ts rerun",
     "replay": "tsx apps/cli/src/index.ts replay",
-    "typecheck": "tsc -p tsconfig.base.json --noEmit"
+    "cassette:d1": "tsx scripts/build-d1-cassette.ts",
+    "test": "node --import tsx --test packages/core/src/*.test.ts packages/tools/src/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@types/node": "^24.7.2",

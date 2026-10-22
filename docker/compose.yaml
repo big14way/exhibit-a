@@ -1,0 +1,14 @@
+services:
+  exhibit-a:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      SAMPLE_MODE: "true"
+    command:
+      - pnpm
+      - exhibit-a
+      - investigate
+      - is the FY2018 jump real?
+      - --metric
+      - analytics.sector_revenue_by_year

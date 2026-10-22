@@ -1,0 +1,299 @@
+{
+  "id": "cassette_d1_bootstrap",
+  "recorded_at": "2026-10-22",
+  "label": "labelled SAMPLE_MODE cassette from the D1 tool path (replace after first live Zetaris recording)",
+  "entries": [
+    {
+      "tool": "catalog_search",
+      "args_sha256": "f8a92a14623f3db6992604bb4c3885c7095ae37c3e55dea22c9d050056c5a2a2",
+      "result": {
+        "columns": [
+          "database"
+        ],
+        "rows": [
+          [
+            "lightning"
+          ],
+          [
+            "analytics"
+          ],
+          [
+            "edgar"
+          ]
+        ],
+        "row_count": 3,
+        "truncated": false
+      }
+    },
+    {
+      "tool": "describe",
+      "args_sha256": "88e37dc73eb333c509c95a8699f1edca50c28078a31d4b675c99fad3295b770c",
+      "result": {
+        "columns": [
+          "col_name",
+          "data_type"
+        ],
+        "rows": [
+          [
+            "sic_division",
+            "string"
+          ],
+          [
+            "fiscal_year",
+            "int"
+          ],
+          [
+            "revenue_usd",
+            "double"
+          ]
+        ],
+        "row_count": 3,
+        "truncated": false
+      }
+    },
+    {
+      "tool": "run_sql",
+      "args_sha256": "837c5112d505a7ab84eda5cb9e210f43f8a5f2bff498c7e1ddfbc03767589e08",
+      "result": {
+        "columns": [
+          "sic_division",
+          "fiscal_year",
+          "revenue_usd"
+        ],
+        "rows": [
+          [
+            "Retail Trade",
+            2017,
+            480000000000
+          ],
+          [
+            "Retail Trade",
+            2018,
+            510000000000
+          ],
+          [
+            "Manufacturing",
+            2017,
+            220000000000
+          ],
+          [
+            "Manufacturing",
+            2018,
+            390000000000
+          ],
+          [
+            "Manufacturing",
+            2019,
+            405000000000
+          ]
+        ],
+        "row_count": 5,
+        "truncated": false
+      }
+    },
+    {
+      "tool": "profile",
+      "args_sha256": "8d5fe850df650dcd874996f44ac18a56aead9ec5547a7c3b4b61eb509b98d440",
+      "result": {
+        "columns": [
+          "segment",
+          "n",
+          "non_null",
+          "min_v",
+          "max_v"
+        ],
+        "rows": [
+          [
+            2017,
+            2,
+            2,
+            220000000000,
+            480000000000
+          ],
+          [
+            2018,
+            2,
+            2,
+            390000000000,
+            510000000000
+          ],
+          [
+            2019,
+            1,
+            1,
+            405000000000,
+            405000000000
+          ]
+        ],
+        "row_count": 3,
+        "truncated": false
+      }
+    },
+    {
+      "tool": "metric_history",
+      "args_sha256": "48f0d270f6e56466c24670a41d6814a0b3db2993d9a0e04b9b382f1289f8691f",
+      "result": {
+        "columns": [
+          "sic_division",
+          "fiscal_year",
+          "revenue_usd"
+        ],
+        "rows": [
+          [
+            "Retail Trade",
+            2017,
+            480000000000
+          ],
+          [
+            "Retail Trade",
+            2018,
+            510000000000
+          ],
+          [
+            "Manufacturing",
+            2017,
+            220000000000
+          ],
+          [
+            "Manufacturing",
+            2018,
+            390000000000
+          ],
+          [
+            "Manufacturing",
+            2019,
+            405000000000
+          ]
+        ],
+        "row_count": 5,
+        "truncated": false
+      }
+    },
+    {
+      "tool": "run_sql",
+      "args_sha256": "0447779e56c7d01bd3e29d560a01c395e79694312fbed555cd66bfe158366a86",
+      "result": {
+        "columns": [
+          "database"
+        ],
+        "rows": [
+          [
+            "lightning"
+          ],
+          [
+            "analytics"
+          ],
+          [
+            "edgar"
+          ]
+        ],
+        "row_count": 3,
+        "truncated": false
+      }
+    },
+    {
+      "tool": "run_sql",
+      "args_sha256": "bb89f207aacaf558d6c1c410c1484f566040e7bcd1705ed12ca75a7289c5f311",
+      "result": {
+        "columns": [
+          "col_name",
+          "data_type"
+        ],
+        "rows": [
+          [
+            "sic_division",
+            "string"
+          ],
+          [
+            "fiscal_year",
+            "int"
+          ],
+          [
+            "revenue_usd",
+            "double"
+          ]
+        ],
+        "row_count": 3,
+        "truncated": false
+      }
+    },
+    {
+      "tool": "run_sql",
+      "args_sha256": "5f9e5dcbd8cdf16a72d9ba2dc8db20238ed12b8aff2eaf00fbb3e4878df18189",
+      "result": {
+        "columns": [
+          "segment",
+          "n",
+          "non_null",
+          "min_v",
+          "max_v"
+        ],
+        "rows": [
+          [
+            2017,
+            2,
+            2,
+            220000000000,
+            480000000000
+          ],
+          [
+            2018,
+            2,
+            2,
+            390000000000,
+            510000000000
+          ],
+          [
+            2019,
+            1,
+            1,
+            405000000000,
+            405000000000
+          ]
+        ],
+        "row_count": 3,
+        "truncated": false
+      }
+    },
+    {
+      "tool": "run_sql",
+      "args_sha256": "96784b0ba591bd7253454c551b4c273e1faaa675f88b7f52a07280024481d068",
+      "result": {
+        "columns": [
+          "sic_division",
+          "fiscal_year",
+          "revenue_usd"
+        ],
+        "rows": [
+          [
+            "Retail Trade",
+            2017,
+            480000000000
+          ],
+          [
+            "Retail Trade",
+            2018,
+            510000000000
+          ],
+          [
+            "Manufacturing",
+            2017,
+            220000000000
+          ],
+          [
+            "Manufacturing",
+            2018,
+            390000000000
+          ],
+          [
+            "Manufacturing",
+            2019,
+            405000000000
+          ]
+        ],
+        "row_count": 5,
+        "truncated": false
+      }
+    }
+  ]
+}

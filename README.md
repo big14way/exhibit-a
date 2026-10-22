@@ -1,102 +1,80 @@
 # Exhibit A
 
-A number in a dashboard moved, and someone asks **is this real?**
+A number in a dashboard moved, and someone asks: **is this real?**
 
 Exhibit A finds the fragmented sources behind that number, puts every possible explanation on trial, and returns one of:
 
-- **data artifact** — duplication, a missing source, a concept/unit/schema change, or an ingestion gap
+- **data artifact** (duplication, a missing source, a concept/unit/schema change, or an ingestion gap)
 - **real change**
 - **mixed**, with each cause's share
 - **insufficient evidence**
 
 Every claim carries an *exhibit*: the exact SQL that ran, its result hash, and a one-command re-run. Code, not the model, decides whether the evidence is enough.
 
-Findings are **data-quality results on public filings**, not investment advice.
+**Track:** Solving Fragmented Intelligence.
 
-## Track
+Outputs are **data-quality findings on public filings, not investment advice.**
 
-Primary track: **Solving Fragmented Intelligence**. The agent infers which federated tables and columns a metric is built from, finds an independent second source, and resolves the same entity across sources.
+## Status (Day 1)
 
-## Quick start (no keys)
+Working now, with `SAMPLE_MODE=true` (default):
 
 ```bash
-pnpm install
-SAMPLE_MODE=true pnpm exhibit-a investigate "is the FY2019 jump real?" --metric analytics.sector_revenue_by_year
+npm install
+npm run cli -- investigate "is the FY2018 jump real?" --metric analytics.sector_revenue_by_year
+npm run cli -- rerun <exhibit_id>
+npm run cli -- replay <case_id>
 ```
 
-Or:
+This prints a metric series and five exhibits (catalog, describe, SQL, profile, history). `rerun` re-executes stored SQL and diffs the result hash.
+
+Live Zetaris + NVIDIA loops, lineage, evidence gates, writeback, memory, evals, and the case viewer land on later days.
+
+The Day 1 cassette is a **labelled** replay of the same tool path. Replace it after the first live Zetaris recording. It is not a hardcoded verdict.
+
+## Setup
+
+- Node 20+
+- Copy `.env.example` to `.env.local` for live mode (`SAMPLE_MODE=false`, Zetaris URL and key)
+- Zetaris runs separately; this repo does not embed the platform
+- No local GPU
 
 ```bash
-SAMPLE_MODE=true docker compose -f docker/compose.yaml up --build
+SAMPLE_MODE=true npm run cli -- investigate "is this jump real?"
 ```
 
-`SAMPLE_MODE=true` replays a recorded run. The CLI prints a replay banner. This is not live inference.
-
-Re-run any exhibit:
+Docker (SAMPLE_MODE):
 
 ```bash
-SAMPLE_MODE=true pnpm exhibit-a rerun ex_<id>
-```
-
-Replay a captured trace:
-
-```bash
-SAMPLE_MODE=true pnpm exhibit-a replay <case_id>
-```
-
-## Live mode (Zetaris + NVIDIA)
-
-Copy `.env.example` to `.env.local`, set keys, then run the same commands without `SAMPLE_MODE`.
-
-- Zetaris REST: `POST $ZETARIS_REST_URL/sql-editor/sqls/run` (one statement per call, no trailing semicolon, qualified names).
-- User-Agent values must include a contact email or URL.
-
-Apply the declared analyst fixture (naive sector revenue view) only against a Zetaris workspace you control:
-
-```bash
-pnpm exhibit-a bootstrap-metric
+docker compose -f docker/compose.yml up
 ```
 
 ## Where each sponsor technology is used
 
 | Technology | Where it is used |
 |---|---|
-| **Zetaris federated SQL** | Every fact query (`catalog_search`, `describe`, `run_sql`, `profile`, `metric_history`) goes through the sql-editor REST API. |
-| **Zetaris lineage inference** | `INFER SQLTABLE SOURCES/COLUMNS` builds column-level lineage for a metric view (investigator loop). |
-| **Zetaris USL** | `LOAD USL` / `LIST DQ` / `RUN DQ` for keys and duplicate detection; catalog `UPDATE USL … SET DESCRIPTION` as case memory after approval. |
-| **Zetaris schemastore views** | Shadow and corrected views. The original analyst view is never overwritten. |
-| **Meterless World Model** | Lineage and entity graph with bitemporal edges (concept superseded-by). |
-| **Meterless H-MEM** | Case memory: recall before investigating, mine lessons on close, trust-ledger audit. |
-| **Meterless Markovian** | Bounded-context chunks for long investigations. |
-| **Meterless Scout Intent** | Minimal Sense → Guard → Route → signed execution contract. The writer refuses unsigned writes. |
-| **NVIDIA Nemotron** | Super 120B: lead + repair. Ultra 550B: critic. Lightning: scout/scribe. Embed: catalog/concept discovery. Content Safety: user report and untrusted REST text. |
-| **Cursor** | All implementation in Cursor Agent mode, with committed `.cursor/rules`. |
-
-## CLI
-
-```
-exhibit-a investigate "<report>" --metric <view>
-exhibit-a rerun <exhibit_id>
-exhibit-a replay <case_id>
-exhibit-a bootstrap-metric
-exhibit-a eval
-```
+| **Zetaris** | All fact queries go through the REST SQL editor (`packages/tools`). Lineage inference, USL keys/DQ, schemastore views, and writeback are Day 2–4. The naive metric fixture is `analytics/sector_revenue_by_year.sql`. |
+| **Meterless** | World Model (lineage graph), H-MEM (case memory), Markovian (bounded context), Scout Intent (signed write contracts). Scaffolded under `packages/engines`. |
+| **NVIDIA Nemotron** | Lead/repair, critic, scout/scribe, embeddings, content-safety guard. Client lands with the investigator loop. |
+| **Cursor** | All implementation in Agent mode. Project rules live in `.cursor/rules/`. |
 
 ## Layout
 
 ```
-apps/cli/            CLI
-apps/web/            case viewer (later)
-packages/core/       models, state machine, evidence gates, exhibits, traces, cassettes
-packages/tools/      Zetaris client, SQL guard, SEC / company_dns clients
-packages/agents/     lead, scout, critic, repair, scribe
-packages/llm/        NIM + budget
-packages/engines/    Meterless engine integrations
-analytics/           declared naive metric view (the fixture under investigation)
-evals/               scenarios graded from state JSON and traces
-fixtures/cassettes/  recorded live runs for SAMPLE_MODE
+apps/cli/            investigate | rerun | replay
+apps/web/            case viewer (Day 5)
+packages/core/       exhibits, traces, cassettes, state machine
+packages/tools/      Zetaris client + SQL guard + D1 tools
+packages/agents/     multi-agent loop (later)
+packages/llm/        NIM + budget (later)
+packages/engines/    Meterless engines (later)
+analytics/           declared metric-view SQL
+fixtures/cassettes/  labelled SAMPLE_MODE recordings
+evals/
 ```
 
-## Development
+## Hygiene
 
-Requires Node 20+. Install with `pnpm install`. Secrets stay in `.env.local` (gitignored).
+- Secrets stay in `.env.local`
+- `EXHIBIT_A_BLUEPRINT.md` is private planning notes and is gitignored
+- Investigation SQL is read-only unless a signed, approved write contract exists
