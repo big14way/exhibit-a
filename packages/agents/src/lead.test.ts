@@ -40,8 +40,8 @@ test("the D2 sample path reaches a hypothesis table with exhibits", async () => 
       grain: "fiscal_year",
     });
 
-    assert.equal(state.stage, "EVIDENCE");
-    assert.equal(state.exhibits.length, 14);
+    assert.equal(state.stage, "ADJUDICATED");
+    assert.equal(state.exhibits.length, 15);
     assert.ok(state.exhibits.every((ex) => ex.case_id === caseId));
     assert.ok(state.exhibits.every((ex) => ex.transport === "cassette" || ex.transport === "code"));
 
@@ -58,6 +58,18 @@ test("the D2 sample path reaches a hypothesis table with exhibits", async () => 
 
     assert.equal(state.baseline?.onset?.segment, "Manufacturing");
     assert.equal(state.baseline?.onset?.period, 2018);
+
+    const verdict = state.verdict;
+    assert.ok(verdict);
+    assert.equal(verdict.kind, "MIXED");
+    assert.equal(verdict.gate_failures, undefined);
+    assert.equal(verdict.causes.length, 2);
+    const artifact = verdict.causes.find((row) => row.cause === "filing_year_duplication");
+    const realCause = verdict.causes.find((row) => row.cause === "real_change");
+    assert.ok(Math.abs((artifact?.share ?? 0) - 0.96168) < 0.0001);
+    assert.ok(Math.abs((realCause?.share ?? 0) - 0.03832) < 0.0001);
+    assert.equal(verdict.unexplained_share, 0);
+    assert.ok(state.exhibits.some((exhibit) => exhibit.tool === "counterfactual"));
 
     // Every hypothesis cites exhibits that are on file.
     const ids = new Set(state.exhibits.map((ex) => ex.id));

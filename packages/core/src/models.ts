@@ -128,6 +128,7 @@ export type BaselineComparison = {
 
 export type CauseShare = {
   cause: string;
+  kind: "artifact" | "real";
   share: number;
   exhibit_ids: string[];
 };
@@ -137,6 +138,8 @@ export type Verdict = {
   causes: CauseShare[];
   unexplained_share?: number;
   exhibit_ids: string[];
+  notes?: string[];
+  gate_failures?: { rule: string; detail: string }[];
 };
 
 export type TraceLine = {

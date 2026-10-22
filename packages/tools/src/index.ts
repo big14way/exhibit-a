@@ -7,4 +7,5 @@ export * from "./baseline.ts";
 export * from "./second-channel.ts";
 export * from "./edgar.ts";
 export * from "./canonical.ts";
+export * from "./counterfactual.ts";
 export * from "./rerun.ts";

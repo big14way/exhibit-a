@@ -34,12 +34,13 @@ export async function describeObject(
 export async function runSql(
   rt: ToolRuntime,
   sql: string,
+  title = "ad hoc SQL",
 ): Promise<{ exhibit: Exhibit; result: SqlResult }> {
   return executeSqlTool({
     rt,
     tool: "run_sql",
     kind: "sql",
-    title: "ad hoc SQL",
+    title,
     sql,
     args: { sql },
   });

@@ -7,6 +7,7 @@ import {
   catalogSearch,
   companyBucketsSql,
   compareToBaseline,
+  counterfactual,
   describeObject,
   duplicationSql,
   inferLineage,
@@ -22,6 +23,7 @@ import {
   type SecFramesResult,
   type ToolRuntime,
 } from "@exhibit-a/tools";
+import { adjudicate } from "./adjudicate.ts";
 import { assessHypotheses, draftHypotheses, type EvidenceRefs } from "./hypotheses.ts";
 
 const CIK_FILTER = EDGAR_COMPANIES.map((company) => company.cik);
@@ -78,10 +80,10 @@ export async function runInvestigation(
   });
 
   state = advance(state, "EVIDENCE");
-  const coverageResult = await runSql(rt, companyBucketsSql());
-  const duplicationResult = await runSql(rt, duplicationSql());
-  const bucketResult = await runSql(rt, bucketSql());
-  const canonicalResult = await runSql(rt, canonicalFactsSql());
+  const coverageResult = await runSql(rt, companyBucketsSql(), "company coverage by fiscal year");
+  const duplicationResult = await runSql(rt, duplicationSql(), "duplicate rows per company");
+  const bucketResult = await runSql(rt, bucketSql(), "fiscal-year bucket profile");
+  const canonicalResult = await runSql(rt, canonicalFactsSql(), "annual fact rows for the corrected series");
   const canonical = canonicalSeries(rt, canonicalResult);
   exhibits.push(
     coverageResult.exhibit,
@@ -145,10 +147,67 @@ export async function runInvestigation(
     exhibit_ids: hypotheses.flatMap((row) => row.exhibit_ids),
   });
 
+  const cf = counterfactual(rt, {
+    baseline: baseline.comparison,
+    canonical: canonical.series,
+    canonicalExhibit: canonical.exhibit,
+  });
+  if (cf) exhibits.push(cf.exhibit);
+
+  state = advance(state, "CRITIQUED");
+  emitTrace(input.root, {
+    case_id: state.id,
+    agent_name: "DefenseCounsel",
+    action: "critic.review",
+    input_summary: cf
+      ? `counterfactual explains ${(cf.result.explained_share * 100).toFixed(1)}%`
+      : "no counterfactual available",
+    output_summary: process.env.NVIDIA_API_KEY
+      ? "model critique available; code gate is final"
+      : "model critique skipped (no key); code gate is final",
+    status: "success",
+    latency_ms: 0,
+    exhibit_ids: cf ? [cf.exhibit.id] : [],
+  });
+
+  const adjudication = cf
+    ? adjudicate({
+        root: input.root,
+        state: { ...state, hypotheses, exhibits },
+        baseline: baseline.comparison,
+        exhibits,
+        counterfactual: cf.result,
+      })
+    : undefined;
+  state = advance(state, "ADJUDICATED");
+
+  emitTrace(input.root, {
+    case_id: state.id,
+    agent_name: "LeadInvestigator",
+    action: "adjudicate",
+    input_summary: `${hypotheses.length} hypotheses, ${exhibits.length} exhibits`,
+    output_summary: adjudication
+      ? `${adjudication.verdict.kind} ${adjudication.verdict.causes
+          .map((row) => `${row.cause}=${(row.share * 100).toFixed(1)}%`)
+          .join(", ")}`
+      : "INSUFFICIENT_EVIDENCE (no counterfactual)",
+    status: "success",
+    latency_ms: 0,
+    exhibit_ids: adjudication?.verdict.exhibit_ids ?? [],
+  });
+
   return {
     ...state,
     exhibits,
     hypotheses,
     baseline: baseline.comparison,
+    verdict:
+      adjudication?.verdict ??
+      {
+        kind: "INSUFFICIENT_EVIDENCE",
+        causes: [],
+        exhibit_ids: [],
+        notes: ["no onset outside the baseline band; nothing to adjudicate"],
+      },
   };
 }

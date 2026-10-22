@@ -8,6 +8,7 @@ import {
   loadExhibits,
   newId,
   sampleBanner,
+  summarizeVerdict,
   type CaseState,
   type Cassette,
 } from "@exhibit-a/core";
@@ -118,6 +119,24 @@ async function investigate(argv: string[]): Promise<void> {
     console.log(`      exhibits: ${hypothesis.exhibit_ids.join(", ")}`);
   }
 
+  console.log("\nverdict:");
+  if (current.verdict) {
+    console.log(`  ${summarizeVerdict(current.verdict)}`);
+    if (current.verdict.unexplained_share !== undefined) {
+      console.log(`  unexplained ${(current.verdict.unexplained_share * 100).toFixed(1)}%`);
+    }
+    for (const note of current.verdict.notes ?? []) console.log(`  note: ${note}`);
+    if (current.verdict.gate_failures?.length) {
+      for (const failure of current.verdict.gate_failures) {
+        console.log(`  GATE FAIL ${failure.rule}: ${failure.detail}`);
+      }
+    } else {
+      console.log("  gate: pass");
+    }
+  } else {
+    console.log("  not adjudicated");
+  }
+
   console.log("\nexhibits:");
   for (const ex of current.exhibits) {
     console.log(`  ${ex.id}  ${ex.kind.padEnd(14)}  ${ex.title}  sha ${ex.result_sha256.slice(0, 12)}  ${ex.rerun}`);
@@ -126,7 +145,7 @@ async function investigate(argv: string[]): Promise<void> {
 
   const confirmed = current.hypotheses.filter((row) => row.status === "confirmed").length;
   const eliminated = current.hypotheses.filter((row) => row.status === "eliminated").length;
-  console.log(`${confirmed} confirmed, ${eliminated} eliminated, ${current.hypotheses.filter((row) => row.status === "open").length} open. Verdict gates land on Day 3.`);
+  console.log(`${confirmed} confirmed, ${eliminated} eliminated, ${current.hypotheses.filter((row) => row.status === "open").length} open.`);
 }
 
 async function rerun(exhibitId?: string): Promise<void> {

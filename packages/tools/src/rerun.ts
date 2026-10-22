@@ -2,6 +2,10 @@ import type { Exhibit } from "@exhibit-a/core";
 import { sha256Json } from "@exhibit-a/core";
 import { compareMetricSeries, type Band } from "./baseline.ts";
 import { canonicalSeries } from "./canonical.ts";
+import {
+  computeCounterfactual,
+  type CounterfactualArgs,
+} from "./counterfactual.ts";
 import { executeSqlTool, emitComputedExhibit, type ToolRuntime } from "./runtime.ts";
 import { secondChannel, type SecondChannelArgs } from "./second-channel.ts";
 
@@ -58,6 +62,28 @@ export async function rerunExhibit(rt: ToolRuntime, exhibit: Exhibit): Promise<R
       title: exhibit.title,
       args: exhibit.args,
       result: comparison as unknown as Record<string, unknown>,
+      sql: exhibit.sql,
+    });
+  } else if (tool === "counterfactual") {
+    if (!exhibit.sql) throw new Error("counterfactual exhibit has no source SQL");
+    const source = await executeSqlTool({
+      rt,
+      tool: "run_sql",
+      kind: "sql",
+      title: "rerun counterfactual source",
+      sql: exhibit.sql,
+      args: { sql: exhibit.sql },
+    });
+    const series = canonicalSeries(rt, source).series;
+    const result = computeCounterfactual(series, exhibit.args as CounterfactualArgs);
+    if (!result) throw new Error("counterfactual cannot be recomputed from stored args");
+    again = emitComputedExhibit({
+      rt,
+      tool,
+      kind: "profile",
+      title: exhibit.title,
+      args: exhibit.args,
+      result: result as unknown as Record<string, unknown>,
       sql: exhibit.sql,
     });
   } else if (tool === "canonical_series") {
