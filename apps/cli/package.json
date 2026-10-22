@@ -1,0 +1,13 @@
+{
+  "name": "@exhibit-a/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "exhibit-a": "./src/index.ts"
+  },
+  "dependencies": {
+    "@exhibit-a/core": "workspace:*",
+    "@exhibit-a/tools": "workspace:*"
+  }
+}

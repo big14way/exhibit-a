@@ -1,0 +1,14 @@
+---
+description: Exhibit A public-repo and sponsor-tech hygiene
+alwaysApply: true
+---
+
+# Exhibit A
+
+- Keep `EXHIBIT_A_BLUEPRINT.md` gitignored. Never commit it or link it from public files.
+- Do not name or link prior-art repositories in the README, comments, commits, or UI copy.
+- Never print, log, or commit `ZETARIS_API_KEY`, `NVIDIA_API_KEY`, or other secrets. Load them from env.
+- Investigation SQL is read-only (`SELECT|WITH|SHOW|DESCRIBE|EXPLAIN|LOAD USL|LIST DQ|RUN DQ|SHOW DQ|INFER SQLTABLE`). Writes need a signed, operator-approved contract.
+- Displayed numbers come from exhibits (tool results), never from model prose.
+- `SAMPLE_MODE=true` replays recorded live-run cassettes and must be labelled as replay, not as live inference.
+- Outputs are data-quality findings on public filings, not investment advice.

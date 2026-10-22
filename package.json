@@ -1,0 +1,23 @@
+{
+  "name": "exhibit-a",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Adjudicate whether a dashboard metric movement is a data artifact or a real change.",
+  "type": "module",
+  "packageManager": "pnpm@10.12.1",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "exhibit-a": "tsx apps/cli/src/index.ts",
+    "investigate": "tsx apps/cli/src/index.ts investigate",
+    "rerun": "tsx apps/cli/src/index.ts rerun",
+    "replay": "tsx apps/cli/src/index.ts replay",
+    "typecheck": "tsc -p tsconfig.base.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
