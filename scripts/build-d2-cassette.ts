@@ -17,6 +17,8 @@ import {
   lineageSourcesSql,
   secCompanyConceptArgs,
   secFramesArgs,
+  shadowReadSql,
+  shadowResultFromFacts,
 } from "../packages/tools/src/index.ts";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -207,6 +209,7 @@ const canonicalResult = asSqlResult(
   canonicalRows,
   1000,
 );
+const shadowResult = shadowResultFromFacts(canonicalResult);
 
 const apple = fixture.companies.find((company) => company.ticker === "AAPL");
 if (!apple) throw new Error("Apple missing from fixture");
@@ -230,6 +233,7 @@ const coverageSqlText = companyBucketsSql();
 const duplicationSqlText = duplicationSql();
 const bucketSqlText = bucketSql();
 const canonicalSqlText = canonicalFactsSql();
+const shadowSqlText = shadowReadSql();
 const sourcesSqlText = lineageSourcesSql(viewSql);
 const columnsSqlText = lineageColumnsSql(viewSql);
 
@@ -252,6 +256,7 @@ const entries = [
   { tool: "run_sql", args: { sql: duplicationSqlText }, result: duplicateResult },
   { tool: "run_sql", args: { sql: bucketSqlText }, result: bucketResult },
   { tool: "run_sql", args: { sql: canonicalSqlText }, result: canonicalResult },
+  { tool: "repair_shadow", args: { sql: shadowSqlText }, result: shadowResult },
   // re-run paths for earlier SQL exhibits
   { tool: "run_sql", args: { sql: catalogSql }, result: catalogResult },
   { tool: "run_sql", args: { sql: describeSql }, result: describeResult },

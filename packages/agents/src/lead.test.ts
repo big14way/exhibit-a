@@ -40,10 +40,19 @@ test("the D2 sample path reaches a hypothesis table with exhibits", async () => 
       grain: "fiscal_year",
     });
 
-    assert.equal(state.stage, "ADJUDICATED");
-    assert.equal(state.exhibits.length, 15);
+    assert.equal(state.stage, "SHADOW_VERIFIED");
+    assert.equal(state.exhibits.length, 19);
     assert.ok(state.exhibits.every((ex) => ex.case_id === caseId));
     assert.ok(state.exhibits.every((ex) => ex.transport === "cassette" || ex.transport === "code"));
+    assert.ok(state.repair);
+    assert.ok(state.contract);
+    assert.equal(state.contract.approved, false);
+    assert.equal(state.verification?.ok, true);
+    assert.equal(state.verification?.invariants.length, 7);
+    assert.equal(
+      state.verification?.invariants.find((row) => row.name === "second_channel_parity")?.numbers?.checked,
+      12,
+    );
 
     const byCause = new Map(state.hypotheses.map((row) => [row.cause, row]));
     assert.equal(byCause.get("filing_year_duplication")?.status, "confirmed");

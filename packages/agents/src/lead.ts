@@ -25,6 +25,7 @@ import {
 } from "@exhibit-a/tools";
 import { adjudicate } from "./adjudicate.ts";
 import { assessHypotheses, draftHypotheses, type EvidenceRefs } from "./hypotheses.ts";
+import { runRepair } from "./repair.ts";
 
 const CIK_FILTER = EDGAR_COMPANIES.map((company) => company.cik);
 const APPLE = EDGAR_COMPANIES[0];
@@ -206,18 +207,43 @@ export async function runInvestigation(
     exhibit_ids: adjudication?.verdict.exhibit_ids ?? [],
   });
 
+  const verdict =
+    adjudication?.verdict ??
+    {
+      kind: "INSUFFICIENT_EVIDENCE" as const,
+      causes: [],
+      exhibit_ids: [],
+      notes: ["no onset outside the baseline band; nothing to adjudicate"],
+    };
+
+  // Only an artifact-bearing verdict has a repair to test. A real-change or
+  // insufficient-evidence case stops at adjudication; it must not invent a fix.
+  if (
+    cf &&
+    adjudication &&
+    (verdict.kind === "DATA_ARTIFACT" || verdict.kind === "MIXED")
+  ) {
+    const repairRun = await runRepair({
+      root: input.root,
+      state: { ...state, hypotheses, exhibits },
+      rt,
+      metric: state.metric,
+      baseline: baseline.comparison,
+      counterfactual: cf.result,
+      history,
+      canonicalFacts: canonicalResult,
+      canonicalSeries: canonical.series,
+      frames,
+    });
+    state = repairRun.state;
+    exhibits.push(...repairRun.exhibits);
+  }
+
   return {
     ...state,
     exhibits,
     hypotheses,
     baseline: baseline.comparison,
-    verdict:
-      adjudication?.verdict ??
-      {
-        kind: "INSUFFICIENT_EVIDENCE",
-        causes: [],
-        exhibit_ids: [],
-        notes: ["no onset outside the baseline band; nothing to adjudicate"],
-      },
+    verdict,
   };
 }

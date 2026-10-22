@@ -161,6 +161,49 @@ export type TraceLine = {
   chunk?: number;
 };
 
+export type WriteContract = {
+  id: string;
+  case_id: string;
+  intent: string;
+  scope: string[];
+  statements: string[];
+  statements_sha256: string;
+  cost_ceiling: number;
+  expires_at: string;
+  signer: string;
+  signature: string;
+  approved: boolean;
+  approved_by?: string;
+  approved_at?: string;
+};
+
+export type RepairPlan = {
+  metric: string;
+  shadow_metric: string;
+  corrected_metric: string;
+  corrected_sql: string;
+  statements: string[];
+  created_at: string;
+};
+
+export type VerifierInvariant = {
+  name: string;
+  ok: boolean;
+  detail: string;
+  numbers?: Record<string, number | string>;
+};
+
+export type VerificationResult = {
+  ok: boolean;
+  shadow_metric: string;
+  corrected_metric: string;
+  invariants: VerifierInvariant[];
+  corrected_prior?: number;
+  corrected_now?: number;
+  corrected_delta?: number;
+  corrected_ratio?: number;
+};
+
 export type CaseState = {
   id: string;
   reported_at: string;
@@ -174,6 +217,9 @@ export type CaseState = {
   hypotheses: Hypothesis[];
   baseline?: BaselineComparison;
   verdict?: Verdict;
+  repair?: RepairPlan;
+  contract?: WriteContract;
+  verification?: VerificationResult;
   error?: string;
 };
 

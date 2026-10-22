@@ -4821,6 +4821,76 @@
       }
     },
     {
+      "tool": "repair_shadow",
+      "args_sha256": "d29db83dfefc07a224f81d9f05b9f5bf38fd187f0bb9d6a5f76cf1febe25cbe7",
+      "result": {
+        "columns": [
+          "sic_division",
+          "fiscal_year",
+          "revenue_usd"
+        ],
+        "rows": [
+          [
+            "Manufacturing",
+            2016,
+            374439132000
+          ],
+          [
+            "Retail Trade",
+            2016,
+            485873000000
+          ],
+          [
+            "Services",
+            2016,
+            117711000000
+          ],
+          [
+            "Manufacturing",
+            2017,
+            397769000000
+          ],
+          [
+            "Retail Trade",
+            2017,
+            500343000000
+          ],
+          [
+            "Services",
+            2017,
+            118522000000
+          ],
+          [
+            "Manufacturing",
+            2018,
+            447394000000
+          ],
+          [
+            "Retail Trade",
+            2018,
+            514405000000
+          ],
+          [
+            "Services",
+            2018,
+            119097000000
+          ],
+          [
+            "Manufacturing",
+            2019,
+            180478000000
+          ],
+          [
+            "Services",
+            2019,
+            77147000000
+          ]
+        ],
+        "row_count": 11,
+        "truncated": false
+      }
+    },
+    {
       "tool": "run_sql",
       "args_sha256": "0447779e56c7d01bd3e29d560a01c395e79694312fbed555cd66bfe158366a86",
       "result": {

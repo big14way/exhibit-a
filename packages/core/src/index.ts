@@ -4,5 +4,6 @@ export * from "./machine.ts";
 export * from "./exhibits.ts";
 export * from "./trace.ts";
 export * from "./cassette.ts";
+export * from "./contracts.ts";
 export * from "./gates.ts";
 export * from "./world-model.ts";

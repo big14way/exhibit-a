@@ -137,6 +137,29 @@ async function investigate(argv: string[]): Promise<void> {
     console.log("  not adjudicated");
   }
 
+  if (current.repair) {
+    console.log("\nrepair:");
+    console.log(`  shadow:    ${current.repair.shadow_metric}`);
+    console.log(`  corrected: ${current.repair.corrected_metric} (not written)`);
+    console.log(`  rule:      one annual fact per cik/period_end, last filed wins`);
+    if (current.contract) {
+      console.log(
+        `  contract:  ${current.contract.id} scope ${current.contract.scope.join(", ")} ` +
+          `approved ${current.contract.approved ? "yes" : "no (shadow only)"}`,
+      );
+    }
+    if (current.verification) {
+      console.log(`  verifier:  ${current.verification.ok ? "PASS" : "FAIL"}`);
+      for (const invariant of current.verification.invariants) {
+        console.log(`    [${invariant.ok ? "pass" : "FAIL"}] ${invariant.name}: ${invariant.detail}`);
+      }
+    }
+    if (current.stage === "SHADOW_VERIFIED") {
+      console.log("  next:      operator approval required before writeback; reported view untouched");
+    }
+    if (current.error) console.log(`  error:     ${current.error}`);
+  }
+
   console.log("\nexhibits:");
   for (const ex of current.exhibits) {
     console.log(`  ${ex.id}  ${ex.kind.padEnd(14)}  ${ex.title}  sha ${ex.result_sha256.slice(0, 12)}  ${ex.rerun}`);

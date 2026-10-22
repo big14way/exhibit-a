@@ -1,5 +1,5 @@
-import type { Exhibit } from "@exhibit-a/core";
-import { sha256Json } from "@exhibit-a/core";
+import type { Exhibit, SqlResult, WriteContract } from "@exhibit-a/core";
+import { loadExhibits, sha256Json, verifyContract } from "@exhibit-a/core";
 import { compareMetricSeries, type Band } from "./baseline.ts";
 import { canonicalSeries } from "./canonical.ts";
 import {
@@ -7,7 +7,13 @@ import {
   type CounterfactualArgs,
 } from "./counterfactual.ts";
 import { executeSqlTool, emitComputedExhibit, type ToolRuntime } from "./runtime.ts";
-import { secondChannel, type SecondChannelArgs } from "./second-channel.ts";
+import { secondChannel, type SecondChannelArgs, type SecFramesResult } from "./second-channel.ts";
+import { repairContractSecret } from "./repair.ts";
+import {
+  seriesFromCanonicalFacts,
+  verifyRepair,
+  type VerifierRerunArgs,
+} from "./verifier.ts";
 
 export type RerunResult = {
   exhibit: Exhibit;
@@ -23,6 +29,7 @@ const SQL_TOOLS = new Set([
   "metric_history",
   "lineage_sources",
   "lineage_columns",
+  "repair_shadow",
 ]);
 
 /**
@@ -97,6 +104,80 @@ export async function rerunExhibit(rt: ToolRuntime, exhibit: Exhibit): Promise<R
       args: { sql: exhibit.sql },
     });
     again = canonicalSeries(rt, source).exhibit;
+  } else if (tool === "write_contract") {
+    const args = exhibit.args as { contract: WriteContract; sample_mode: boolean };
+    verifyContract(args.contract, repairContractSecret(args.sample_mode), {
+      ignoreExpiry: true,
+    });
+    again = emitComputedExhibit({
+      rt,
+      tool,
+      kind: "writeback",
+      title: exhibit.title,
+      args: exhibit.args,
+      result: {
+        contract_id: args.contract.id,
+        scope: args.contract.scope,
+        statements_sha256: args.contract.statements_sha256,
+        mode: args.sample_mode ? "sample-replay" : "live-write",
+        executed: !args.sample_mode,
+        original_view_touched: false,
+        approval: "shadow-only; operator approval still required for writeback",
+      },
+    });
+  } else if (tool === "verifier") {
+    const args = exhibit.args as VerifierRerunArgs;
+    const byId = new Map(
+      loadExhibits(rt.root, exhibit.case_id).map((item) => [item.id, item]),
+    );
+    const get = (id: string): Exhibit => {
+      const found = byId.get(id);
+      if (!found) throw new Error(`verifier input exhibit missing: ${id}`);
+      return found;
+    };
+    const canonicalFacts = get(args.canonical_facts_exhibit_id);
+    const canonicalResult = canonicalFacts.result as SqlResult;
+    const history = get(args.history_exhibit_id);
+    const historyReread = get(args.history_reread_exhibit_id);
+    const shadow = get(args.shadow_exhibit_id);
+    const frames = args.frame_exhibits.map((frame) => ({
+      period: frame.period,
+      result: get(frame.exhibit_id).result as SecFramesResult,
+    }));
+    let contractOk = true;
+    try {
+      verifyContract(args.contract, repairContractSecret(rt.sampleMode), {
+        scope: args.shadow_metric,
+        ignoreExpiry: true,
+      });
+    } catch {
+      contractOk = false;
+    }
+    const verification = verifyRepair({
+      metric: args.metric,
+      shadowMetric: args.shadow_metric,
+      correctedMetric: args.corrected_metric,
+      correctedSql: args.corrected_sql,
+      contractId: args.contract_id,
+      contractOk,
+      baseline: args.baseline,
+      counterfactual: args.counterfactual,
+      originalHistory: { exhibit: history, result: history.result as SqlResult },
+      historyReread: { exhibit: historyReread, result: historyReread.result as SqlResult },
+      canonicalFacts: { exhibit: canonicalFacts, result: canonicalResult },
+      canonicalSeries: seriesFromCanonicalFacts(canonicalResult),
+      shadow: { exhibit: shadow, result: shadow.result as SqlResult },
+      frames,
+    });
+    again = emitComputedExhibit({
+      rt,
+      tool,
+      kind: "test",
+      title: exhibit.title,
+      args: exhibit.args,
+      result: verification as unknown as Record<string, unknown>,
+      sql: exhibit.sql,
+    });
   } else if (tool === "run_sql" || SQL_TOOLS.has(tool)) {
     if (!exhibit.sql) throw new Error(`exhibit ${exhibit.id} has no SQL to re-run`);
     const result = await executeSqlTool({
