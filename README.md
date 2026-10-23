@@ -114,6 +114,7 @@ npm run eval:claims   # re-check evals/results/latest.json
 - `SUBMISSION.md` — written sponsor explanation (problem, workflow, Zetaris/Meterless/NVIDIA use, Cursor, limits).
 - `PRE_EXISTING_DECLARATION.md` — conservative declaration of pre-window planning notes, environment onboarding, and third-party material.
 - `deck/exhibit-a-deck.pdf` — 10-slide deck (also editable as `deck/exhibit-a-deck.pptx`).
+- `deck/exhibit-a-demo.mp4` — 3:17 narrated, slide-based walkthrough (1920×1080, H.264/AAC).
 - `evals/results/latest.md` — 14/14 claim checks from the committed sample replay.
 
 ## Setup

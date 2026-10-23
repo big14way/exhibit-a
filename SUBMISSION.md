@@ -6,6 +6,8 @@
 
 Outputs are **data-quality findings on public filings, not investment advice.**
 
+**Submission assets:** `deck/exhibit-a-deck.pdf` (editable `.pptx` alongside), `deck/exhibit-a-demo.mp4` (narrated walkthrough), `PRE_EXISTING_DECLARATION.md`, and the committed `evals/results/latest.md` claim checks.
+
 ## The problem and the user
 
 A revenue dashboard moves. The analyst has seven fragmented SEC-derived tables, a naive metric view, and a meeting in an hour. The expensive question is not "what is the new number?" It is "is this number real, and which source caused it?" The common failure modes are duplication, a missing source, a concept/unit/schema change, an ingestion gap, or genuine growth. Most tools return a chart or a fluent explanation. Exhibit A returns an auditable adjudication.
