@@ -9,6 +9,7 @@ import {
   loadExhibits,
   newId,
   sampleBanner,
+  sha256Json,
   signContract,
   summarizeVerdict,
   type CaseState,
@@ -21,7 +22,7 @@ import {
   rerunExhibit,
   ZetarisClient,
 } from "@exhibit-a/tools";
-import { runInvestigation } from "@exhibit-a/agents";
+import { approveWriteback, runInvestigation, runWriteback } from "@exhibit-a/agents";
 import { isSampleMode, loadEnv } from "./env.ts";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
@@ -34,6 +35,8 @@ function usage(): never {
 
 Usage:
   exhibit-a investigate "<question>" [--metric <view>] [--cassette <path>] [--grain <column>]
+  exhibit-a approve <case_id>
+  exhibit-a writeback <case_id>
   exhibit-a rerun <exhibit_id>
   exhibit-a replay <case_id>
   exhibit-a bootstrap-metric
@@ -46,6 +49,8 @@ async function main(): Promise<void> {
   const [cmd, ...rest] = process.argv.slice(2);
   if (!cmd) usage();
   if (cmd === "investigate") await investigate(rest);
+  else if (cmd === "approve") await approve(rest[0]);
+  else if (cmd === "writeback") await writeback(rest[0]);
   else if (cmd === "rerun") await rerun(rest[0]);
   else if (cmd === "replay") await replay(rest[0]);
   else if (cmd === "bootstrap-metric") await bootstrapMetric();
@@ -177,6 +182,84 @@ async function investigate(argv: string[]): Promise<void> {
   const confirmed = current.hypotheses.filter((row) => row.status === "confirmed").length;
   const eliminated = current.hypotheses.filter((row) => row.status === "eliminated").length;
   console.log(`${confirmed} confirmed, ${eliminated} eliminated, ${current.hypotheses.filter((row) => row.status === "open").length} open.`);
+}
+
+async function approve(caseId?: string): Promise<void> {
+  if (!caseId) usage();
+  const state = loadState(caseId);
+  assertModeMatches(state);
+  const secret = repairContractSecret(state.sample_mode);
+  const approved = approveWriteback({
+    root: ROOT,
+    state,
+    secret,
+    sampleMode: state.sample_mode,
+  });
+  persistState(approved);
+  const contract = approved.write_contract;
+  if (!contract) throw new Error("approval returned no final contract");
+  console.log(`case ${approved.id}  stage ${approved.stage}`);
+  console.log(`contract ${contract.id}  approved ${contract.approved ? "yes" : "no"} by ${contract.approved_by ?? "unknown"}`);
+  console.log(`scope    ${contract.scope.join(", ")}`);
+  console.log(`expires  ${contract.expires_at}`);
+  console.log(`statements ${contract.statements.length}  sha ${contract.statements_sha256.slice(0, 16)}`);
+  for (const statement of contract.statements) {
+    console.log(`  [${sha256Json(statement).slice(0, 12)}]`);
+    for (const line of statement.split("\n")) console.log(`    ${line}`);
+  }
+  console.log(
+    "\nNo write has happened. The reported analytics view is untouched. " +
+      `Run \`exhibit-a writeback ${approved.id}\` to execute the approved contract.`,
+  );
+}
+
+async function writeback(caseId?: string): Promise<void> {
+  if (!caseId) usage();
+  const state = loadState(caseId);
+  assertModeMatches(state);
+  const cassette = state.sample_mode ? loadCassette(DEFAULT_CASSETTE) : undefined;
+  const rt = createRuntime({
+    root: ROOT,
+    caseId: state.id,
+    sampleMode: state.sample_mode,
+    cassette,
+  });
+  const run = await runWriteback({ root: ROOT, state, rt });
+  persistState(run.state);
+  console.log(`case ${run.state.id}  stage ${run.state.stage}`);
+  console.log(`written ${run.state.writeback?.written_metric ?? state.repair?.corrected_metric ?? "unknown"}`);
+  if (run.state.writeback) {
+    const checks = run.state.writeback.checks;
+    console.log(
+      `writeback ${run.state.writeback.ok ? "PASS" : "FAIL"} ` +
+        `${checks.filter((row) => row.ok).length}/${checks.length}`,
+    );
+    for (const check of checks) {
+      console.log(`  [${check.ok ? "pass" : "FAIL"}] ${check.name}: ${check.detail}`);
+    }
+    if (run.state.writeback.memory_note) {
+      console.log(`\ncatalog memory:\n  ${run.state.writeback.memory_note}`);
+    }
+  }
+  if (run.state.error) console.log(`error: ${run.state.error}`);
+  console.log(`\nexhibits: ${run.state.exhibits.length} on file`);
+  if (run.state.stage !== "CLOSED") process.exitCode = 1;
+}
+
+function loadState(caseId: string): CaseState {
+  const path = resolve(ROOT, "logs", caseId, "state.json");
+  if (!existsSync(path)) throw new Error(`no state for ${caseId}`);
+  return JSON.parse(readFileSync(path, "utf8")) as CaseState;
+}
+
+function assertModeMatches(state: CaseState): void {
+  const current = isSampleMode();
+  if (state.sample_mode !== current) {
+    throw new Error(
+      `case ${state.id} was recorded in ${state.sample_mode ? "SAMPLE_MODE" : "live mode"}; ` +
+        `set SAMPLE_MODE=${state.sample_mode ? "true" : "false"} to continue`,
+    );
+  }
 }
 
 async function rerun(exhibitId?: string): Promise<void> {

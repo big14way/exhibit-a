@@ -17,6 +17,11 @@ export const SHADOW_METRIC = `${SHADOW_CONTAINER}.${SHADOW_VIEW_NAME}`;
 export const CORRECTED_CONTAINER = "exhibit_a";
 export const CORRECTED_VIEW_NAME = "sector_revenue_by_year_v2";
 export const CORRECTED_METRIC = `${CORRECTED_CONTAINER}.${CORRECTED_VIEW_NAME}`;
+export const USL_NAMESPACE = "lightning.metastore.exhibit_a";
+export const USL_NAME = "revenue_facts";
+export const USL_PATH = `${USL_NAMESPACE}.${USL_NAME}`;
+export const USL_TABLE_PATH = `${USL_PATH}.fact`;
+export const USL_ROW_RULE = "annual_has_frame";
 
 const SAMPLE_CONTRACT_SECRET = "exhibit-a-sample-replay-contract-secret";
 
@@ -90,9 +95,139 @@ export function shadowViewStatement(body: string): string {
   return `CREATE OR REPLACE SCHEMASTORE VIEW ${SHADOW_VIEW_NAME} WITH CONTAINER ${SHADOW_CONTAINER} AS ${body}`;
 }
 
+export function finalViewStatement(body: string): string {
+  return `CREATE OR REPLACE SCHEMASTORE VIEW ${CORRECTED_VIEW_NAME} WITH CONTAINER ${CORRECTED_CONTAINER} AS ${body}`;
+}
+
 export function shadowReadSql(view = SHADOW_METRIC): string {
   assertIdentifier(view, "shadow view");
   return `SELECT sic_division, fiscal_year, revenue_usd FROM ${view} ORDER BY fiscal_year, sic_division`;
+}
+
+/**
+ * One canonical annual fact per (cik, period_end), last filed wins. This is the
+ * activation query for the USL duplicate detector; it deliberately keeps the
+ * fact grain rather than the division/year metric grain.
+ */
+export function canonicalPeriodSql(
+  sicTable = "edgar.sic_edgar_usl",
+): string {
+  const sic = assertIdentifier(sicTable, "SIC table");
+  return `WITH annual AS (
+  SELECT
+    s.sic_division,
+    f.cik,
+    f.period_start,
+    f.period_end,
+    f.value_usd,
+    f.filed_date,
+    CASE
+      WHEN MONTH(f.period_end) <= 6 THEN YEAR(f.period_end) - 1
+      ELSE YEAR(f.period_end)
+    END AS period_year,
+    ROW_NUMBER() OVER (
+      PARTITION BY f.cik, f.period_end
+      ORDER BY f.filed_date DESC, f.value_usd DESC
+    ) AS rn
+  FROM (
+    SELECT * FROM edgar.apple_revenue_table
+    UNION ALL SELECT * FROM edgar.ibm_revenue_table
+    UNION ALL SELECT * FROM edgar.oracle_revenue_table
+    UNION ALL SELECT * FROM edgar.walmart_revenue_table
+    UNION ALL SELECT * FROM edgar.target_revenue_table
+    UNION ALL SELECT * FROM edgar.ford_revenue_table
+    UNION ALL SELECT * FROM edgar.tesla_revenue_table
+  ) f
+  LEFT JOIN ${sic} s ON s.cik = f.cik
+  WHERE DATEDIFF(f.period_end, f.period_start) BETWEEN 330 AND 400
+)
+SELECT
+  COALESCE(CAST(cik AS STRING), '') AS cik,
+  COALESCE(CAST(period_end AS DATE), CURRENT_DATE) AS period_end,
+  CONCAT('CY', CAST(COALESCE(period_year, 0) AS STRING)) AS period_frame,
+  sic_division,
+  COALESCE(period_year, 0) AS period_year,
+  CAST(value_usd AS DOUBLE) AS value_usd,
+  CAST(filed_date AS DATE) AS filed_date
+FROM annual
+WHERE rn = 1`;
+}
+
+export function uslActivationStatement(
+  sicTable = "edgar.sic_edgar_usl",
+): string {
+  return `ACTIVATE USL TABLE ${USL_TABLE_PATH} AS\n${canonicalPeriodSql(sicTable)}`;
+}
+
+export function uslDdlStatement(): string {
+  return `COMPILE USL IF NOT EXISTS ${USL_NAME} DEPLOY NAMESPACE ${USL_NAMESPACE} DDL
+CREATE TABLE fact (
+  cik varchar(10) NOT NULL,
+  period_end date NOT NULL,
+  period_frame varchar(16),
+  sic_division varchar(200),
+  period_year int NOT NULL,
+  value_usd double,
+  filed_date date,
+  PRIMARY KEY (cik, period_end)
+)`;
+}
+
+export function uslRowRuleStatement(): string {
+  return `REGISTER DQ ${USL_ROW_RULE} TABLE ${USL_TABLE_PATH} AS period_frame IS NOT NULL`;
+}
+
+function sqlLiteral(value: string): string {
+  return `'${value.replace(/'/g, "''")}'`;
+}
+
+export function memoryNote(input: {
+  caseId: string;
+  verdict?: { kind: string; causes: { cause: string; share: number }[] };
+  exhibitIds?: string[];
+  date?: string;
+}): string {
+  const causes = input.verdict?.causes.length
+    ? input.verdict.causes
+        .map((cause) => `${cause.cause}=${(cause.share * 100).toFixed(1)}%`)
+        .join(", ")
+    : "no cause shares";
+  const exhibits = (input.exhibitIds ?? []).slice(0, 6).join(", ") || "none";
+  const date = input.date ?? new Date().toISOString().slice(0, 10);
+  return (
+    `Exhibit A ${input.caseId} verdict ${input.verdict?.kind ?? "UNKNOWN"} ` +
+    `(${causes}), exhibits ${exhibits}, ${date}. ` +
+    "Data-quality finding on public filings, not investment advice."
+  );
+}
+
+export function uslDescriptionStatement(note: string): string {
+  return `UPDATE USL ${USL_TABLE_PATH} SET TABLE DESCRIPTION ${sqlLiteral(note)}`;
+}
+
+export function finalReadSql(view = CORRECTED_METRIC): string {
+  assertIdentifier(view, "corrected view");
+  return `SELECT sic_division, fiscal_year, revenue_usd FROM ${view} ORDER BY fiscal_year, sic_division`;
+}
+
+export function uslLoadSql(): string {
+  return `LOAD USL ${USL_NAME} NAMESPACE ${USL_NAMESPACE}`;
+}
+
+export function uslListDqSql(): string {
+  return `LIST DQ USL ${USL_PATH}`;
+}
+
+export function uslCompositeDqSql(): string {
+  return `RUN DQ \`cik,period_end\` TABLE ${USL_TABLE_PATH}`;
+}
+
+export function uslRowDqSql(): string {
+  return `RUN DQ ${USL_ROW_RULE} TABLE ${USL_TABLE_PATH}`;
+}
+
+export function showViewsSql(): string {
+  return "SHOW DATASOURCE VIEWS";
 }
 
 export function buildRepairPlan(input: {

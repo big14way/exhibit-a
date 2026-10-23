@@ -8,7 +8,15 @@ import {
 } from "./counterfactual.ts";
 import { executeSqlTool, emitComputedExhibit, type ToolRuntime } from "./runtime.ts";
 import { secondChannel, type SecondChannelArgs, type SecFramesResult } from "./second-channel.ts";
-import { repairContractSecret } from "./repair.ts";
+import {
+  CORRECTED_METRIC,
+  repairContractSecret,
+} from "./repair.ts";
+import {
+  assertFinalContract,
+  parseUslModel,
+  verifyWriteback,
+} from "./writeback.ts";
 import {
   seriesFromCanonicalFacts,
   verifyRepair,
@@ -30,6 +38,13 @@ const SQL_TOOLS = new Set([
   "lineage_sources",
   "lineage_columns",
   "repair_shadow",
+  "write_read",
+  "write_original",
+  "write_usl",
+  "write_dq_list",
+  "write_dq_composite",
+  "write_dq_row",
+  "write_views",
 ]);
 
 /**
@@ -124,6 +139,94 @@ export async function rerunExhibit(rt: ToolRuntime, exhibit: Exhibit): Promise<R
         original_view_touched: false,
         approval: "shadow-only; operator approval still required for writeback",
       },
+    });
+  } else if (tool === "writeback") {
+    const args = exhibit.args as {
+      contract: WriteContract;
+      sample_mode: boolean;
+      note?: string;
+    };
+    verifyContract(args.contract, repairContractSecret(args.sample_mode), {
+      requireApproved: true,
+      scope: CORRECTED_METRIC,
+    });
+    assertFinalContract(args.contract);
+    again = emitComputedExhibit({
+      rt,
+      tool: "writeback",
+      kind: "writeback",
+      title: exhibit.title,
+      args: exhibit.args,
+      result: {
+        contract_id: args.contract.id,
+        scope: args.contract.scope,
+        statements_sha256: args.contract.statements_sha256,
+        statements_count: args.contract.statements.length,
+        mode: args.sample_mode ? "sample-replay" : "live-write",
+        executed: !args.sample_mode,
+        original_view_touched: false,
+        approval: "operator-approved",
+      },
+    });
+  } else if (tool === "write_verified") {
+    const args = exhibit.args as {
+      contract_id: string;
+      note: string;
+      final_read_exhibit_id?: string;
+      usl_load_exhibit_id?: string;
+      dq_list_exhibit_id?: string;
+      composite_dq_exhibit_id?: string;
+      row_dq_exhibit_id?: string;
+      views_exhibit_id?: string;
+      original_exhibit_id: string;
+      original_reread_exhibit_id?: string;
+      shadow_exhibit_id?: string;
+      write_executed?: boolean;
+    };
+    if (!args.shadow_exhibit_id) {
+      throw new Error("write_verified exhibit has no shadow exhibit id");
+    }
+    const byId = new Map(
+      loadExhibits(rt.root, exhibit.case_id).map((item) => [item.id, item]),
+    );
+    const get = (id?: string): Exhibit | undefined => (id ? byId.get(id) : undefined);
+    const resultOf = (id?: string): SqlResult | undefined =>
+      get(id)?.result as SqlResult | undefined;
+    const uslLoad = resultOf(args.usl_load_exhibit_id);
+    const verification = verifyWriteback({
+      contractId: args.contract_id,
+      writtenMetric: CORRECTED_METRIC,
+      contractOk: true,
+      writeExecuted: args.write_executed ?? true,
+      caseId: exhibit.case_id,
+      note: args.note,
+      shadow: resultOf(args.shadow_exhibit_id)!,
+      finalRead: resultOf(args.final_read_exhibit_id),
+      originalHistory: resultOf(args.original_exhibit_id),
+      originalReread: resultOf(args.original_reread_exhibit_id),
+      uslModel: uslLoad ? parseUslModel(uslLoad) : undefined,
+      dqList: resultOf(args.dq_list_exhibit_id),
+      compositeDq: resultOf(args.composite_dq_exhibit_id),
+      rowDq: resultOf(args.row_dq_exhibit_id),
+      views: resultOf(args.views_exhibit_id),
+    });
+    again = emitComputedExhibit({
+      rt,
+      tool: "write_verified",
+      kind: "test",
+      title: exhibit.title,
+      args: exhibit.args,
+      result: verification as unknown as Record<string, unknown>,
+      sql: exhibit.sql,
+    });
+  } else if (tool === "memory") {
+    again = emitComputedExhibit({
+      rt,
+      tool: "memory",
+      kind: "memory",
+      title: exhibit.title,
+      args: exhibit.args,
+      result: exhibit.result as Record<string, unknown>,
     });
   } else if (tool === "verifier") {
     const args = exhibit.args as VerifierRerunArgs;

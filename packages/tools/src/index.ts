@@ -9,5 +9,6 @@ export * from "./edgar.ts";
 export * from "./canonical.ts";
 export * from "./counterfactual.ts";
 export * from "./repair.ts";
+export * from "./writeback.ts";
 export * from "./verifier.ts";
 export * from "./rerun.ts";

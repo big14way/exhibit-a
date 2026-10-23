@@ -15,7 +15,7 @@ Every claim carries an *exhibit*: the exact SQL that ran, its result hash, and a
 
 Outputs are **data-quality findings on public filings, not investment advice.**
 
-## Status (Day 4 repair + shadow verifier; live path verified)
+## Status (Day 4 repair + shadow verifier + operator-approved writeback)
 
 Working in two modes:
 
@@ -25,11 +25,15 @@ Working in two modes:
 ```bash
 npm install
 npm run cli -- investigate "is the FY2018 jump real?" --metric analytics.sector_revenue_by_year
+npm run cli -- approve <case_id>
+npm run cli -- writeback <case_id>
 npm run cli -- rerun <exhibit_id>
 npm run cli -- replay <case_id>
 ```
 
 The investigator walks: catalog → describe → `INFER SQLTABLE` lineage → baseline onset → five hypotheses → evidence → counterfactual → critic checkpoint → adjudication → repair plan → signed shadow write → shadow verifier. It writes 19 exhibits, runs the code gate, and prints a verdict plus the repair evidence. The reported view is never replaced in place.
+
+The repair path then stops at `SHADOW_VERIFIED`. `approve <case_id>` verifies the shadow result, signs the exact final statement set, and moves the case to `AWAITING_APPROVAL`; it performs no write. `writeback <case_id>` executes only that approved contract, creates `exhibit_a.sector_revenue_by_year_v2`, activates the `revenue_facts` USL with a composite `(cik, period_end)` key, registers the `annual_has_frame` rule, writes the case note into the USL table description, then re-reads the view and catalog through a separate Zetaris session. It reaches `WRITE_VERIFIED → MEMORISED → CLOSED` only when all eight checks pass.
 
 On the committed sample:
 
@@ -46,6 +50,28 @@ On the committed sample:
 
 **Sample verdict: `MIXED (filing_year_duplication=96.2%, real_change=3.8%)`, gate pass, unexplained 0.0%; shadow verifier 7/7.**
 
+### Writeback and memory
+
+The final write is split into two deliberate commands:
+
+1. `approve` verifies the shadow contract and the seven shadow invariants, then signs a seven-statement contract: corrected container, corrected view, `exhibit_a` USL namespace, `COMPILE USL revenue_facts` with `PRIMARY KEY (cik, period_end)`, `ACTIVATE USL TABLE ... AS` the canonical-period select, `REGISTER DQ annual_has_frame`, and `UPDATE USL ... SET TABLE DESCRIPTION` with the case id, verdict, exhibit ids and date.
+2. `writeback` refuses an unapproved, expired, out-of-scope or tampered contract. It executes exactly those statements and re-reads every write through a separate Zetaris client/session: the final view, the original reported view, `LOAD USL`, `LIST DQ`, both `RUN DQ` forms, and `SHOW DATASOURCE VIEWS`.
+
+The sample replay reaches `CLOSED` with **29 exhibits** and **8/8** writeback checks:
+
+| Check | Sample evidence |
+|---|---|
+| `write_contract` | operator-approved contract, 7 signed statements |
+| `final_view_readback` | 11 final cells match the verified shadow; 0 missing, 0 mismatched, 0 extra |
+| `usl_model` | `LOAD USL` shows `(cik, period_end)`, `annual_has_frame`, activation query, catalog note |
+| `usl_dq_catalog` | `LIST DQ` shows the composite key and the row rule |
+| `usl_duplicate_detector` | 21 records, 21 valid, **0 invalid** |
+| `usl_row_rule` | 21 records, 21 valid, **0 invalid** |
+| `view_catalog` | `SHOW DATASOURCE VIEWS` lists `sector_revenue_by_year_v2` |
+| `original_untouched` | reported view hash unchanged |
+
+The sample path is a labelled replay: it uses the verified shadow and canonical counts, writes nothing, and records `executed: false` in the writeback exhibit. A disposable live USL probe separately confirmed that Zetaris 2.4.3.1 accepts the composite primary key, the `COALESCE`/`CAST` activation select, both `RUN DQ` forms, and the table-description update; the probe was removed. The live case remains at `SHADOW_VERIFIED` until an operator runs `approve` and `writeback`.
+
 ### Live Zetaris verification
 
 The same investigation has been run end to end with `SAMPLE_MODE=false` against a local Zetaris instance:
@@ -55,7 +81,8 @@ The same investigation has been run end to end with `SAMPLE_MODE=false` against 
 - The live canonical query returns **1,298 fact rows**. The seven `SEC_DATA.*_revenue_facts` inputs hold **936 duplicate rows** across full history; FY2018 holds **100 rows over 32 period ends**.
 - SEC frames parity is **12/12** within 0.5%.
 - Live verdict: **`MIXED (filing_year_duplication=96.2%, real_change=3.8%)`**, gate pass, unexplained 0.0%.
-- The live shadow write created `exhibit_a_shadow.sector_revenue_by_year` through a signed contract. The shadow has **12 cells**; the verifier passes **7/7** (60 annual facts in the 2016–2019 period window, 22 unique `(cik, period_end)` facts, 38 declared duplicate facts). The reported `analytics.sector_revenue_by_year` re-read hash is unchanged. Final writeback to `exhibit_a.sector_revenue_by_year_v2` still requires operator approval.
+- The live shadow write created `exhibit_a_shadow.sector_revenue_by_year` through a signed contract. The shadow has **12 cells**; the verifier passes **7/7** (60 annual facts in the 2016–2019 period window, 22 unique `(cik, period_end)` facts, 38 declared duplicate facts). The reported `analytics.sector_revenue_by_year` re-read hash is unchanged.
+- The final write is implemented but deliberately not executed by the investigator: the live case is at `SHADOW_VERIFIED`. `approve` is the explicit operator gate; `writeback` is the separate execution step. The final target is `exhibit_a.sector_revenue_by_year_v2`; the reported view is never named in a write statement.
 
 Live `INFER SQLTABLE` resolves the `edgar.*` schema-store views down to seven `SEC_DATA.*_revenue_facts` source tables; the world model has 8 nodes / 7 edges. Column-level lineage from the live parser is coarser (`parent` is null), so the gate uses source-level lineage.
 
@@ -89,7 +116,7 @@ docker compose -f docker/compose.yml up --build
 
 | Technology | Where it is used |
 |---|---|
-| **Zetaris** | All fact queries go through the REST SQL editor (`packages/tools`). `INFER SQLTABLE SOURCES/COLUMNS` builds the case lineage graph; live `INFER` resolves schema-store views to `SEC_DATA.*`. The repair path creates an isolated `exhibit_a_shadow` schema-store view and verifies it; USL keys/DQ and final writeback are later. The naive metric fixture is `analytics/sector_revenue_by_year.sql`. |
+| **Zetaris** | All fact queries go through the REST SQL editor (`packages/tools`). `INFER SQLTABLE SOURCES/COLUMNS` builds the case lineage graph; live `INFER` resolves schema-store views to `SEC_DATA.*`. The repair path creates an isolated `exhibit_a_shadow` schema-store view and verifies it. The approved writeback creates `exhibit_a.sector_revenue_by_year_v2`, a `revenue_facts` USL with a composite `(cik, period_end)` key, the `annual_has_frame` DQ rule, and a USL table description as catalog memory; verify-after-write re-reads all of it through a separate session. The naive metric fixture is `analytics/sector_revenue_by_year.sql`. |
 | **Meterless** | World Model (lineage graph), H-MEM (case memory), Markovian (bounded context), Scout Intent (signed write contracts). `packages/core/src/contracts.ts` implements HMAC-signed statements and scope enforcement; `packages/core/src/world-model.ts` is a local implementation of the node/edge contract. The vendored engines land under `packages/engines`. |
 | **NVIDIA Nemotron** | NIM client with retries, typed tool calls, and a per-case spend ledger (`packages/llm`). Model IDs are configured, never guessed. The deterministic evidence path runs without a key; model critique is optional and not required for a verdict. |
 | **SEC EDGAR** | Independent second channel (`packages/tools/src/second-channel.ts`): companyconcept and frames APIs, rate-limited, with a browser-shaped User-Agent and declared `From` contact. |
@@ -98,7 +125,7 @@ docker compose -f docker/compose.yml up --build
 ## Layout
 
 ```
-apps/cli/            investigate | rerun | replay
+apps/cli/            investigate | approve | writeback | rerun | replay
 apps/web/            case viewer (Day 5)
 packages/core/       exhibits, traces, cassettes, state machine, contracts, world-model
 packages/tools/      Zetaris client, SQL guard, lineage, repair/verifier, SEC second channel
@@ -114,5 +141,5 @@ fixtures/cassettes/  labelled SAMPLE_MODE recordings
 
 - Secrets stay in `.env.local` (gitignored, mode 600)
 - `EXHIBIT_A_BLUEPRINT.md` is private planning notes and is gitignored
-- Investigation SQL is read-only. Writes go through an HMAC-signed contract; the shadow is isolated and final writeback requires operator approval
+- Investigation SQL is read-only. Writes go through an HMAC-signed contract; the shadow is isolated, `approve` is a separate operator gate, and `writeback` executes only the approved final statements. The reported analytics view is never named in a write statement
 - `npm test` and `npm run typecheck` must pass before a push

@@ -204,6 +204,16 @@ export type VerificationResult = {
   corrected_ratio?: number;
 };
 
+export type WritebackResult = {
+  ok: boolean;
+  contract_id: string;
+  written_metric: string;
+  checks: VerifierInvariant[];
+  readback_sha256?: string;
+  usl_model?: string;
+  memory_note?: string;
+};
+
 export type CaseState = {
   id: string;
   reported_at: string;
@@ -220,6 +230,9 @@ export type CaseState = {
   repair?: RepairPlan;
   contract?: WriteContract;
   verification?: VerificationResult;
+  write_contract?: WriteContract;
+  writeback_note?: string;
+  writeback?: WritebackResult;
   error?: string;
 };
 
