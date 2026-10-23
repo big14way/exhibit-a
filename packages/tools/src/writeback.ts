@@ -25,7 +25,7 @@ import {
   uslRowDqSql,
 } from "./repair.ts";
 
-export const FINAL_WRITEBACK_TTL_MS = 15 * 60 * 1000;
+export const FINAL_WRITEBACK_TTL_MS = 30 * 60 * 1000;
 export const SAMPLE_WRITEBACK_TTL_MS = 365 * 24 * 60 * 60 * 1000;
 
 /** The exact statements shown to the operator at approval time. */

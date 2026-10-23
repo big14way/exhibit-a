@@ -47,8 +47,13 @@ export type ApprovalOptions = {
  */
 export function approveWriteback(input: ApprovalOptions): CaseState {
   const state = input.state;
-  if (state.stage !== "SHADOW_VERIFIED") {
-    throw new Error(`approval needs SHADOW_VERIFIED; case is ${state.stage}`);
+  if (state.stage !== "SHADOW_VERIFIED" && state.stage !== "AWAITING_APPROVAL") {
+    throw new Error(
+      `approval needs SHADOW_VERIFIED or AWAITING_APPROVAL; case is ${state.stage}`,
+    );
+  }
+  if (state.writeback) {
+    throw new Error("case already has a writeback result; re-approval is not allowed");
   }
   if (!state.verification?.ok) {
     throw new Error("cannot approve a writeback whose shadow verifier did not pass");

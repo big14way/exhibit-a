@@ -62,9 +62,21 @@ test("sample writeback is operator-approved, re-read, memorised, and closed", as
     assert.equal(approved.write_contract?.statements.length, 7);
     assert.ok(approved.write_contract?.scope.includes("exhibit_a.sector_revenue_by_year_v2"));
 
-    const run = await runWriteback({
+    // Re-approval is allowed from AWAITING_APPROVAL after expiry, but only
+    // before any writeback result exists.
+    const reapproved = approveWriteback({
       root,
       state: approved,
+      secret,
+      sampleMode: true,
+    });
+    assert.equal(reapproved.stage, "AWAITING_APPROVAL");
+    assert.equal(reapproved.write_contract?.approved, true);
+    assert.notEqual(reapproved.write_contract?.id, approved.write_contract?.id);
+
+    const run = await runWriteback({
+      root,
+      state: reapproved,
       rt: createRuntime({
         root,
         caseId,
