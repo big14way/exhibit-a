@@ -6,7 +6,7 @@
 
 Outputs are **data-quality findings on public filings, not investment advice.**
 
-**Submission assets:** `deck/exhibit-a-deck.pdf` (editable `.pptx` alongside), `deck/exhibit-a-demo.mp4` (narrated walkthrough), `PRE_EXISTING_DECLARATION.md`, and the committed `evals/results/latest.md` claim checks.
+**Submission assets:** `deck/exhibit-a-deck.pdf` (editable `.pptx` alongside), `deck/exhibit-a-demo.mp4` (3:44 narrated walkthrough with a real sample CLI replay scene), `PRE_EXISTING_DECLARATION.md`, and the committed `evals/results/latest.md` claim checks.
 
 ## The problem and the user
 
