@@ -109,6 +109,13 @@ npm run eval:claims   # re-check evals/results/latest.json
 
 `npm run eval` runs the sample investigation twice against a temp log directory: cold (empty H-MEM), then warm after the first case closes. It checks the 96.2/3.8 verdict, 7/7 shadow invariants, 8/8 writeback checks, H-MEM recall/persistence, discovery replacement concept, recorded critic, content safety, and a deliberate ablation (counterfactual + second channel removed → `INSUFFICIENT_EVIDENCE`). It writes `evals/results/latest.json` and `.md`.
 
+## Submission assets
+
+- `SUBMISSION.md` — written sponsor explanation (problem, workflow, Zetaris/Meterless/NVIDIA use, Cursor, limits).
+- `PRE_EXISTING_DECLARATION.md` — conservative declaration of pre-window planning notes, environment onboarding, and third-party material.
+- `deck/exhibit-a-deck.pdf` — 10-slide deck (also editable as `deck/exhibit-a-deck.pptx`).
+- `evals/results/latest.md` — 14/14 claim checks from the committed sample replay.
+
 ## Setup
 
 - Node 20+

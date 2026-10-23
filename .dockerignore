@@ -1,0 +1,14 @@
+.git
+.gitignore
+.cursor
+node_modules
+logs
+dist
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+EXHIBIT_A_BLUEPRINT.md
+docker/data
+evals/results
+.DS_Store
