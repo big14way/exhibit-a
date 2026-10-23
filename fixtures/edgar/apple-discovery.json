@@ -1,0 +1,58 @@
+{
+  "company": "Apple Inc.",
+  "cik": "0000320193",
+  "current_concept": "Revenues",
+  "current_annual_facts": 3,
+  "replacement_concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+  "replacement_reason": "Revenues has 3 annual 10-K facts ending 2018-09-29; RevenueFromContractWithCustomerExcludingAssessedTax has 9 annual 10-K facts ending 2025-09-27 and a continuous chain, so the missing history is a concept switch, not a lost source.",
+  "candidates": [
+    {
+      "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+      "annual_facts": 9,
+      "first_period": "2017-09-30",
+      "last_period": "2025-09-27",
+      "continuous": true,
+      "latest_forms": [
+        "10-K"
+      ],
+      "score": 30
+    },
+    {
+      "concept": "SalesRevenueNet",
+      "annual_facts": 11,
+      "first_period": "2007-09-29",
+      "last_period": "2017-09-30",
+      "continuous": false,
+      "latest_forms": [
+        "10-K",
+        "10-K/A"
+      ],
+      "score": 22
+    },
+    {
+      "concept": "Revenues",
+      "annual_facts": 3,
+      "first_period": "2016-09-24",
+      "last_period": "2018-09-29",
+      "continuous": false,
+      "latest_forms": [
+        "10-K"
+      ],
+      "score": 14
+    }
+  ],
+  "peers": [
+    {
+      "ticker": "F",
+      "table": "edgar.ford_revenue_table",
+      "sic_division": "Manufacturing"
+    },
+    {
+      "ticker": "TSLA",
+      "table": "edgar.tesla_revenue_table",
+      "sic_division": "Manufacturing"
+    }
+  ],
+  "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+  "rule": "revenue concept must have USD annual 10-K facts (330-400 days), a chain ending within 421 days, and extend the stopped concept"
+}

@@ -4,7 +4,7 @@
  * committed SEC sample. The SQL strings and argument objects are imported from
  * the same modules the investigator uses, so a cassette miss fails the run.
  */
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { asSqlResult, sha256Json, type Cassette } from "../packages/core/src/index.ts";
@@ -69,6 +69,9 @@ const fixture = JSON.parse(
 const framesFixture = JSON.parse(
   readFileSync(resolve(ROOT, "fixtures/edgar/sec-frames.json"), "utf8"),
 ) as FramesFixture;
+const discoveryFixture = JSON.parse(
+  readFileSync(resolve(ROOT, "fixtures/edgar/apple-discovery.json"), "utf8"),
+) as Record<string, unknown>;
 const viewSql = readFileSync(resolve(ROOT, "analytics/sector_revenue_by_year.sql"), "utf8").trim();
 
 const companies = new Map(fixture.companies.map((company) => [company.cik, company]));
@@ -225,6 +228,14 @@ const appleConcept = {
   source_url: `https://data.sec.gov/api/xbrl/companyconcept/CIK${apple.cik}/us-gaap/Revenues.json`,
 };
 
+const discoveryArgs = {
+  kind: "sec_companyfacts",
+  cik: apple.cik,
+  entity_name: apple.entity_name,
+  concept: "Revenues",
+  sic_division: apple.sic_division,
+};
+
 const catalogSql = "SHOW LIGHTNING DATABASES";
 const describeSql = `DESCRIBE DATASOURCE TABLE ${METRIC}`;
 const historySql = `SELECT * FROM ${METRIC} ORDER BY ${GRAIN}`;
@@ -252,6 +263,7 @@ const entries = [
   },
   { tool: "lineage_sources", args: { view: METRIC, sql: sourcesSqlText }, result: lineageSources },
   { tool: "lineage_columns", args: { view: METRIC, sql: columnsSqlText }, result: lineageColumns },
+  { tool: "discover_sources", args: discoveryArgs, result: discoveryFixture },
   { tool: "run_sql", args: { sql: coverageSqlText }, result: coverageResult },
   { tool: "run_sql", args: { sql: duplicationSqlText }, result: duplicateResult },
   { tool: "run_sql", args: { sql: bucketSqlText }, result: bucketResult },
@@ -284,13 +296,16 @@ entries.push({
   result: appleConcept,
 });
 
+const existingModels = existsSync(OUT)
+  ? ((JSON.parse(readFileSync(OUT, "utf8")) as Cassette).models ?? [])
+  : [];
 const cassette: Cassette = {
   id: "cassette_d2_edgar",
   recorded_at: new Date().toISOString().slice(0, 10),
   label:
-    "labelled SAMPLE_MODE cassette built from a committed SEC companyconcept/frames sample; replace after the first live Zetaris recording",
+    "labelled SAMPLE_MODE cassette built from a committed SEC companyconcept/frames sample and a recorded Nemotron critic response; replace after the first live Zetaris recording",
   entries,
-  models: [],
+  models: existingModels,
 };
 
 writeFileSync(OUT, `${JSON.stringify(cassette, null, 2)}\n`);

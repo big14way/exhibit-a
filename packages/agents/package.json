@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "@exhibit-a/core": "workspace:*",
+    "@exhibit-a/engines": "workspace:*",
+    "@exhibit-a/llm": "workspace:*",
     "@exhibit-a/tools": "workspace:*"
   }
 }

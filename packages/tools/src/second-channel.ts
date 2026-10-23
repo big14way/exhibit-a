@@ -41,7 +41,7 @@ export type SecCompanyConceptResult = {
 
 let lastRequestAt = 0;
 
-async function secGet(url: string): Promise<unknown> {
+export async function secGet(url: string): Promise<unknown> {
   const contact = process.env.SEC_USER_AGENT;
   if (!contact || !/[@/]/.test(contact)) {
     throw new Error(
@@ -167,4 +167,39 @@ export async function fetchSecondChannel(
 export function normalizeCik(cik: string): string {
   const digits = cik.replace(/\D/g, "");
   return digits.padStart(10, "0");
+}
+
+export type CompanyFact = {
+  start?: string;
+  end?: string;
+  val?: number;
+  form?: string;
+  filed?: string;
+  fy?: number;
+  fp?: string;
+  frame?: string;
+};
+
+export type CompanyFacts = {
+  cik: string;
+  entityName: string;
+  facts: Record<string, Record<string, { label?: string; units?: Record<string, CompanyFact[]> }>>;
+  source_url: string;
+};
+
+/** SEC companyfacts is the concept-discovery surface used by Scout. */
+export async function fetchCompanyFacts(cik: string): Promise<CompanyFacts> {
+  const normalized = normalizeCik(cik);
+  const url = `${SEC_BASE}/companyfacts/CIK${normalized}.json`;
+  const raw = (await secGet(url)) as {
+    cik?: number | string;
+    entityName?: string;
+    facts?: CompanyFacts["facts"];
+  };
+  return {
+    cik: normalizeCik(String(raw.cik ?? normalized)),
+    entityName: String(raw.entityName ?? ""),
+    facts: raw.facts ?? {},
+    source_url: url,
+  };
 }

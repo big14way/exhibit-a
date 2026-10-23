@@ -1,7 +1,7 @@
 {
   "id": "cassette_d2_edgar",
-  "recorded_at": "2026-10-22",
-  "label": "labelled SAMPLE_MODE cassette built from a committed SEC companyconcept/frames sample; replace after the first live Zetaris recording",
+  "recorded_at": "2026-10-23",
+  "label": "labelled SAMPLE_MODE cassette built from a committed SEC companyconcept/frames sample and a recorded Nemotron critic response; replace after the first live Zetaris recording",
   "entries": [
     {
       "tool": "catalog_search",
@@ -345,6 +345,68 @@
         ],
         "row_count": 23,
         "truncated": false
+      }
+    },
+    {
+      "tool": "discover_sources",
+      "args_sha256": "22706bdde2d22b8cc5bf5458a36b875fd5125c73fe28ba20e47a7b9daab280cd",
+      "result": {
+        "company": "Apple Inc.",
+        "cik": "0000320193",
+        "current_concept": "Revenues",
+        "current_annual_facts": 3,
+        "replacement_concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+        "replacement_reason": "Revenues has 3 annual 10-K facts ending 2018-09-29; RevenueFromContractWithCustomerExcludingAssessedTax has 9 annual 10-K facts ending 2025-09-27 and a continuous chain, so the missing history is a concept switch, not a lost source.",
+        "candidates": [
+          {
+            "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+            "annual_facts": 9,
+            "first_period": "2017-09-30",
+            "last_period": "2025-09-27",
+            "continuous": true,
+            "latest_forms": [
+              "10-K"
+            ],
+            "score": 30
+          },
+          {
+            "concept": "SalesRevenueNet",
+            "annual_facts": 11,
+            "first_period": "2007-09-29",
+            "last_period": "2017-09-30",
+            "continuous": false,
+            "latest_forms": [
+              "10-K",
+              "10-K/A"
+            ],
+            "score": 22
+          },
+          {
+            "concept": "Revenues",
+            "annual_facts": 3,
+            "first_period": "2016-09-24",
+            "last_period": "2018-09-29",
+            "continuous": false,
+            "latest_forms": [
+              "10-K"
+            ],
+            "score": 14
+          }
+        ],
+        "peers": [
+          {
+            "ticker": "F",
+            "table": "edgar.ford_revenue_table",
+            "sic_division": "Manufacturing"
+          },
+          {
+            "ticker": "TSLA",
+            "table": "edgar.tesla_revenue_table",
+            "sic_division": "Manufacturing"
+          }
+        ],
+        "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+        "rule": "revenue concept must have USD annual 10-K facts (330-400 days), a chain ending within 421 days, and extend the stopped concept"
       }
     },
     {
@@ -5161,5 +5223,19 @@
       }
     }
   ],
-  "models": []
+  "models": [
+    {
+      "agent": "DefenseCounsel",
+      "request_sha256": "b20522debcc59601b0b62c3e1af83ec50f81e96bb7e3c1f03b18322b3660e8dd",
+      "response": {
+        "content": "{\n  \"objections\": [\n    {\n      \"claim\": \"FY2018 holds 100 rows across 32 distinct period_end dates; 322 duplicate rows across the seven tables.\",\n      \"severity\": \"high\",\n      \"exhibit_sha256\": \"f0ab60383ba97b9eab89abc8681fa811a6506eea48793ff7a576dff07aa4cab3\"\n    },\n    {\n      \"claim\": \"Apple Inc. has 11 Revenues facts, all in fiscal_year 2018; that contributes $1205.3B of the $1295.0B jump.\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"5170a0f1a6ab171733433d2693f7c29840c2a0e873a453d835835866ae2c33cf\"\n    },\n    {\n      \"claim\": \"Corrected Manufacturing is 1.125x ($49.6B); that is 3.8% of the reported jump.\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"1553669f41f4e50e80d76d83ee424f0043e9f4873d0334ee8b0ed9615c16e757\"\n    },\n    {\n      \"claim\": \"Tesla, Inc. has rows in both FY2017 and FY2018; its share of the reported jump is 4.3%.\",\n      \"severity\": \"low\",\n      \"exhibit_sha256\": \"bfdc376020910ef941b56f6321ef0257e7c9d4bafa3a938f3f7b06128e3932bf\"\n    },\n    {\n      \"claim\": \"Zetaris holds 11 Apple Inc. facts; the SEC companyconcept endpoint returns 11. Nothing is missing.\",\n      \"severity\": \"low\",\n      \"exhibit_sha256\": \"66dc7ed7cdc39fb01011cb2e9659be6cfe979b0f823153358941196e9fbe9a14\"\n    }\n  ],\n  \"summary\": \"The data‑quality finding that the FY2018 revenue jump is real is undermined by several evidential gaps: (1) the duplication claim lacks quantitative support (only 7 duplicate rows reported vs. 322 claimed); (2) the assertion that Apple’s 11 revenue facts are confined to FY2018 is contradicted by evidence of records in FY2017; (3) the corrected manufacturing increase of 1.125× is not substantiated by the limited bucket‑profile evidence; (4) the Tesla contribution claim is not anchored in any specific exhibit, leaving its validity unproven; (5) the ingestion‑gap denial rests on a single SEC record that does not confirm the CIK of the 11 facts, so the ‘nothing missing’ assertion is unverified.\"\n}",
+        "tool_calls": [],
+        "usage": {
+          "prompt_tokens": 2599,
+          "completion_tokens": 5562
+        },
+        "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"
+      }
+    }
+  ]
 }

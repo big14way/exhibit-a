@@ -100,7 +100,7 @@ async function main(): Promise<void> {
       frame?: string;
       data?: { cik?: number; entityName?: string; val?: number }[];
     };
-    const wanted = new Set(EDGAR_COMPANIES.map((company) => company.cik));
+    const wanted = new Set<string>(EDGAR_COMPANIES.map((company) => company.cik));
     const rows = (raw.data ?? [])
       .filter((row) => wanted.has(String(row.cik ?? "").padStart(10, "0")))
       .map((row) => ({

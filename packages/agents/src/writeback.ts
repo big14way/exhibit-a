@@ -6,8 +6,10 @@ import {
   verifyContract,
   type CaseState,
   type Exhibit,
+  type HmemSummary,
   type SqlResult,
 } from "@exhibit-a/core";
+import { auditMemory, rememberCase } from "@exhibit-a/engines";
 import {
   CORRECTED_METRIC,
   SHADOW_METRIC,
@@ -304,6 +306,30 @@ export async function runWriteback(input: {
   });
   exhibits.push(verifiedExhibit);
 
+  let hmem: HmemSummary | undefined;
+  if (verification.ok) {
+    const record = rememberCase(
+      root,
+      {
+        ...state,
+        stage: "CLOSED",
+        verdict: state.verdict,
+        exhibits: [...state.exhibits, ...exhibits],
+      },
+      note,
+    );
+    const audit = auditMemory(root);
+    hmem = {
+      record_id: record.case_id,
+      records: audit.records,
+      valid: audit.valid,
+      malformed: audit.malformed,
+      duplicates: audit.duplicates,
+      storage: audit.storage,
+      recalled: state.memory?.hits.length ?? 0,
+    };
+  }
+
   const memoryExhibit = emitComputedExhibit({
     rt,
     tool: "memory",
@@ -321,6 +347,7 @@ export async function runWriteback(input: {
       readback: verification.ok ? "verified" : "failed",
       memory_kind: "USL table description",
       original_view_touched: false,
+      hmem,
     },
   });
   exhibits.push(memoryExhibit);
@@ -352,6 +379,7 @@ export async function runWriteback(input: {
       ...next,
       writeback: verification,
       exhibits: allExhibits,
+      hmem,
       error: verification.ok
         ? undefined
         : `writeback verifier failed: ${verification.checks

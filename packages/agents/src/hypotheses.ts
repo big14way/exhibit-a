@@ -1,4 +1,9 @@
-import { newId, type BaselineComparison, type Hypothesis } from "@exhibit-a/core";
+import {
+  newId,
+  type BaselineComparison,
+  type DiscoveryResult,
+  type Hypothesis,
+} from "@exhibit-a/core";
 import {
   EDGAR_COMPANIES,
   type BucketRow,
@@ -21,6 +26,7 @@ export type EvidenceRefs = {
   canonical: string;
   frames: Record<string, string>;
   appleConcept: string;
+  discovery: string;
 };
 
 export type Evidence = {
@@ -31,6 +37,7 @@ export type Evidence = {
   canonical: CanonicalSeries;
   frames: { period: string; result: SecFramesResult }[];
   appleConcept: SecCompanyConceptResult;
+  discovery?: DiscoveryResult;
   refs: EvidenceRefs;
 };
 
@@ -167,9 +174,16 @@ export function assessHypotheses(hypotheses: Hypothesis[], evidence: Evidence): 
         return {
           ...hypothesis,
           status: confirmed ? "confirmed" : "open",
-          exhibit_ids: [evidence.refs.companyBuckets, evidence.refs.appleConcept],
+          exhibit_ids: [
+            evidence.refs.companyBuckets,
+            evidence.refs.appleConcept,
+            evidence.refs.discovery,
+          ],
           note: confirmed
-            ? `${APPLE.entity_name} has ${appleRows.reduce((sum, row) => sum + row.rows_n, 0)} Revenues facts, all in fiscal_year ${onsetYear}; that contributes ${formatUsd(appleDelta)} of the ${formatUsd(onset.delta)} jump. ${TARGET.entity_name} has no Revenues fact after fiscal_year ${targetLast}.`
+            ? `${APPLE.entity_name} has ${appleRows.reduce((sum, row) => sum + row.rows_n, 0)} Revenues facts, all in fiscal_year ${onsetYear}; that contributes ${formatUsd(appleDelta)} of the ${formatUsd(onset.delta)} jump. ${TARGET.entity_name} has no Revenues fact after fiscal_year ${targetLast}.` +
+              (evidence.discovery?.replacement_concept
+                ? ` Scout found the replacement concept ${evidence.discovery.replacement_concept} with ${evidence.discovery.candidates.find((candidate) => candidate.concept === evidence.discovery?.replacement_concept)?.annual_facts ?? "more"} annual 10-K facts.`
+                : "")
             : "no single-year concentration found",
         };
       }

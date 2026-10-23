@@ -1,5 +1,11 @@
-import type { Exhibit, SqlResult, WriteContract } from "@exhibit-a/core";
-import { loadExhibits, sha256Json, verifyContract } from "@exhibit-a/core";
+import type { Exhibit, SafetyResult, SqlResult, WriteContract } from "@exhibit-a/core";
+import {
+  checkContentSafety,
+  loadExhibits,
+  sha256Json,
+  verifyContract,
+} from "@exhibit-a/core";
+import { discoverSources, type DiscoverSourcesArgs } from "./discovery.ts";
 import { compareMetricSeries, type Band } from "./baseline.ts";
 import { canonicalSeries } from "./canonical.ts";
 import {
@@ -219,14 +225,42 @@ export async function rerunExhibit(rt: ToolRuntime, exhibit: Exhibit): Promise<R
       result: verification as unknown as Record<string, unknown>,
       sql: exhibit.sql,
     });
-  } else if (tool === "memory") {
+  } else if (tool === "discover_sources") {
+    again = (await discoverSources(rt, exhibit.args as DiscoverSourcesArgs)).exhibit;
+  } else if (tool === "critic") {
+    // The critique is advisory and model-authored; a rerun replays the
+    // recorded critique rather than inventing a new one. The code gate is
+    // unaffected either way.
     again = emitComputedExhibit({
       rt,
-      tool: "memory",
+      tool: "critic",
+      kind: "critic",
+      title: exhibit.title,
+      args: exhibit.args,
+      result: exhibit.result as Record<string, unknown>,
+      source: "nvidia-nim",
+    });
+  } else if (tool === "safety") {
+    const args = exhibit.args as { policy?: string; text?: string };
+    const safety: SafetyResult = checkContentSafety(args.text ?? "");
+    again = emitComputedExhibit({
+      rt,
+      tool: "safety",
+      kind: "safety",
+      title: exhibit.title,
+      args: exhibit.args,
+      result: safety as unknown as Record<string, unknown>,
+      source: "safety",
+    });
+  } else if (tool === "memory" || tool === "memory_recall") {
+    again = emitComputedExhibit({
+      rt,
+      tool,
       kind: "memory",
       title: exhibit.title,
       args: exhibit.args,
       result: exhibit.result as Record<string, unknown>,
+      source: tool === "memory_recall" ? "hmem" : undefined,
     });
   } else if (tool === "verifier") {
     const args = exhibit.args as VerifierRerunArgs;

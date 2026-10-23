@@ -7,6 +7,7 @@ import {
   type CauseClaim,
   type Exhibit,
   type GateResult,
+  type CriticResult,
   type Verdict,
 } from "@exhibit-a/core";
 import {
@@ -31,6 +32,7 @@ export function adjudicate(input: {
   baseline: BaselineComparison;
   exhibits: Exhibit[];
   counterfactual: CounterfactualResult;
+  critic?: CriticResult;
 }): Adjudication {
   const onset = input.baseline.onset;
   const graph = loadGraph(input.root, input.state.id);
@@ -81,16 +83,21 @@ export function adjudicate(input: {
     });
   }
 
-  const critiqueConfigured = Boolean(
-    process.env.NVIDIA_API_KEY &&
-      (process.env.NIM_CRITIC_MODEL ?? process.env.NIM_LEAD_MODEL),
-  );
+  const critic = input.critic;
+  const criticNote =
+    critic?.status === "ran"
+      ? `Defense Counsel raised ${critic.objections.length} objection(s)` +
+        (critic.cited_unknown.length
+          ? `, ${critic.cited_unknown.length} citing an unknown exhibit`
+          : "") +
+        "; the deterministic code gate is final."
+      : critic?.status === "error"
+        ? `Defense Counsel critique failed safely (${critic.detail}); the deterministic code gate is final.`
+        : "Defense Counsel model critique was skipped (no NVIDIA_API_KEY/NIM model or no recorded response); the code gate is final and no model prose can promote a cause.";
   const notes = [
     "Concept switch / missing history is confirmed as a data-quality finding but carries no separate share: deduplicating by period recovers Apple's prior-year facts, so it does not add to the reported jump.",
     "Tesla short history and an ingestion gap were eliminated with exhibits, not left as possibilities.",
-    critiqueConfigured
-      ? "Defense Counsel model critique is configured; the deterministic code gate is final."
-      : "Defense Counsel model critique did not run (no NVIDIA_API_KEY or NIM model); the code gate is final and no model prose can promote a cause.",
+    criticNote,
     input.state.sample_mode
       ? "SAMPLE_MODE: tool results replayed from the labelled cassette; no live inference."
       : "Live mode.",

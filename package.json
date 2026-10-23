@@ -18,8 +18,13 @@
     "replay": "tsx apps/cli/src/index.ts replay",
     "cassette:d1": "tsx scripts/build-d1-cassette.ts",
     "cassette:d2": "tsx scripts/build-d2-cassette.ts",
+    "record:nim": "tsx scripts/record-nim-critic.ts",
     "fixture:edgar": "tsx scripts/build-edgar-fixture.ts",
-    "test": "node --import tsx --test packages/core/src/*.test.ts packages/tools/src/*.test.ts packages/agents/src/*.test.ts packages/llm/src/*.test.ts",
+    "fixture:discovery": "tsx scripts/build-discovery-fixture.ts",
+    "eval": "tsx evals/run.ts",
+    "eval:claims": "tsx evals/check_claims.ts",
+    "web": "tsx apps/web/src/server.ts",
+    "test": "node --import tsx --test packages/core/src/*.test.ts packages/tools/src/*.test.ts packages/agents/src/*.test.ts packages/llm/src/*.test.ts packages/engines/src/*.test.ts evals/*.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {

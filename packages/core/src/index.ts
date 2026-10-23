@@ -7,3 +7,4 @@ export * from "./cassette.ts";
 export * from "./contracts.ts";
 export * from "./gates.ts";
 export * from "./world-model.ts";
+export * from "./safety.ts";

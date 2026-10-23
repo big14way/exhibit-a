@@ -126,10 +126,13 @@ test("sample writeback is operator-approved, re-read, memorised, and closed", as
       8,
     );
     assert.equal(run.state.error, undefined);
-    assert.equal(run.state.exhibits.length, 29);
+    assert.equal(run.state.exhibits.length, 33);
     assert.ok(run.state.exhibits.some((exhibit) => exhibit.tool === "write_verified"));
     assert.ok(run.state.exhibits.some((exhibit) => exhibit.tool === "memory"));
     assert.ok(run.state.writeback?.memory_note?.includes(caseId));
+    assert.equal(run.state.hmem?.record_id, caseId);
+    assert.equal(run.state.hmem?.valid, 1);
+    assert.equal(run.state.hmem?.malformed, 0);
 
     const writebackExhibit = run.state.exhibits.find((exhibit) => exhibit.tool === "writeback");
     assert.ok(writebackExhibit);

@@ -5,6 +5,7 @@ export * from "./catalog.ts";
 export * from "./lineage.ts";
 export * from "./baseline.ts";
 export * from "./second-channel.ts";
+export * from "./discovery.ts";
 export * from "./edgar.ts";
 export * from "./canonical.ts";
 export * from "./counterfactual.ts";

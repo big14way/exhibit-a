@@ -34,6 +34,9 @@ export type ExhibitKind =
   | "profile"
   | "sql"
   | "second_channel"
+  | "discovery"
+  | "critic"
+  | "safety"
   | "memory"
   | "test"
   | "writeback";
@@ -214,6 +217,113 @@ export type WritebackResult = {
   memory_note?: string;
 };
 
+export type MemoryHit = {
+  case_id: string;
+  metric: string;
+  question: string;
+  verdict_kind: string;
+  causes: string[];
+  closed_at: string;
+  score: number;
+  match: string[];
+  excerpt: string;
+};
+
+export type MemoryRecall = {
+  storage: string;
+  cold_start: boolean;
+  query: { metric: string; question: string };
+  records: number;
+  hits: MemoryHit[];
+  audit: { valid: number; malformed: number; duplicates: number };
+};
+
+export type MemoryRecord = {
+  version: 1;
+  case_id: string;
+  metric: string;
+  question: string;
+  verdict_kind: string;
+  causes: string[];
+  stage: string;
+  closed_at: string;
+  exhibits: number;
+  exhibit_ids: string[];
+  sample_mode: boolean;
+  note: string;
+};
+
+export type SafetyFinding = {
+  rule: string;
+  match: string;
+  detail: string;
+};
+
+export type SafetyResult = {
+  ok: boolean;
+  policy: string;
+  findings: SafetyFinding[];
+  checked_chars: number;
+  action: "allow" | "block";
+};
+
+export type CriticObjection = {
+  claim: string;
+  severity: "low" | "medium" | "high";
+  exhibit_sha256?: string;
+  resolved?: boolean;
+  resolution?: string;
+};
+
+export type CriticResult = {
+  status: "ran" | "skipped" | "error";
+  model: string | null;
+  detail: string;
+  content: string;
+  objections: CriticObjection[];
+  cited_unknown: string[];
+  unresolved: number;
+  unsafe: boolean;
+  safety_findings: SafetyFinding[];
+  context_chunks: number;
+  context_chars: number;
+  usage: { prompt_tokens: number; completion_tokens: number };
+  spend: { calls: number; input_tokens: number; output_tokens: number; spent_usd: number };
+};
+
+export type DiscoveryCandidate = {
+  concept: string;
+  annual_facts: number;
+  first_period: string | null;
+  last_period: string | null;
+  continuous: boolean;
+  latest_forms: string[];
+  score: number;
+};
+
+export type DiscoveryResult = {
+  company: string;
+  cik: string;
+  current_concept: string;
+  current_annual_facts: number;
+  replacement_concept: string | null;
+  replacement_reason: string;
+  candidates: DiscoveryCandidate[];
+  peers: { ticker: string; table: string; sic_division: string }[];
+  source_url: string;
+  rule: string;
+};
+
+export type HmemSummary = {
+  record_id: string;
+  records: number;
+  valid: number;
+  malformed: number;
+  duplicates: number;
+  storage: string;
+  recalled: number;
+};
+
 export type CaseState = {
   id: string;
   reported_at: string;
@@ -225,6 +335,11 @@ export type CaseState = {
   cassette_recorded_at?: string;
   exhibits: Exhibit[];
   hypotheses: Hypothesis[];
+  memory?: MemoryRecall;
+  discovery?: DiscoveryResult;
+  critic?: CriticResult;
+  safety?: SafetyResult;
+  hmem?: HmemSummary;
   baseline?: BaselineComparison;
   verdict?: Verdict;
   repair?: RepairPlan;
