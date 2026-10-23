@@ -226,6 +226,7 @@ type UslTable = {
   primaryKey?: { columns?: string[] };
   dqAnnotations?: { name?: string; expression?: string }[];
   activateQuery?: string;
+  description?: string;
 };
 
 export function checkUslModel(
@@ -240,7 +241,11 @@ export function checkUslModel(
   const table = record?.tables?.find((row) => row.name === "fact") ?? record?.tables?.[0];
   const key = table?.primaryKey?.columns ?? [];
   const rules = table?.dqAnnotations?.map((row) => row.name) ?? [];
-  const description = record?.description ?? "";
+  // Depending on the Zetaris build, LOAD USL returns the table description at
+  // the model root or on the table. Older builds also store the SQL quotes.
+  const description = String(record?.description ?? table?.description ?? "")
+    .replace(/^'+|'+$/g, "")
+    .trim();
   const keyOk = key.includes("cik") && key.includes("period_end");
   const ruleOk = rules.includes(USL_ROW_RULE);
   const activationOk = Boolean(table?.activateQuery);
@@ -314,8 +319,13 @@ export function checkDqRun(
 }
 
 export function checkViewCatalog(result: SqlResult): VerifierInvariant {
-  const text = result.rows.flat().map((cell) => String(cell ?? "")).join(" ");
-  const found = text.includes(CORRECTED_VIEW_NAME);
+  // SHOW DATASOURCE VIEWS returns uppercase identifiers on the live build.
+  const text = result.rows
+    .flat()
+    .map((cell) => String(cell ?? ""))
+    .join(" ")
+    .toLowerCase();
+  const found = text.includes(CORRECTED_VIEW_NAME.toLowerCase());
   return {
     name: "view_catalog",
     ok: found,

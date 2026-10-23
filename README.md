@@ -15,7 +15,7 @@ Every claim carries an *exhibit*: the exact SQL that ran, its result hash, and a
 
 Outputs are **data-quality findings on public filings, not investment advice.**
 
-## Status (Day 4 repair + shadow verifier + operator-approved writeback)
+## Status (Day 4 repair + shadow verifier + live writeback)
 
 Working in two modes:
 
@@ -70,7 +70,7 @@ The sample replay reaches `CLOSED` with **29 exhibits** and **8/8** writeback ch
 | `view_catalog` | `SHOW DATASOURCE VIEWS` lists `sector_revenue_by_year_v2` |
 | `original_untouched` | reported view hash unchanged |
 
-The sample path is a labelled replay: it uses the verified shadow and canonical counts, writes nothing, and records `executed: false` in the writeback exhibit. A disposable live USL probe separately confirmed that Zetaris 2.4.3.1 accepts the composite primary key, the `COALESCE`/`CAST` activation select, both `RUN DQ` forms, and the table-description update; the probe was removed. The live case remains at `SHADOW_VERIFIED` until an operator runs `approve` and `writeback`.
+The sample path is a labelled replay: it uses the verified shadow and canonical counts, writes nothing, and records `executed: false` in the writeback exhibit. A disposable live USL probe separately confirmed that Zetaris 2.4.3.1 accepts the composite primary key, the `COALESCE`/`CAST` activation select, both `RUN DQ` forms, and the table-description update; the probe was removed. The live case is now `CLOSED` after operator approval; the live evidence is below.
 
 ### Live Zetaris verification
 
@@ -82,7 +82,9 @@ The same investigation has been run end to end with `SAMPLE_MODE=false` against 
 - SEC frames parity is **12/12** within 0.5%.
 - Live verdict: **`MIXED (filing_year_duplication=96.2%, real_change=3.8%)`**, gate pass, unexplained 0.0%.
 - The live shadow write created `exhibit_a_shadow.sector_revenue_by_year` through a signed contract. The shadow has **12 cells**; the verifier passes **7/7** (60 annual facts in the 2016–2019 period window, 22 unique `(cik, period_end)` facts, 38 declared duplicate facts). The reported `analytics.sector_revenue_by_year` re-read hash is unchanged.
-- The final write is implemented but deliberately not executed by the investigator: the live case is at `SHADOW_VERIFIED`. `approve` is the explicit operator gate; `writeback` is the separate execution step. The final target is `exhibit_a.sector_revenue_by_year_v2`; the reported view is never named in a write statement.
+- The operator-approved live writeback executed contract `contract_24227e473dae28c8` (7 signed statements) and reached `CLOSED`. The final `exhibit_a.sector_revenue_by_year_v2` re-read has **12 cells**, matching the shadow with **0 missing, 0 mismatched, 0 extra, max relative diff 0.000%**. The `revenue_facts` USL has the `(cik, period_end)` key and `annual_has_frame` rule; both `RUN DQ` forms return **102 records, 102 valid, 0 invalid**. `LOAD USL` carries the case/verdict/date catalog note, `SHOW DATASOURCE VIEWS` lists the final view, and the reported `analytics.sector_revenue_by_year` re-read hash is unchanged. Final: **8/8 checks, 39 exhibits**.
+- Verify-after-write caught two readback issues before close: Zetaris returns the USL description on the table (not the model root) and the first `UPDATE USL` stored SQL quote characters; `SHOW DATASOURCE VIEWS` also upper-cases view names. The verifier now handles both shapes and is case-insensitive, the description statement sends unquoted text, and a narrow recovery re-approval re-executed the idempotent contract under a fresh signature. The failed attempt remains in the exhibit/trace log; the final result is 8/8.
+- The reported view is never named in a write statement. The only write scope is `exhibit_a.sector_revenue_by_year_v2` plus the `lightning.metastore.exhibit_a.revenue_facts` USL.
 
 Live `INFER SQLTABLE` resolves the `edgar.*` schema-store views down to seven `SEC_DATA.*_revenue_facts` source tables; the world model has 8 nodes / 7 edges. Column-level lineage from the live parser is coarser (`parent` is null), so the gate uses source-level lineage.
 

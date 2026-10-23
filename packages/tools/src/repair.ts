@@ -177,10 +177,6 @@ export function uslRowRuleStatement(): string {
   return `REGISTER DQ ${USL_ROW_RULE} TABLE ${USL_TABLE_PATH} AS period_frame IS NOT NULL`;
 }
 
-function sqlLiteral(value: string): string {
-  return `'${value.replace(/'/g, "''")}'`;
-}
-
 export function memoryNote(input: {
   caseId: string;
   verdict?: { kind: string; causes: { cause: string; share: number }[] };
@@ -202,7 +198,10 @@ export function memoryNote(input: {
 }
 
 export function uslDescriptionStatement(note: string): string {
-  return `UPDATE USL ${USL_TABLE_PATH} SET TABLE DESCRIPTION ${sqlLiteral(note)}`;
+  // The Zetaris grammar takes the description as the rest of the statement
+  // (unquoted); quoting it stores the quote characters in the catalog.
+  const text = note.replace(/\s+/g, " ").replace(/;/g, ",").trim();
+  return `UPDATE USL ${USL_TABLE_PATH} SET TABLE DESCRIPTION ${text}`;
 }
 
 export function finalReadSql(view = CORRECTED_METRIC): string {

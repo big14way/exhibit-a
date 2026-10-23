@@ -74,6 +74,39 @@ test("sample writeback is operator-approved, re-read, memorised, and closed", as
     assert.equal(reapproved.write_contract?.approved, true);
     assert.notEqual(reapproved.write_contract?.id, approved.write_contract?.id);
 
+    const failed: CaseState = {
+      ...reapproved,
+      stage: "FAILED",
+      writeback: {
+        ok: false,
+        contract_id: reapproved.write_contract!.id,
+        written_metric: "exhibit_a.sector_revenue_by_year_v2",
+        checks: [
+          { name: "usl_model", ok: false, detail: "catalog description missing" },
+          { name: "view_catalog", ok: false, detail: "uppercase view name" },
+        ],
+      },
+    };
+    const recovered = approveWriteback({
+      root,
+      state: failed,
+      secret,
+      sampleMode: true,
+    });
+    assert.equal(recovered.stage, "AWAITING_APPROVAL");
+    assert.equal(recovered.writeback?.ok, false);
+    const blocked: CaseState = {
+      ...failed,
+      writeback: {
+        ...failed.writeback!,
+        checks: [{ name: "original_untouched", ok: false, detail: "changed" }],
+      },
+    };
+    assert.throws(
+      () => approveWriteback({ root, state: blocked, secret, sampleMode: true }),
+      /cannot recover failed writeback checks/,
+    );
+
     const run = await runWriteback({
       root,
       state: reapproved,

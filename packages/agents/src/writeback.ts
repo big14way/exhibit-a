@@ -47,12 +47,30 @@ export type ApprovalOptions = {
  */
 export function approveWriteback(input: ApprovalOptions): CaseState {
   const state = input.state;
-  if (state.stage !== "SHADOW_VERIFIED" && state.stage !== "AWAITING_APPROVAL") {
+  const recovering = state.stage === "FAILED";
+  if (recovering) {
+    // Recovery is deliberately narrow: the core view and the reported view
+    // already passed; only a catalog/verifier check may be repaired. A failed
+    // final read or a changed original view is never recoverable this way.
+    if (!state.writeback || state.writeback.ok) {
+      throw new Error("FAILED case has no failed writeback result to recover");
+    }
+    if (!state.write_contract) {
+      throw new Error("FAILED case has no prior write contract to recover");
+    }
+    const failed = state.writeback.checks
+      .filter((check) => !check.ok)
+      .map((check) => check.name);
+    const recoverable = new Set(["usl_model", "view_catalog"]);
+    const blocked = failed.filter((name) => !recoverable.has(name));
+    if (blocked.length) {
+      throw new Error(`cannot recover failed writeback checks: ${blocked.join(", ")}`);
+    }
+  } else if (state.stage !== "SHADOW_VERIFIED" && state.stage !== "AWAITING_APPROVAL") {
     throw new Error(
       `approval needs SHADOW_VERIFIED or AWAITING_APPROVAL; case is ${state.stage}`,
     );
-  }
-  if (state.writeback) {
+  } else if (state.writeback) {
     throw new Error("case already has a writeback result; re-approval is not allowed");
   }
   if (!state.verification?.ok) {
@@ -77,13 +95,18 @@ export function approveWriteback(input: ApprovalOptions): CaseState {
     requireApproved: true,
     scope: CORRECTED_METRIC,
   });
-  const next = advance(state, "AWAITING_APPROVAL");
+  // FAILED is normally terminal. This is the one explicit recovery path: the
+  // operator re-approves after a catalog-only verifier failure, and the
+  // writeback re-executes the idempotent statements under a fresh contract.
+  const next = recovering
+    ? { ...state, stage: "AWAITING_APPROVAL" as const }
+    : advance(state, "AWAITING_APPROVAL");
   emitTrace(input.root, {
     case_id: state.id,
     agent_name: "ScoutIntent",
-    action: "writeback.approve",
+    action: recovering ? "writeback.recover.approve" : "writeback.approve",
     input_summary: `shadow verifier ${state.verification.invariants.filter((row) => row.ok).length}/${state.verification.invariants.length}`,
-    output_summary: `operator-approved contract ${contract.id}; ${contract.statements.length} statements; awaiting writeback`,
+    output_summary: `${recovering ? "recovery " : ""}operator-approved contract ${contract.id}; ${contract.statements.length} statements; awaiting writeback`,
     status: "success",
     latency_ms: 0,
     exhibit_ids: [],
@@ -92,7 +115,7 @@ export function approveWriteback(input: ApprovalOptions): CaseState {
     ...next,
     write_contract: contract,
     writeback_note: note,
-    writeback: undefined,
+    writeback: recovering ? state.writeback : undefined,
     error: undefined,
     exhibits: state.exhibits,
   };

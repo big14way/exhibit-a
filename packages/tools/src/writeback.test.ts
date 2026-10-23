@@ -70,7 +70,10 @@ test("the final contract is approved, scoped, and never names the reported view"
   assert.ok(contract.statements.some((row) => /PRIMARY KEY \(cik, period_end\)/.test(row)));
   assert.ok(contract.statements.some((row) => row.startsWith("ACTIVATE USL TABLE")));
   assert.ok(contract.statements.some((row) => row.startsWith("REGISTER DQ annual_has_frame")));
-  assert.ok(contract.statements.some((row) => row.startsWith("UPDATE USL")));
+  const description = contract.statements.find((row) => row.startsWith("UPDATE USL"));
+  assert.ok(description);
+  assert.ok(description!.includes("SET TABLE DESCRIPTION Exhibit A"));
+  assert.ok(!description!.includes("SET TABLE DESCRIPTION '"));
   assert.ok(note.includes("case_writeback_test"));
   assert.ok(!contract.statements.some((row) => /analytics\./i.test(row)));
   assertFinalContract(contract);
@@ -118,10 +121,10 @@ test("the final read is compared cell-by-cell to the verified shadow", () => {
 
 test("the USL model readback checks the composite key, rule, and catalog note", () => {
   const model = {
-    description: "Exhibit A case_writeback_test verdict MIXED",
     tables: [
       {
         name: "fact",
+        description: "'Exhibit A case_writeback_test verdict MIXED'",
         primaryKey: { columns: ["cik", "period_end"] },
         dqAnnotations: [{ name: "annual_has_frame", expression: "period_frame IS NOT NULL" }],
         activateQuery: "SELECT 1",
@@ -154,7 +157,7 @@ test("verifyWriteback requires every readback, not just the core view", () => {
       ["annual_has_frame", "fact", "Custom Data Quality", "period_frame IS NOT NULL"],
     ],
   );
-  const views = asSqlResult(["name", "type"], [["sector_revenue_by_year_v2", "view"]]);
+  const views = asSqlResult(["name", "type"], [["SECTOR_REVENUE_BY_YEAR_V2", "view"]]);
   const model = {
     description: "Exhibit A case_writeback_test",
     tables: [
