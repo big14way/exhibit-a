@@ -2,5 +2,15 @@
   "name": "@exhibit-a/web",
   "version": "0.1.0",
   "private": true,
-  "description": "Case viewer (Day 5). Placeholder package so the workspace layout is complete."
+  "type": "module",
+  "description": "Local case viewer for Exhibit A: timeline, lineage, verdict, exhibits, rerun, and writeback status.",
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "dev": "tsx src/server.ts"
+  },
+  "dependencies": {
+    "@exhibit-a/agents": "workspace:*",
+    "@exhibit-a/core": "workspace:*",
+    "@exhibit-a/tools": "workspace:*"
+  }
 }

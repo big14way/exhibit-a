@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Exhibit A — case viewer</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <div class="brand">EXHIBIT A</div>
+        <div class="tagline">Evidence, not prose. A data-quality investigation viewer.</div>
+      </div>
+      <div class="top-actions">
+        <span id="mode-badge" class="badge muted">local</span>
+        <a href="/api/cases" class="link" target="_blank" rel="noreferrer">API</a>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-head">
+          <h2>Cases</h2>
+          <button id="refresh" class="button small" type="button">Refresh</button>
+        </div>
+        <div id="case-list" class="case-list"><div class="empty">Loading cases…</div></div>
+      </aside>
+
+      <section class="content">
+        <div id="empty-state" class="empty panel">
+          No case selected. Run <code>npm run cli -- investigate "is the FY2018 jump real?" --metric analytics.sector_revenue_by_year</code> and refresh.
+        </div>
+
+        <div id="case-view" class="hidden">
+          <div class="case-head">
+            <div>
+              <div class="eyebrow" id="case-id"></div>
+              <h1 id="case-question"></h1>
+              <div class="meta-row">
+                <span id="case-metric" class="mono"></span>
+                <span id="case-mode" class="badge"></span>
+                <span id="case-stage" class="badge stage"></span>
+              </div>
+            </div>
+            <div class="verdict-big" id="verdict-kind"></div>
+          </div>
+
+          <div id="stage-strip" class="stage-strip"></div>
+
+          <div class="grid two">
+            <article class="panel">
+              <h2>Verdict</h2>
+              <div id="verdict-body"></div>
+            </article>
+            <article class="panel">
+              <h2>Writeback</h2>
+              <div id="writeback-body"></div>
+            </article>
+          </div>
+
+          <div class="grid two">
+            <article class="panel">
+              <h2>Hypotheses</h2>
+              <div id="hypotheses-body"></div>
+            </article>
+            <article class="panel">
+              <h2>Evidence channels</h2>
+              <div id="channels-body"></div>
+            </article>
+          </div>
+
+          <article class="panel">
+            <div class="panel-head">
+              <h2>Lineage</h2>
+              <span class="hint">World Model reference graph</span>
+            </div>
+            <div id="lineage-body" class="lineage"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <h2>Exhibits</h2>
+              <div class="filters">
+                <input id="exhibit-search" type="search" placeholder="Filter exhibits…" />
+                <select id="exhibit-kind"><option value="">All kinds</option></select>
+              </div>
+            </div>
+            <div class="split">
+              <div id="exhibit-list" class="exhibit-list"></div>
+              <div id="exhibit-detail" class="exhibit-detail">
+                <div class="empty">Select an exhibit to inspect its SQL and result hash.</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <h2>Timeline</h2>
+              <span class="hint">Agent activity, in order</span>
+            </div>
+            <div id="timeline-body" class="timeline"></div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

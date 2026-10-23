@@ -1,0 +1,770 @@
+{
+  "generated_at": "2026-10-23T08:31:23.962Z",
+  "mode": "SAMPLE_MODE replay from the committed cassette",
+  "cold": {
+    "id": "case_eval_cold",
+    "stage": "SHADOW_VERIFIED",
+    "sample_mode": true,
+    "exhibits": 23,
+    "verdict": "MIXED",
+    "causes": [
+      {
+        "cause": "filing_year_duplication",
+        "kind": "artifact",
+        "share": 0.96168,
+        "exhibit_ids": [
+          "ex_71221750ca0b7969",
+          "ex_f96d2b0d318ef09f",
+          "ex_e3a9ee832b8b46e8",
+          "ex_9b0305fa834c13ff",
+          "ex_f2508423a370c490",
+          "ex_679dcefb89ea40e3",
+          "ex_35c2ad0c8bff8199",
+          "ex_3c990ec59a6620fd"
+        ]
+      },
+      {
+        "cause": "real_change",
+        "kind": "real",
+        "share": 0.03832,
+        "exhibit_ids": [
+          "ex_0cc2a56e3e33d571",
+          "ex_f2508423a370c490",
+          "ex_679dcefb89ea40e3",
+          "ex_176311b878edc233",
+          "ex_3c990ec59a6620fd"
+        ]
+      }
+    ],
+    "gate_failures": [],
+    "critic": {
+      "status": "ran",
+      "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "objections": 5,
+      "cited_unknown": 0,
+      "usage": {
+        "prompt_tokens": 2599,
+        "completion_tokens": 5562
+      }
+    },
+    "safety": {
+      "ok": true,
+      "policy": "data-quality-finding-no-investment-advice",
+      "findings": [],
+      "checked_chars": 3123,
+      "action": "allow"
+    },
+    "discovery": {
+      "company": "Apple Inc.",
+      "cik": "0000320193",
+      "current_concept": "Revenues",
+      "current_annual_facts": 3,
+      "replacement_concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+      "replacement_reason": "Revenues has 3 annual 10-K facts ending 2018-09-29; RevenueFromContractWithCustomerExcludingAssessedTax has 9 annual 10-K facts ending 2025-09-27 and a continuous chain, so the missing history is a concept switch, not a lost source.",
+      "candidates": [
+        {
+          "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+          "annual_facts": 9,
+          "first_period": "2017-09-30",
+          "last_period": "2025-09-27",
+          "continuous": true,
+          "latest_forms": [
+            "10-K"
+          ],
+          "score": 30
+        },
+        {
+          "concept": "SalesRevenueNet",
+          "annual_facts": 11,
+          "first_period": "2007-09-29",
+          "last_period": "2017-09-30",
+          "continuous": false,
+          "latest_forms": [
+            "10-K",
+            "10-K/A"
+          ],
+          "score": 22
+        },
+        {
+          "concept": "Revenues",
+          "annual_facts": 3,
+          "first_period": "2016-09-24",
+          "last_period": "2018-09-29",
+          "continuous": false,
+          "latest_forms": [
+            "10-K"
+          ],
+          "score": 14
+        }
+      ],
+      "peers": [
+        {
+          "ticker": "F",
+          "table": "edgar.ford_revenue_table",
+          "sic_division": "Manufacturing"
+        },
+        {
+          "ticker": "TSLA",
+          "table": "edgar.tesla_revenue_table",
+          "sic_division": "Manufacturing"
+        }
+      ],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+      "rule": "revenue concept must have USD annual 10-K facts (330-400 days), a chain ending within 421 days, and extend the stopped concept"
+    },
+    "memory": {
+      "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-eval-ChuBhb/logs/memory/index.json",
+      "cold_start": true,
+      "query": {
+        "metric": "analytics.sector_revenue_by_year",
+        "question": "is the FY2018 jump real?"
+      },
+      "records": 0,
+      "hits": [],
+      "audit": {
+        "valid": 0,
+        "malformed": 0,
+        "duplicates": 0
+      }
+    },
+    "verification": {
+      "ok": true,
+      "invariants": [
+        {
+          "name": "row_preservation",
+          "ok": true,
+          "numbers": {
+            "expected_cells": 11,
+            "missing": 0,
+            "mismatched": 0,
+            "extra": 0,
+            "max_diff": 0
+          }
+        },
+        {
+          "name": "uniqueness",
+          "ok": true,
+          "numbers": {
+            "annual_facts": 42,
+            "unique_annual_facts": 21,
+            "declared_duplicates": 21,
+            "shadow_rows": 11,
+            "duplicate_shadow_cells": 0
+          }
+        },
+        {
+          "name": "second_channel_parity",
+          "ok": true,
+          "numbers": {
+            "checked": 12,
+            "matched": 12,
+            "max_diff": 0
+          }
+        },
+        {
+          "name": "history_immutability",
+          "ok": true
+        },
+        {
+          "name": "metric_sanity",
+          "ok": true,
+          "numbers": {
+            "corrected_prior": 397769000000,
+            "corrected_now": 447394000000,
+            "corrected_delta": 49625000000,
+            "corrected_ratio": 1.1247583396393384,
+            "counterfactual_delta": 49625000000
+          }
+        },
+        {
+          "name": "shadow_contract",
+          "ok": true
+        },
+        {
+          "name": "bad_repair_rejected",
+          "ok": true
+        }
+      ]
+    },
+    "writeback": null,
+    "contract": null
+  },
+  "closed": {
+    "id": "case_eval_cold",
+    "stage": "CLOSED",
+    "sample_mode": true,
+    "exhibits": 33,
+    "verdict": "MIXED",
+    "causes": [
+      {
+        "cause": "filing_year_duplication",
+        "kind": "artifact",
+        "share": 0.96168,
+        "exhibit_ids": [
+          "ex_71221750ca0b7969",
+          "ex_f96d2b0d318ef09f",
+          "ex_e3a9ee832b8b46e8",
+          "ex_9b0305fa834c13ff",
+          "ex_f2508423a370c490",
+          "ex_679dcefb89ea40e3",
+          "ex_35c2ad0c8bff8199",
+          "ex_3c990ec59a6620fd"
+        ]
+      },
+      {
+        "cause": "real_change",
+        "kind": "real",
+        "share": 0.03832,
+        "exhibit_ids": [
+          "ex_0cc2a56e3e33d571",
+          "ex_f2508423a370c490",
+          "ex_679dcefb89ea40e3",
+          "ex_176311b878edc233",
+          "ex_3c990ec59a6620fd"
+        ]
+      }
+    ],
+    "gate_failures": [],
+    "critic": {
+      "status": "ran",
+      "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "objections": 5,
+      "cited_unknown": 0,
+      "usage": {
+        "prompt_tokens": 2599,
+        "completion_tokens": 5562
+      }
+    },
+    "safety": {
+      "ok": true,
+      "policy": "data-quality-finding-no-investment-advice",
+      "findings": [],
+      "checked_chars": 3123,
+      "action": "allow"
+    },
+    "discovery": {
+      "company": "Apple Inc.",
+      "cik": "0000320193",
+      "current_concept": "Revenues",
+      "current_annual_facts": 3,
+      "replacement_concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+      "replacement_reason": "Revenues has 3 annual 10-K facts ending 2018-09-29; RevenueFromContractWithCustomerExcludingAssessedTax has 9 annual 10-K facts ending 2025-09-27 and a continuous chain, so the missing history is a concept switch, not a lost source.",
+      "candidates": [
+        {
+          "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+          "annual_facts": 9,
+          "first_period": "2017-09-30",
+          "last_period": "2025-09-27",
+          "continuous": true,
+          "latest_forms": [
+            "10-K"
+          ],
+          "score": 30
+        },
+        {
+          "concept": "SalesRevenueNet",
+          "annual_facts": 11,
+          "first_period": "2007-09-29",
+          "last_period": "2017-09-30",
+          "continuous": false,
+          "latest_forms": [
+            "10-K",
+            "10-K/A"
+          ],
+          "score": 22
+        },
+        {
+          "concept": "Revenues",
+          "annual_facts": 3,
+          "first_period": "2016-09-24",
+          "last_period": "2018-09-29",
+          "continuous": false,
+          "latest_forms": [
+            "10-K"
+          ],
+          "score": 14
+        }
+      ],
+      "peers": [
+        {
+          "ticker": "F",
+          "table": "edgar.ford_revenue_table",
+          "sic_division": "Manufacturing"
+        },
+        {
+          "ticker": "TSLA",
+          "table": "edgar.tesla_revenue_table",
+          "sic_division": "Manufacturing"
+        }
+      ],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+      "rule": "revenue concept must have USD annual 10-K facts (330-400 days), a chain ending within 421 days, and extend the stopped concept"
+    },
+    "memory": {
+      "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-eval-ChuBhb/logs/memory/index.json",
+      "cold_start": true,
+      "query": {
+        "metric": "analytics.sector_revenue_by_year",
+        "question": "is the FY2018 jump real?"
+      },
+      "records": 0,
+      "hits": [],
+      "audit": {
+        "valid": 0,
+        "malformed": 0,
+        "duplicates": 0
+      }
+    },
+    "hmem": {
+      "record_id": "case_eval_cold",
+      "records": 1,
+      "valid": 1,
+      "malformed": 0,
+      "duplicates": 0,
+      "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-eval-ChuBhb/logs/memory/index.json",
+      "recalled": 0
+    },
+    "verification": {
+      "ok": true,
+      "invariants": [
+        {
+          "name": "row_preservation",
+          "ok": true,
+          "numbers": {
+            "expected_cells": 11,
+            "missing": 0,
+            "mismatched": 0,
+            "extra": 0,
+            "max_diff": 0
+          }
+        },
+        {
+          "name": "uniqueness",
+          "ok": true,
+          "numbers": {
+            "annual_facts": 42,
+            "unique_annual_facts": 21,
+            "declared_duplicates": 21,
+            "shadow_rows": 11,
+            "duplicate_shadow_cells": 0
+          }
+        },
+        {
+          "name": "second_channel_parity",
+          "ok": true,
+          "numbers": {
+            "checked": 12,
+            "matched": 12,
+            "max_diff": 0
+          }
+        },
+        {
+          "name": "history_immutability",
+          "ok": true
+        },
+        {
+          "name": "metric_sanity",
+          "ok": true,
+          "numbers": {
+            "corrected_prior": 397769000000,
+            "corrected_now": 447394000000,
+            "corrected_delta": 49625000000,
+            "corrected_ratio": 1.1247583396393384,
+            "counterfactual_delta": 49625000000
+          }
+        },
+        {
+          "name": "shadow_contract",
+          "ok": true
+        },
+        {
+          "name": "bad_repair_rejected",
+          "ok": true
+        }
+      ]
+    },
+    "writeback": {
+      "ok": true,
+      "checks": [
+        {
+          "name": "write_contract",
+          "ok": true,
+          "detail": "operator-approved contract contract_b088e60934bad33f executed exactly its signed statements"
+        },
+        {
+          "name": "final_view_readback",
+          "ok": true,
+          "detail": "final view re-read via a separate Zetaris session: 11 cells; 0 missing, 0 mismatched, 0 extra, max relative diff 0.000%",
+          "numbers": {
+            "expected_cells": 11,
+            "final_cells": 11,
+            "missing": 0,
+            "mismatched": 0,
+            "extra": 0,
+            "max_diff": 0
+          }
+        },
+        {
+          "name": "usl_model",
+          "ok": true,
+          "detail": "LOAD USL lightning.metastore.exhibit_a.revenue_facts.fact: key (cik, period_end); DQ rules annual_has_frame; activation present; catalog description contains the case",
+          "numbers": {
+            "key_columns": 2,
+            "dq_rules": 1,
+            "description_chars": 299
+          }
+        },
+        {
+          "name": "usl_dq_catalog",
+          "ok": true,
+          "detail": "LIST DQ shows composite key cik,period_end; annual_has_frame",
+          "numbers": {
+            "rules": 2
+          }
+        },
+        {
+          "name": "usl_duplicate_detector",
+          "ok": true,
+          "detail": "cik,period_end: 21 records, 21 valid, 0 invalid",
+          "numbers": {
+            "total_record": 21,
+            "valid_record": 21,
+            "invalid_record": 0
+          }
+        },
+        {
+          "name": "usl_row_rule",
+          "ok": true,
+          "detail": "annual_has_frame: 21 records, 21 valid, 0 invalid",
+          "numbers": {
+            "total_record": 21,
+            "valid_record": 21,
+            "invalid_record": 0
+          }
+        },
+        {
+          "name": "view_catalog",
+          "ok": true,
+          "detail": "SHOW DATASOURCE VIEWS lists sector_revenue_by_year_v2"
+        },
+        {
+          "name": "original_untouched",
+          "ok": true,
+          "detail": "reported view re-read hash a68f561a6786 is unchanged"
+        }
+      ],
+      "written_metric": "exhibit_a.sector_revenue_by_year_v2"
+    },
+    "contract": {
+      "id": "contract_b088e60934bad33f",
+      "statements": 7,
+      "approved": true
+    }
+  },
+  "warm": {
+    "id": "case_eval_warm",
+    "stage": "SHADOW_VERIFIED",
+    "sample_mode": true,
+    "exhibits": 23,
+    "verdict": "MIXED",
+    "causes": [
+      {
+        "cause": "filing_year_duplication",
+        "kind": "artifact",
+        "share": 0.96168,
+        "exhibit_ids": [
+          "ex_15444f197cf55f3f",
+          "ex_30717b40abcb8aaf",
+          "ex_1a8a55d2f6f2a8f0",
+          "ex_66278089cb81228f",
+          "ex_f2519492abfdb1ce",
+          "ex_a1b219c995db97d7",
+          "ex_81c02b48a714912f",
+          "ex_fdc8bbeca8ca7797"
+        ]
+      },
+      {
+        "cause": "real_change",
+        "kind": "real",
+        "share": 0.03832,
+        "exhibit_ids": [
+          "ex_928ad66e0181c649",
+          "ex_f2519492abfdb1ce",
+          "ex_a1b219c995db97d7",
+          "ex_717d5a732e23bf9d",
+          "ex_fdc8bbeca8ca7797"
+        ]
+      }
+    ],
+    "gate_failures": [],
+    "critic": {
+      "status": "error",
+      "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "objections": 0,
+      "cited_unknown": 0,
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    "safety": {
+      "ok": true,
+      "policy": "data-quality-finding-no-investment-advice",
+      "findings": [],
+      "checked_chars": 1314,
+      "action": "allow"
+    },
+    "discovery": {
+      "company": "Apple Inc.",
+      "cik": "0000320193",
+      "current_concept": "Revenues",
+      "current_annual_facts": 3,
+      "replacement_concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+      "replacement_reason": "Revenues has 3 annual 10-K facts ending 2018-09-29; RevenueFromContractWithCustomerExcludingAssessedTax has 9 annual 10-K facts ending 2025-09-27 and a continuous chain, so the missing history is a concept switch, not a lost source.",
+      "candidates": [
+        {
+          "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+          "annual_facts": 9,
+          "first_period": "2017-09-30",
+          "last_period": "2025-09-27",
+          "continuous": true,
+          "latest_forms": [
+            "10-K"
+          ],
+          "score": 30
+        },
+        {
+          "concept": "SalesRevenueNet",
+          "annual_facts": 11,
+          "first_period": "2007-09-29",
+          "last_period": "2017-09-30",
+          "continuous": false,
+          "latest_forms": [
+            "10-K",
+            "10-K/A"
+          ],
+          "score": 22
+        },
+        {
+          "concept": "Revenues",
+          "annual_facts": 3,
+          "first_period": "2016-09-24",
+          "last_period": "2018-09-29",
+          "continuous": false,
+          "latest_forms": [
+            "10-K"
+          ],
+          "score": 14
+        }
+      ],
+      "peers": [
+        {
+          "ticker": "F",
+          "table": "edgar.ford_revenue_table",
+          "sic_division": "Manufacturing"
+        },
+        {
+          "ticker": "TSLA",
+          "table": "edgar.tesla_revenue_table",
+          "sic_division": "Manufacturing"
+        }
+      ],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+      "rule": "revenue concept must have USD annual 10-K facts (330-400 days), a chain ending within 421 days, and extend the stopped concept"
+    },
+    "memory": {
+      "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-eval-ChuBhb/logs/memory/index.json",
+      "cold_start": false,
+      "query": {
+        "metric": "analytics.sector_revenue_by_year",
+        "question": "is the FY2018 jump real?"
+      },
+      "records": 1,
+      "hits": [
+        {
+          "case_id": "case_eval_cold",
+          "metric": "analytics.sector_revenue_by_year",
+          "question": "is the FY2018 jump real?",
+          "verdict_kind": "MIXED",
+          "causes": [
+            "filing_year_duplication=96.2%",
+            "real_change=3.8%"
+          ],
+          "closed_at": "2026-10-23T08:31:23.953Z",
+          "score": 14,
+          "match": [
+            "same metric",
+            "4 shared terms",
+            "MIXED"
+          ],
+          "excerpt": "Exhibit A case_eval_cold verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_71221750ca0b7969, ex_f96d2b0d318ef09f, ex_e3a9ee832b8b46e8, ex_9b0305fa834c13ff, ex_f2508423a370c490, ex_679dcefb89ea40e3, 2026-10-23. Data-quality finding on public filings, not investment advice."
+        }
+      ],
+      "audit": {
+        "valid": 1,
+        "malformed": 0,
+        "duplicates": 0
+      }
+    },
+    "verification": {
+      "ok": true,
+      "invariants": [
+        {
+          "name": "row_preservation",
+          "ok": true,
+          "numbers": {
+            "expected_cells": 11,
+            "missing": 0,
+            "mismatched": 0,
+            "extra": 0,
+            "max_diff": 0
+          }
+        },
+        {
+          "name": "uniqueness",
+          "ok": true,
+          "numbers": {
+            "annual_facts": 42,
+            "unique_annual_facts": 21,
+            "declared_duplicates": 21,
+            "shadow_rows": 11,
+            "duplicate_shadow_cells": 0
+          }
+        },
+        {
+          "name": "second_channel_parity",
+          "ok": true,
+          "numbers": {
+            "checked": 12,
+            "matched": 12,
+            "max_diff": 0
+          }
+        },
+        {
+          "name": "history_immutability",
+          "ok": true
+        },
+        {
+          "name": "metric_sanity",
+          "ok": true,
+          "numbers": {
+            "corrected_prior": 397769000000,
+            "corrected_now": 447394000000,
+            "corrected_delta": 49625000000,
+            "corrected_ratio": 1.1247583396393384,
+            "counterfactual_delta": 49625000000
+          }
+        },
+        {
+          "name": "shadow_contract",
+          "ok": true
+        },
+        {
+          "name": "bad_repair_rejected",
+          "ok": true
+        }
+      ]
+    },
+    "writeback": null,
+    "contract": null
+  },
+  "ablation": {
+    "kind": "INSUFFICIENT_EVIDENCE",
+    "gate_failures": [
+      {
+        "rule": "filing_year_duplication:sufficient",
+        "detail": "artifact cause needs a counterfactual exhibit"
+      },
+      {
+        "rule": "filing_year_duplication:second-channel",
+        "detail": "DATA_ARTIFACT/MIXED needs an independent second-channel exhibit"
+      }
+    ]
+  },
+  "claims": [
+    {
+      "id": "sample_labelled",
+      "claim": "SAMPLE_MODE is labelled replay, not live inference",
+      "ok": true,
+      "evidence": "23 exhibits; transport values code, cassette"
+    },
+    {
+      "id": "verdict_mixed",
+      "claim": "The FY2018 sample verdict is MIXED with two causes",
+      "ok": true,
+      "evidence": "MIXED; 2 causes"
+    },
+    {
+      "id": "artifact_share",
+      "claim": "Artifact share is 96.168% and real share is 3.832%",
+      "ok": true,
+      "evidence": "artifact 96.168%, real 3.832%, unexplained 0.000%"
+    },
+    {
+      "id": "gate_pass",
+      "claim": "The deterministic gate passes without failures",
+      "ok": true,
+      "evidence": "0 failures"
+    },
+    {
+      "id": "shadow_verified",
+      "claim": "Shadow repair passes 7/7 invariants and 12/12 second-channel cells",
+      "ok": true,
+      "evidence": "7/7; parity 12/12"
+    },
+    {
+      "id": "sample_close",
+      "claim": "The sample writeback reaches CLOSED with 8/8 readback checks",
+      "ok": true,
+      "evidence": "CLOSED; 8/8 checks"
+    },
+    {
+      "id": "reported_view_untouched",
+      "claim": "No write statement names the reported analytics view",
+      "ok": true,
+      "evidence": "no statement names the reported view"
+    },
+    {
+      "id": "hmem_cold_warm",
+      "claim": "H-MEM starts cold and recalls the closed case on the warm run",
+      "ok": true,
+      "evidence": "cold 0 hit(s); warm 1 hit(s); recalled case_eval_cold"
+    },
+    {
+      "id": "hmem_persisted",
+      "claim": "The closed case is written to the H-MEM index and audits cleanly",
+      "ok": true,
+      "evidence": "record case_eval_cold; 1 valid, 0 malformed"
+    },
+    {
+      "id": "discovery",
+      "claim": "Scout discovers the replacement Apple revenue concept from SEC companyfacts",
+      "ok": true,
+      "evidence": "Revenues -> RevenueFromContractWithCustomerExcludingAssessedTax; 3 candidates"
+    },
+    {
+      "id": "nim_critic",
+      "claim": "The recorded Nemotron critic runs in replay with five grounded objections",
+      "ok": true,
+      "evidence": "ran; 5 objections; 2599 prompt tokens"
+    },
+    {
+      "id": "content_safety",
+      "claim": "The content-safety guard passes generated finding prose",
+      "ok": true,
+      "evidence": "cold true; warm true"
+    },
+    {
+      "id": "ablation",
+      "claim": "Removing the counterfactual/second channel downgrades the verdict",
+      "ok": true,
+      "evidence": "INSUFFICIENT_EVIDENCE; 2 gate failures"
+    },
+    {
+      "id": "exhibit_counts",
+      "claim": "The sample investigation and close have the expected exhibit counts",
+      "ok": true,
+      "evidence": "23 investigate; 33 close"
+    }
+  ]
+}
