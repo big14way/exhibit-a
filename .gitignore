@@ -26,3 +26,7 @@ logs/**
 
 # docker
 docker/data
+
+# local-only
+logs_bak/
+docs/video/pw/
