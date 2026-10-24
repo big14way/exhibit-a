@@ -6,7 +6,7 @@
 
 Outputs are **data-quality findings on public filings, not investment advice.**
 
-**Submission assets:** `deck/exhibit-a-deck.pdf` (editable `.pptx` alongside), `deck/exhibit-a-demo.mp4`, `README.md`, `PRE_EXISTING_DECLARATION.md`, `evals/results/latest.md` (18/18 claim checks), `fixtures/cases/live/` (the recorded live Zetaris close).
+**Submission assets:** `deck/exhibit-a-deck.pdf` (editable `.pptx` alongside), `deck/exhibit-a-demo.mp4` (YouTube: https://youtu.be/ij--TZQ0H4Y), the read-only viewer at https://big14way.github.io/exhibit-a/, `README.md`, `PRE_EXISTING_DECLARATION.md`, `evals/results/latest.md` (18/18 claim checks), `fixtures/cases/live/` (the recorded live Zetaris close).
 
 ## The problem and the user
 

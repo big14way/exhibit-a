@@ -127,7 +127,8 @@ The live close predates the H-MEM embedding, discovery, critic, safety and viewe
 
 - `SUBMISSION.md` — written sponsor explanation.
 - `PRE_EXISTING_DECLARATION.md` — declaration of pre-window material.
-- `deck/exhibit-a-deck.pdf` (+ editable `.pptx`) and `deck/exhibit-a-demo.mp4`.
+- `deck/exhibit-a-deck.pdf` (+ editable `.pptx`) and `deck/exhibit-a-demo.mp4` — also on YouTube: https://youtu.be/ij--TZQ0H4Y
+- Read-only viewer: https://big14way.github.io/exhibit-a/
 - `evals/results/latest.md` — 18/18 claim checks.
 - `fixtures/cases/live/` — the recorded live Zetaris close; `fixtures/cases/sample/` — generated with `npm run fixture:cases`.
 
