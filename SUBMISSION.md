@@ -6,7 +6,7 @@
 
 Outputs are **data-quality findings on public filings, not investment advice.**
 
-**Submission assets:** `deck/exhibit-a-deck.pdf` (editable `.pptx` alongside), `deck/exhibit-a-demo.mp4` (YouTube: https://youtu.be/ij--TZQ0H4Y), the read-only viewer at https://big14way.github.io/exhibit-a/, `README.md`, `PRE_EXISTING_DECLARATION.md`, `evals/results/latest.md` (18/18 claim checks), `fixtures/cases/live/` (the recorded live Zetaris close).
+**Submission assets:** `deck/exhibit-a-deck.pdf` (editable `.pptx` alongside), `deck/exhibit-a-demo.mp4` (YouTube: https://youtu.be/ij--TZQ0H4Y), the read-only viewer at https://big14way.github.io/exhibit-a/, `README.md`, `PRE_EXISTING_DECLARATION.md`, `evals/results/latest.md` (20/20 claim checks), `fixtures/cases/live/` (the recorded live Zetaris close).
 
 ## The problem and the user
 
@@ -79,7 +79,7 @@ The project was developed in Cursor Agent mode with project rules in `.cursor/ru
 - **The repair is proven before it is written.** Shadow view, signed contract, seven verifier invariants and two bad-repair probes come before operator approval.
 - **The writeback is auditable.** The final view and the USL are re-read through a separate session and the original reported view hash must be unchanged; the live close is committed as evidence.
 - **Three Nemotron roles, all bounded.** Critic, content safety and embeddings each have a documented boundary and a recorded fallback.
-- **Reproducible without keys.** `npm run eval` passes 18/18 claim checks and reproduces its result file byte for byte.
+- **Reproducible without keys.** `npm run eval` passes 20/20 claim checks and reproduces its result file byte for byte.
 
 ## Reproduce
 
