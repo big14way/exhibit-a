@@ -28,7 +28,8 @@ No Exhibit A source file was copied from a pre-existing product or another team'
 - Runtime and development dependencies are installed from `package-lock.json` (npm). They are third-party open-source packages under their own licenses; they are not claimed as original work.
 - **No Meterless runtime or engine source code is vendored.** `packages/engines/src/memory.ts` (H-MEM), `packages/engines/src/markovian.ts` (Markovian bounded context), `packages/core/src/world-model.ts` (World Model lineage graph), and `packages/core/src/contracts.ts` (Scout Intent signed contracts) are original reference implementations of the documented engine contracts, written during the event.
 - SEC companyconcept, companyfacts, and frames data in `fixtures/edgar/` is public-domain U.S. government filing data retrieved during the event. The SEC API terms and declared User-Agent/contact are respected.
-- The committed `fixtures/cassettes/d2-edgar-investigation.json` is a labelled SAMPLE_MODE recording produced during the event. It includes tool results and one recorded NVIDIA Nemotron critic response. It is not live inference and is labelled as replay in the README, CLI, exhibits, viewer, and evals.
+- The committed `fixtures/cassettes/d2-edgar-investigation.json` is a labelled SAMPLE_MODE recording produced during the event. It includes tool results and recorded NVIDIA Nemotron responses for three roles (Defense Counsel critic, content-safety model, H-MEM embeddings). It is not live inference and is labelled as replay in the README, CLI, exhibits, viewer, and evals.
+- `fixtures/cases/live/` is the case log of the live Zetaris close recorded on 2026-10-22/23 against the local instance; `fixtures/cases/sample/` is generated from the cassette by `npm run fixture:cases`. Both were produced during the event.
 
 ## AI-assisted development
 
@@ -45,5 +46,5 @@ No Exhibit A source file was copied from a pre-existing product or another team'
 
 ## Signature
 
-Name: ______________________
-Date: ______________________
+Name: Godswill Idolor (GitHub: big14way)
+Date: 2026-10-24

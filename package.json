@@ -25,7 +25,8 @@
     "eval:claims": "tsx evals/check_claims.ts",
     "web": "tsx apps/web/src/server.ts",
     "test": "node --import tsx --test packages/core/src/*.test.ts packages/tools/src/*.test.ts packages/agents/src/*.test.ts packages/llm/src/*.test.ts packages/engines/src/*.test.ts evals/*.test.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "fixture:cases": "tsx scripts/build-sample-cases.ts"
   },
   "devDependencies": {
     "@types/node": "^24.7.2",

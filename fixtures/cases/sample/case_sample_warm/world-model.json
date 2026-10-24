@@ -1,7 +1,7 @@
 {
-  "case_id": "case_399f7934a8aabdf0",
+  "case_id": "case_sample_warm",
   "view": "analytics.sector_revenue_by_year",
-  "built_at": "2026-10-24T11:06:45.597Z",
+  "built_at": "2026-10-24T11:08:15.509Z",
   "nodes": [
     "analytics.sector_revenue_by_year",
     "analytics.sector_revenue_by_year.fiscal_year",
