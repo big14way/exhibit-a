@@ -1,0 +1,83 @@
+{
+  "case_id": "case_797df0a52bd53bc6",
+  "view": "analytics.sector_revenue_by_year",
+  "built_at": "2026-10-22T16:16:45.645Z",
+  "nodes": [
+    "SEC_DATA.apple_revenue_facts",
+    "SEC_DATA.ford_revenue_facts",
+    "SEC_DATA.ibm_revenue_facts",
+    "SEC_DATA.oracle_revenue_facts",
+    "SEC_DATA.target_revenue_facts",
+    "SEC_DATA.tesla_revenue_facts",
+    "SEC_DATA.walmart_revenue_facts",
+    "analytics.sector_revenue_by_year"
+  ],
+  "edges": [
+    {
+      "from": "SEC_DATA.apple_revenue_facts",
+      "to": "analytics.sector_revenue_by_year",
+      "kind": "source"
+    },
+    {
+      "from": "SEC_DATA.ibm_revenue_facts",
+      "to": "analytics.sector_revenue_by_year",
+      "kind": "source"
+    },
+    {
+      "from": "SEC_DATA.oracle_revenue_facts",
+      "to": "analytics.sector_revenue_by_year",
+      "kind": "source"
+    },
+    {
+      "from": "SEC_DATA.walmart_revenue_facts",
+      "to": "analytics.sector_revenue_by_year",
+      "kind": "source"
+    },
+    {
+      "from": "SEC_DATA.target_revenue_facts",
+      "to": "analytics.sector_revenue_by_year",
+      "kind": "source"
+    },
+    {
+      "from": "SEC_DATA.ford_revenue_facts",
+      "to": "analytics.sector_revenue_by_year",
+      "kind": "source"
+    },
+    {
+      "from": "SEC_DATA.tesla_revenue_facts",
+      "to": "analytics.sector_revenue_by_year",
+      "kind": "source"
+    }
+  ],
+  "sources": [
+    {
+      "source_table": "SEC_DATA.apple_revenue_facts",
+      "source_kind": "table"
+    },
+    {
+      "source_table": "SEC_DATA.ibm_revenue_facts",
+      "source_kind": "table"
+    },
+    {
+      "source_table": "SEC_DATA.oracle_revenue_facts",
+      "source_kind": "table"
+    },
+    {
+      "source_table": "SEC_DATA.walmart_revenue_facts",
+      "source_kind": "table"
+    },
+    {
+      "source_table": "SEC_DATA.target_revenue_facts",
+      "source_kind": "table"
+    },
+    {
+      "source_table": "SEC_DATA.ford_revenue_facts",
+      "source_kind": "table"
+    },
+    {
+      "source_table": "SEC_DATA.tesla_revenue_facts",
+      "source_kind": "table"
+    }
+  ],
+  "columns": []
+}

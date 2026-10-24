@@ -1,0 +1,5471 @@
+{
+  "id": "case_d6ae091f2661a801",
+  "reported_at": "2026-10-22T15:44:29.658Z",
+  "question": "is the FY2018 jump real?",
+  "metric": "analytics.sector_revenue_by_year",
+  "stage": "ADJUDICATED",
+  "sample_mode": true,
+  "cassette_id": "cassette_d2_edgar",
+  "cassette_recorded_at": "2026-10-22",
+  "exhibits": [
+    {
+      "id": "ex_c080dd6b44ad45d9",
+      "ts": "2026-10-22T15:44:29.660Z",
+      "kind": "metadata",
+      "source": "zetaris",
+      "transport": "cassette",
+      "title": "catalog search analytics.sector_revenue_by_year",
+      "tool": "catalog_search",
+      "sql": "SHOW LIGHTNING DATABASES",
+      "sql_sha256": "073dd0ac7969656d535a61d756cffa9e71b46a9b0ec025d37ba02f92597bed56",
+      "args": {
+        "q": "analytics.sector_revenue_by_year",
+        "sql": "SHOW LIGHTNING DATABASES"
+      },
+      "result": {
+        "columns": [
+          "database"
+        ],
+        "rows": [
+          [
+            "analytics"
+          ],
+          [
+            "edgar"
+          ],
+          [
+            "sic_edgar_usl"
+          ]
+        ],
+        "row_count": 3,
+        "truncated": false
+      },
+      "result_sha256": "50cec15cf32167ace4c65f81cbf6062cc8315089fcf1cb17eeb247633bfeb19a",
+      "rerun": "exhibit-a rerun ex_c080dd6b44ad45d9",
+      "case_id": "case_d6ae091f2661a801",
+      "agent": "LeadInvestigator"
+    },
+    {
+      "id": "ex_966782781b4c3dc3",
+      "ts": "2026-10-22T15:44:29.660Z",
+      "kind": "metadata",
+      "source": "zetaris",
+      "transport": "cassette",
+      "title": "describe analytics.sector_revenue_by_year",
+      "tool": "describe",
+      "sql": "DESCRIBE DATASOURCE TABLE analytics.sector_revenue_by_year",
+      "sql_sha256": "6ae0f9504789fa2cda13da0ca3d0c04d7d301e57dcce768473f8d4cb3006ff57",
+      "args": {
+        "obj": "analytics.sector_revenue_by_year",
+        "sql": "DESCRIBE DATASOURCE TABLE analytics.sector_revenue_by_year"
+      },
+      "result": {
+        "columns": [
+          "col_name",
+          "data_type"
+        ],
+        "rows": [
+          [
+            "sic_division",
+            "string"
+          ],
+          [
+            "fiscal_year",
+            "int"
+          ],
+          [
+            "revenue_usd",
+            "double"
+          ]
+        ],
+        "row_count": 3,
+        "truncated": false
+      },
+      "result_sha256": "7b3848c1656c6f45c8560a63999baf373cea4d9a281c07cb7dc2097f07fae35a",
+      "rerun": "exhibit-a rerun ex_966782781b4c3dc3",
+      "case_id": "case_d6ae091f2661a801",
+      "agent": "LeadInvestigator"
+    },
+    {
+      "id": "ex_4a69580f1ab07df2",
+      "ts": "2026-10-22T15:44:29.661Z",
+      "kind": "lineage",
+      "source": "zetaris",
+      "transport": "cassette",
+      "title": "lineage sources analytics.sector_revenue_by_year",
+      "tool": "lineage_sources",
+      "sql": "INFER SQLTABLE SOURCES SPEC -- Declared naive analyst fixture. Anomalies are not planted; they come from\n-- how SEC companyconcept facts behave when summed by filing fiscal_year.\n-- The dashboard window is FY2016-FY2019. Do not replace this view in place;\n-- corrections go to exhibit_a.*_v2.\n\nCREATE OR REPLACE SCHEMASTORE VIEW analytics.sector_revenue_by_year AS\nSELECT\n  s.sic_division,\n  f.fiscal_year,\n  SUM(f.value_usd) AS revenue_usd\nFROM (\n  SELECT * FROM edgar.apple_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ibm_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.oracle_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.walmart_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.target_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ford_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.tesla_revenue_table\n) f\nLEFT JOIN sic_edgar_usl s\n  ON s.cik = f.cik\nWHERE f.fiscal_year BETWEEN 2016 AND 2019\nGROUP BY s.sic_division, f.fiscal_year",
+      "sql_sha256": "8624c9dd50dad1bd8ffcd615e32c7f0084ad6aa70c8920e37bf3ff443d01c9c2",
+      "args": {
+        "view": "analytics.sector_revenue_by_year",
+        "sql": "INFER SQLTABLE SOURCES SPEC -- Declared naive analyst fixture. Anomalies are not planted; they come from\n-- how SEC companyconcept facts behave when summed by filing fiscal_year.\n-- The dashboard window is FY2016-FY2019. Do not replace this view in place;\n-- corrections go to exhibit_a.*_v2.\n\nCREATE OR REPLACE SCHEMASTORE VIEW analytics.sector_revenue_by_year AS\nSELECT\n  s.sic_division,\n  f.fiscal_year,\n  SUM(f.value_usd) AS revenue_usd\nFROM (\n  SELECT * FROM edgar.apple_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ibm_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.oracle_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.walmart_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.target_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ford_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.tesla_revenue_table\n) f\nLEFT JOIN sic_edgar_usl s\n  ON s.cik = f.cik\nWHERE f.fiscal_year BETWEEN 2016 AND 2019\nGROUP BY s.sic_division, f.fiscal_year"
+      },
+      "result": {
+        "columns": [
+          "source_table",
+          "source_kind"
+        ],
+        "rows": [
+          [
+            "edgar.apple_revenue_table",
+            "table"
+          ],
+          [
+            "edgar.ibm_revenue_table",
+            "table"
+          ],
+          [
+            "edgar.oracle_revenue_table",
+            "table"
+          ],
+          [
+            "edgar.walmart_revenue_table",
+            "table"
+          ],
+          [
+            "edgar.target_revenue_table",
+            "table"
+          ],
+          [
+            "edgar.ford_revenue_table",
+            "table"
+          ],
+          [
+            "edgar.tesla_revenue_table",
+            "table"
+          ],
+          [
+            "sic_edgar_usl",
+            "table"
+          ]
+        ],
+        "row_count": 8,
+        "truncated": false
+      },
+      "result_sha256": "c0758636c68f41cf96da3838a006767b05f70ff243d19ee3059b42aa89cb269e",
+      "rerun": "exhibit-a rerun ex_4a69580f1ab07df2",
+      "case_id": "case_d6ae091f2661a801",
+      "agent": "SourceScout"
+    },
+    {
+      "id": "ex_39cb6d86028a4e38",
+      "ts": "2026-10-22T15:44:29.661Z",
+      "kind": "lineage",
+      "source": "zetaris",
+      "transport": "cassette",
+      "title": "lineage columns analytics.sector_revenue_by_year",
+      "tool": "lineage_columns",
+      "sql": "INFER SQLTABLE COLUMNS SPEC -- Declared naive analyst fixture. Anomalies are not planted; they come from\n-- how SEC companyconcept facts behave when summed by filing fiscal_year.\n-- The dashboard window is FY2016-FY2019. Do not replace this view in place;\n-- corrections go to exhibit_a.*_v2.\n\nCREATE OR REPLACE SCHEMASTORE VIEW analytics.sector_revenue_by_year AS\nSELECT\n  s.sic_division,\n  f.fiscal_year,\n  SUM(f.value_usd) AS revenue_usd\nFROM (\n  SELECT * FROM edgar.apple_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ibm_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.oracle_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.walmart_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.target_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ford_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.tesla_revenue_table\n) f\nLEFT JOIN sic_edgar_usl s\n  ON s.cik = f.cik\nWHERE f.fiscal_year BETWEEN 2016 AND 2019\nGROUP BY s.sic_division, f.fiscal_year",
+      "sql_sha256": "f0e09ce4541eb1d1c57aa53116a60e3b0eba1f50f9756199951d8e8211946422",
+      "args": {
+        "view": "analytics.sector_revenue_by_year",
+        "sql": "INFER SQLTABLE COLUMNS SPEC -- Declared naive analyst fixture. Anomalies are not planted; they come from\n-- how SEC companyconcept facts behave when summed by filing fiscal_year.\n-- The dashboard window is FY2016-FY2019. Do not replace this view in place;\n-- corrections go to exhibit_a.*_v2.\n\nCREATE OR REPLACE SCHEMASTORE VIEW analytics.sector_revenue_by_year AS\nSELECT\n  s.sic_division,\n  f.fiscal_year,\n  SUM(f.value_usd) AS revenue_usd\nFROM (\n  SELECT * FROM edgar.apple_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ibm_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.oracle_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.walmart_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.target_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ford_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.tesla_revenue_table\n) f\nLEFT JOIN sic_edgar_usl s\n  ON s.cik = f.cik\nWHERE f.fiscal_year BETWEEN 2016 AND 2019\nGROUP BY s.sic_division, f.fiscal_year"
+      },
+      "result": {
+        "columns": [
+          "target_column",
+          "source_table",
+          "source_column"
+        ],
+        "rows": [
+          [
+            "revenue_usd",
+            "sic_edgar_usl",
+            "sic_division"
+          ],
+          [
+            "fiscal_year",
+            "sic_edgar_usl",
+            "cik"
+          ],
+          [
+            "revenue_usd",
+            "edgar.apple_revenue_table",
+            "value_usd"
+          ],
+          [
+            "fiscal_year",
+            "edgar.apple_revenue_table",
+            "fiscal_year"
+          ],
+          [
+            "sic_division",
+            "sic_edgar_usl",
+            "sic_division"
+          ],
+          [
+            "revenue_usd",
+            "edgar.ibm_revenue_table",
+            "value_usd"
+          ],
+          [
+            "fiscal_year",
+            "edgar.ibm_revenue_table",
+            "fiscal_year"
+          ],
+          [
+            "sic_division",
+            "sic_edgar_usl",
+            "sic_division"
+          ],
+          [
+            "revenue_usd",
+            "edgar.oracle_revenue_table",
+            "value_usd"
+          ],
+          [
+            "fiscal_year",
+            "edgar.oracle_revenue_table",
+            "fiscal_year"
+          ],
+          [
+            "sic_division",
+            "sic_edgar_usl",
+            "sic_division"
+          ],
+          [
+            "revenue_usd",
+            "edgar.walmart_revenue_table",
+            "value_usd"
+          ],
+          [
+            "fiscal_year",
+            "edgar.walmart_revenue_table",
+            "fiscal_year"
+          ],
+          [
+            "sic_division",
+            "sic_edgar_usl",
+            "sic_division"
+          ],
+          [
+            "revenue_usd",
+            "edgar.target_revenue_table",
+            "value_usd"
+          ],
+          [
+            "fiscal_year",
+            "edgar.target_revenue_table",
+            "fiscal_year"
+          ],
+          [
+            "sic_division",
+            "sic_edgar_usl",
+            "sic_division"
+          ],
+          [
+            "revenue_usd",
+            "edgar.ford_revenue_table",
+            "value_usd"
+          ],
+          [
+            "fiscal_year",
+            "edgar.ford_revenue_table",
+            "fiscal_year"
+          ],
+          [
+            "sic_division",
+            "sic_edgar_usl",
+            "sic_division"
+          ],
+          [
+            "revenue_usd",
+            "edgar.tesla_revenue_table",
+            "value_usd"
+          ],
+          [
+            "fiscal_year",
+            "edgar.tesla_revenue_table",
+            "fiscal_year"
+          ],
+          [
+            "sic_division",
+            "sic_edgar_usl",
+            "sic_division"
+          ]
+        ],
+        "row_count": 23,
+        "truncated": false
+      },
+      "result_sha256": "1793dc88097ace1c8e2879227f8a4cfe70b1c562159130a599a429999a005670",
+      "rerun": "exhibit-a rerun ex_39cb6d86028a4e38",
+      "case_id": "case_d6ae091f2661a801",
+      "agent": "SourceScout"
+    },
+    {
+      "id": "ex_4195053f4dbf1402",
+      "ts": "2026-10-22T15:44:29.662Z",
+      "kind": "baseline",
+      "source": "zetaris",
+      "transport": "cassette",
+      "title": "metric history analytics.sector_revenue_by_year by fiscal_year",
+      "tool": "metric_history",
+      "sql": "SELECT * FROM analytics.sector_revenue_by_year ORDER BY fiscal_year",
+      "sql_sha256": "90b0b5934dd658abef7ecf14e0fe41155a848c83b8d34a92aa16b212dc194df0",
+      "args": {
+        "view": "analytics.sector_revenue_by_year",
+        "grain": "fiscal_year",
+        "sql": "SELECT * FROM analytics.sector_revenue_by_year ORDER BY fiscal_year"
+      },
+      "result": {
+        "columns": [
+          "sic_division",
+          "fiscal_year",
+          "revenue_usd"
+        ],
+        "rows": [
+          [
+            "Manufacturing",
+            2016,
+            1384761882000
+          ],
+          [
+            "Retail Trade",
+            2016,
+            4295094000000
+          ],
+          [
+            "Services",
+            2016,
+            826571000000
+          ],
+          [
+            "Manufacturing",
+            2017,
+            1455942689000
+          ],
+          [
+            "Retail Trade",
+            2017,
+            4308270000000
+          ],
+          [
+            "Services",
+            2017,
+            801304000000
+          ],
+          [
+            "Manufacturing",
+            2018,
+            2750941773000
+          ],
+          [
+            "Retail Trade",
+            2018,
+            4370243000000
+          ],
+          [
+            "Services",
+            2018,
+            805895000000
+          ],
+          [
+            "Manufacturing",
+            2019,
+            1603783244000
+          ],
+          [
+            "Retail Trade",
+            2019,
+            4486360000000
+          ],
+          [
+            "Services",
+            2019,
+            655377000000
+          ]
+        ],
+        "row_count": 12,
+        "truncated": false
+      },
+      "result_sha256": "a68f561a6786ebf87fc7a41329f58e3fc4831f7323592d9bb8c046bf5a568886",
+      "rerun": "exhibit-a rerun ex_4195053f4dbf1402",
+      "case_id": "case_d6ae091f2661a801",
+      "agent": "LeadInvestigator"
+    },
+    {
+      "id": "ex_6ed4059e5c01912f",
+      "ts": "2026-10-22T15:44:29.662Z",
+      "kind": "baseline",
+      "source": "code",
+      "transport": "code",
+      "title": "baseline onset analytics.sector_revenue_by_year by fiscal_year",
+      "tool": "compare_to_baseline",
+      "sql": "SELECT * FROM analytics.sector_revenue_by_year ORDER BY fiscal_year",
+      "sql_sha256": "90b0b5934dd658abef7ecf14e0fe41155a848c83b8d34a92aa16b212dc194df0",
+      "args": {
+        "view": "analytics.sector_revenue_by_year",
+        "grain": "fiscal_year",
+        "band": {
+          "lo": 0.67,
+          "hi": 1.5
+        },
+        "source_exhibit_id": "ex_4195053f4dbf1402"
+      },
+      "result": {
+        "metric": "analytics.sector_revenue_by_year",
+        "grain": "fiscal_year",
+        "band": {
+          "lo": 0.67,
+          "hi": 1.5
+        },
+        "segments": 3,
+        "periods": 4,
+        "explanation": "Manufacturing 2018 is 1.89x 2017 (+1295.0B), outside the 0.67-1.5x band",
+        "onset": {
+          "segment": "Manufacturing",
+          "period": 2018,
+          "prior_period": 2017,
+          "value": 2750941773000,
+          "prior_value": 1455942689000,
+          "ratio": 1.8894574585826984,
+          "delta": 1294999084000
+        }
+      },
+      "result_sha256": "b682ba3114cc26b0be0fede591669acc250f26c826af00d132a088f2c47b11d4",
+      "rerun": "exhibit-a rerun ex_6ed4059e5c01912f",
+      "case_id": "case_d6ae091f2661a801",
+      "agent": "LeadInvestigator"
+    },
+    {
+      "id": "ex_19cd406462c7d979",
+      "ts": "2026-10-22T15:44:29.662Z",
+      "kind": "sql",
+      "source": "zetaris",
+      "transport": "cassette",
+      "title": "company coverage by fiscal year",
+      "tool": "run_sql",
+      "sql": "SELECT '0000320193' AS cik, 'Apple Inc.' AS entity_name, fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd FROM edgar.apple_revenue_table GROUP BY fiscal_year\n  UNION ALL\n  SELECT '0000051143' AS cik, 'International Business Machines Corporation' AS entity_name, fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd FROM edgar.ibm_revenue_table GROUP BY fiscal_year\n  UNION ALL\n  SELECT '0001341439' AS cik, 'Oracle Corporation' AS entity_name, fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd FROM edgar.oracle_revenue_table GROUP BY fiscal_year\n  UNION ALL\n  SELECT '0000104169' AS cik, 'Walmart Inc.' AS entity_name, fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd FROM edgar.walmart_revenue_table GROUP BY fiscal_year\n  UNION ALL\n  SELECT '0000027419' AS cik, 'Target Corporation' AS entity_name, fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd FROM edgar.target_revenue_table GROUP BY fiscal_year\n  UNION ALL\n  SELECT '0000037996' AS cik, 'Ford Motor Co' AS entity_name, fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd FROM edgar.ford_revenue_table GROUP BY fiscal_year\n  UNION ALL\n  SELECT '0001318605' AS cik, 'Tesla, Inc.' AS entity_name, fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd FROM edgar.tesla_revenue_table GROUP BY fiscal_year\nORDER BY cik, fiscal_year",
+      "sql_sha256": "6a383f0c93f6c346b742ea8b256327765a34a289d7a649957992723161969eba",
+      "args": {
+        "sql": "SELECT '0000320193' AS cik, 'Apple Inc.' AS entity_name, fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd FROM edgar.apple_revenue_table GROUP BY fiscal_year\n  UNION ALL\n  SELECT '0000051143' AS cik, 'International Business Machines Corporation' AS entity_name, fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd FROM edgar.ibm_revenue_table GROUP BY fiscal_year\n  UNION ALL\n  SELECT '0001341439' AS cik, 'Oracle Corporation' AS entity_name, fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd FROM edgar.oracle_revenue_table GROUP BY fiscal_year\n  UNION ALL\n  SELECT '0000104169' AS cik, 'Walmart Inc.' AS entity_name, fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd FROM edgar.walmart_revenue_table GROUP BY fiscal_year\n  UNION ALL\n  SELECT '0000027419' AS cik, 'Target Corporation' AS entity_name, fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd FROM edgar.target_revenue_table GROUP BY fiscal_year\n  UNION ALL\n  SELECT '0000037996' AS cik, 'Ford Motor Co' AS entity_name, fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd FROM edgar.ford_revenue_table GROUP BY fiscal_year\n  UNION ALL\n  SELECT '0001318605' AS cik, 'Tesla, Inc.' AS entity_name, fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd FROM edgar.tesla_revenue_table GROUP BY fiscal_year\nORDER BY cik, fiscal_year"
+      },
+      "result": {
+        "columns": [
+          "cik",
+          "entity_name",
+          "fiscal_year",
+          "rows_n",
+          "distinct_periods",
+          "revenue_usd"
+        ],
+        "rows": [
+          [
+            "0000027419",
+            "Target Corporation",
+            2009,
+            14,
+            7,
+            599011000000
+          ],
+          [
+            "0000027419",
+            "Target Corporation",
+            2010,
+            21,
+            9,
+            575278000000
+          ],
+          [
+            "0000027419",
+            "Target Corporation",
+            2011,
+            21,
+            9,
+            593780000000
+          ],
+          [
+            "0000027419",
+            "Target Corporation",
+            2012,
+            21,
+            9,
+            617847000000
+          ],
+          [
+            "0000027419",
+            "Target Corporation",
+            2013,
+            21,
+            9,
+            632441000000
+          ],
+          [
+            "0000027419",
+            "Target Corporation",
+            2014,
+            3,
+            3,
+            217198000000
+          ],
+          [
+            "0000037996",
+            "Ford Motor Co",
+            2016,
+            21,
+            9,
+            1340065000000
+          ],
+          [
+            "0000037996",
+            "Ford Motor Co",
+            2017,
+            21,
+            10,
+            1380104000000
+          ],
+          [
+            "0000037996",
+            "Ford Motor Co",
+            2018,
+            21,
+            9,
+            1413896000000
+          ],
+          [
+            "0000037996",
+            "Ford Motor Co",
+            2019,
+            21,
+            9,
+            1418786000000
+          ],
+          [
+            "0000051143",
+            "International Business Machines Corporation",
+            2016,
+            13,
+            9,
+            569441000000
+          ],
+          [
+            "0000051143",
+            "International Business Machines Corporation",
+            2017,
+            13,
+            9,
+            546656000000
+          ],
+          [
+            "0000051143",
+            "International Business Machines Corporation",
+            2018,
+            13,
+            9,
+            544022000000
+          ],
+          [
+            "0000051143",
+            "International Business Machines Corporation",
+            2019,
+            13,
+            9,
+            538696000000
+          ],
+          [
+            "0000104169",
+            "Walmart Inc.",
+            2016,
+            21,
+            9,
+            4295094000000
+          ],
+          [
+            "0000104169",
+            "Walmart Inc.",
+            2017,
+            21,
+            9,
+            4308270000000
+          ],
+          [
+            "0000104169",
+            "Walmart Inc.",
+            2018,
+            21,
+            9,
+            4370243000000
+          ],
+          [
+            "0000104169",
+            "Walmart Inc.",
+            2019,
+            21,
+            9,
+            4486360000000
+          ],
+          [
+            "0000320193",
+            "Apple Inc.",
+            2018,
+            11,
+            9,
+            1205297000000
+          ],
+          [
+            "0001318605",
+            "Tesla, Inc.",
+            2016,
+            21,
+            9,
+            44696882000
+          ],
+          [
+            "0001318605",
+            "Tesla, Inc.",
+            2017,
+            21,
+            9,
+            75838689000
+          ],
+          [
+            "0001318605",
+            "Tesla, Inc.",
+            2018,
+            21,
+            9,
+            131748773000
+          ],
+          [
+            "0001318605",
+            "Tesla, Inc.",
+            2019,
+            21,
+            9,
+            184997244000
+          ],
+          [
+            "0001341439",
+            "Oracle Corporation",
+            2016,
+            13,
+            9,
+            257130000000
+          ],
+          [
+            "0001341439",
+            "Oracle Corporation",
+            2017,
+            13,
+            9,
+            254648000000
+          ],
+          [
+            "0001341439",
+            "Oracle Corporation",
+            2018,
+            13,
+            9,
+            261873000000
+          ],
+          [
+            "0001341439",
+            "Oracle Corporation",
+            2019,
+            3,
+            3,
+            116681000000
+          ]
+        ],
+        "row_count": 27,
+        "truncated": false
+      },
+      "result_sha256": "bfdc376020910ef941b56f6321ef0257e7c9d4bafa3a938f3f7b06128e3932bf",
+      "rerun": "exhibit-a rerun ex_19cd406462c7d979",
+      "case_id": "case_d6ae091f2661a801",
+      "agent": "LeadInvestigator"
+    },
+    {
+      "id": "ex_9cab09c6142b1094",
+      "ts": "2026-10-22T15:44:29.663Z",
+      "kind": "sql",
+      "source": "zetaris",
+      "transport": "cassette",
+      "title": "duplicate rows per company",
+      "tool": "run_sql",
+      "sql": "SELECT cik, COUNT(*) AS rows_total, COUNT(DISTINCT period_end) AS distinct_periods, COUNT(*) - COUNT(DISTINCT period_end) AS duplicate_rows\nFROM (\n  SELECT * FROM edgar.apple_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ibm_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.oracle_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.walmart_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.target_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ford_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.tesla_revenue_table\n) f\nGROUP BY cik\nORDER BY cik",
+      "sql_sha256": "bad48eef7450cc377e42ee4ee0f74cc639de902b7722a512b520039bdcc694ad",
+      "args": {
+        "sql": "SELECT cik, COUNT(*) AS rows_total, COUNT(DISTINCT period_end) AS distinct_periods, COUNT(*) - COUNT(DISTINCT period_end) AS duplicate_rows\nFROM (\n  SELECT * FROM edgar.apple_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ibm_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.oracle_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.walmart_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.target_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ford_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.tesla_revenue_table\n) f\nGROUP BY cik\nORDER BY cik"
+      },
+      "result": {
+        "columns": [
+          "cik",
+          "rows_total",
+          "distinct_periods",
+          "duplicate_rows"
+        ],
+        "rows": [
+          [
+            "0000027419",
+            101,
+            25,
+            76
+          ],
+          [
+            "0000037996",
+            84,
+            21,
+            63
+          ],
+          [
+            "0000051143",
+            52,
+            21,
+            31
+          ],
+          [
+            "0000104169",
+            84,
+            21,
+            63
+          ],
+          [
+            "0000320193",
+            11,
+            9,
+            2
+          ],
+          [
+            "0001318605",
+            84,
+            21,
+            63
+          ],
+          [
+            "0001341439",
+            42,
+            18,
+            24
+          ]
+        ],
+        "row_count": 7,
+        "truncated": false
+      },
+      "result_sha256": "f0ab60383ba97b9eab89abc8681fa811a6506eea48793ff7a576dff07aa4cab3",
+      "rerun": "exhibit-a rerun ex_9cab09c6142b1094",
+      "case_id": "case_d6ae091f2661a801",
+      "agent": "LeadInvestigator"
+    },
+    {
+      "id": "ex_8083e9e3c5aefad9",
+      "ts": "2026-10-22T15:44:29.663Z",
+      "kind": "sql",
+      "source": "zetaris",
+      "transport": "cassette",
+      "title": "fiscal-year bucket profile",
+      "tool": "run_sql",
+      "sql": "SELECT fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd\nFROM (\n  SELECT * FROM edgar.apple_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ibm_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.oracle_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.walmart_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.target_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ford_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.tesla_revenue_table\n) f\nWHERE fiscal_year >= 2016 AND fiscal_year <= 2019\nGROUP BY fiscal_year\nORDER BY fiscal_year",
+      "sql_sha256": "4d528a8d6275a95e77792ccb58c75b863aad701bc39ca5f0c2b46704a4173cd2",
+      "args": {
+        "sql": "SELECT fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd\nFROM (\n  SELECT * FROM edgar.apple_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ibm_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.oracle_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.walmart_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.target_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ford_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.tesla_revenue_table\n) f\nWHERE fiscal_year >= 2016 AND fiscal_year <= 2019\nGROUP BY fiscal_year\nORDER BY fiscal_year"
+      },
+      "result": {
+        "columns": [
+          "fiscal_year",
+          "rows_n",
+          "distinct_periods",
+          "revenue_usd"
+        ],
+        "rows": [
+          [
+            2016,
+            89,
+            27,
+            6506426882000
+          ],
+          [
+            2017,
+            89,
+            28,
+            6565516689000
+          ],
+          [
+            2018,
+            100,
+            32,
+            7927079773000
+          ],
+          [
+            2019,
+            79,
+            21,
+            6745520244000
+          ]
+        ],
+        "row_count": 4,
+        "truncated": false
+      },
+      "result_sha256": "1553669f41f4e50e80d76d83ee424f0043e9f4873d0334ee8b0ed9615c16e757",
+      "rerun": "exhibit-a rerun ex_8083e9e3c5aefad9",
+      "case_id": "case_d6ae091f2661a801",
+      "agent": "LeadInvestigator"
+    },
+    {
+      "id": "ex_88488aba9cb9fae0",
+      "ts": "2026-10-22T15:44:29.663Z",
+      "kind": "sql",
+      "source": "zetaris",
+      "transport": "cassette",
+      "title": "annual fact rows for the corrected series",
+      "tool": "run_sql",
+      "sql": "SELECT s.sic_division, f.cik, f.period_start, f.period_end, f.period_frame, f.value_usd, f.filed_date\nFROM (\n  SELECT * FROM edgar.apple_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ibm_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.oracle_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.walmart_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.target_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ford_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.tesla_revenue_table\n) f\nLEFT JOIN sic_edgar_usl s ON s.cik = f.cik\nORDER BY f.cik, f.period_end, f.filed_date",
+      "sql_sha256": "12bb3a2a429e3d4f50b3ff8b3ce733e7dae7e05be4d06b8adca122de3d953ba5",
+      "args": {
+        "sql": "SELECT s.sic_division, f.cik, f.period_start, f.period_end, f.period_frame, f.value_usd, f.filed_date\nFROM (\n  SELECT * FROM edgar.apple_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ibm_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.oracle_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.walmart_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.target_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ford_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.tesla_revenue_table\n) f\nLEFT JOIN sic_edgar_usl s ON s.cik = f.cik\nORDER BY f.cik, f.period_end, f.filed_date"
+      },
+      "result": {
+        "columns": [
+          "sic_division",
+          "cik",
+          "period_start",
+          "period_end",
+          "period_frame",
+          "value_usd",
+          "filed_date"
+        ],
+        "rows": [
+          [
+            "Retail Trade",
+            "0000027419",
+            "2007-02-04",
+            "2008-02-02",
+            null,
+            63367000000,
+            "2010-03-12"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2007-02-04",
+            "2008-02-02",
+            "CY2007",
+            63367000000,
+            "2010-03-18"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2008-02-03",
+            "2008-08-02",
+            null,
+            30274000000,
+            "2009-08-28"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2008-05-04",
+            "2008-08-02",
+            "CY2008Q2",
+            15472000000,
+            "2009-08-28"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2008-02-03",
+            "2008-11-01",
+            null,
+            45388000000,
+            "2009-12-04"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2008-08-03",
+            "2008-11-01",
+            "CY2008Q3",
+            15114000000,
+            "2009-12-04"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2008-02-03",
+            "2009-01-31",
+            null,
+            64948000000,
+            "2010-03-12"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2008-02-03",
+            "2009-01-31",
+            null,
+            64948000000,
+            "2010-03-18"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2008-02-03",
+            "2009-01-31",
+            "CY2008",
+            64948000000,
+            "2011-03-11"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-02-01",
+            "2009-05-02",
+            null,
+            14833000000,
+            "2010-05-28"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-02-01",
+            "2009-05-02",
+            "CY2009Q1",
+            14833000000,
+            "2011-03-11"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-02-01",
+            "2009-08-01",
+            null,
+            29900000000,
+            "2009-08-28"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-05-03",
+            "2009-08-01",
+            null,
+            15067000000,
+            "2009-08-28"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-02-01",
+            "2009-08-01",
+            null,
+            29900000000,
+            "2010-08-27"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-05-02",
+            "2009-08-01",
+            "CY2009Q2",
+            15067000000,
+            "2010-08-27"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-05-03",
+            "2009-08-01",
+            null,
+            15067000000,
+            "2011-03-11"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-02-01",
+            "2009-10-31",
+            null,
+            45176000000,
+            "2009-12-04"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-08-02",
+            "2009-10-31",
+            null,
+            15276000000,
+            "2009-12-04"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-02-01",
+            "2009-10-31",
+            null,
+            45176000000,
+            "2010-12-03"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-08-02",
+            "2009-10-31",
+            null,
+            15276000000,
+            "2010-12-03"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-08-02",
+            "2009-10-31",
+            "CY2009Q3",
+            15276000000,
+            "2011-03-11"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-02-01",
+            "2010-01-30",
+            null,
+            65357000000,
+            "2010-03-12"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-02-01",
+            "2010-01-30",
+            null,
+            65357000000,
+            "2010-03-18"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-02-01",
+            "2010-01-30",
+            null,
+            65357000000,
+            "2011-03-11"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-11-01",
+            "2010-01-30",
+            "CY2009Q4",
+            20181000000,
+            "2011-03-11"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2009-02-01",
+            "2010-01-30",
+            "CY2009",
+            65357000000,
+            "2012-03-15"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-01-31",
+            "2010-05-01",
+            null,
+            15593000000,
+            "2010-05-28"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-01-31",
+            "2010-05-01",
+            null,
+            15593000000,
+            "2011-03-11"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-01-31",
+            "2010-05-01",
+            null,
+            15593000000,
+            "2011-05-26"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-01-31",
+            "2010-05-01",
+            "CY2010Q1",
+            15593000000,
+            "2012-03-15"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-01-31",
+            "2010-07-31",
+            null,
+            31124000000,
+            "2010-08-27"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-05-01",
+            "2010-07-31",
+            "CY2010Q2",
+            15532000000,
+            "2010-08-27"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-05-02",
+            "2010-07-31",
+            null,
+            15532000000,
+            "2011-03-11"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-01-31",
+            "2010-07-31",
+            null,
+            31124000000,
+            "2011-08-25"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-05-02",
+            "2010-07-31",
+            null,
+            15532000000,
+            "2011-08-25"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-05-02",
+            "2010-07-31",
+            null,
+            15532000000,
+            "2012-03-15"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-01-31",
+            "2010-10-30",
+            null,
+            46729000000,
+            "2010-12-03"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-08-01",
+            "2010-10-30",
+            null,
+            15605000000,
+            "2010-12-03"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-08-01",
+            "2010-10-30",
+            null,
+            15605000000,
+            "2011-03-11"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-01-31",
+            "2010-10-30",
+            null,
+            46729000000,
+            "2011-11-23"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-08-01",
+            "2010-10-30",
+            null,
+            15605000000,
+            "2011-11-23"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-08-01",
+            "2010-10-30",
+            "CY2010Q3",
+            15605000000,
+            "2012-03-15"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-01-31",
+            "2011-01-29",
+            null,
+            67390000000,
+            "2011-03-11"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-11-01",
+            "2011-01-29",
+            null,
+            20661000000,
+            "2011-03-11"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-01-31",
+            "2011-01-29",
+            null,
+            67390000000,
+            "2012-03-15"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-11-01",
+            "2011-01-29",
+            "CY2010Q4",
+            20661000000,
+            "2012-03-15"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2010-01-31",
+            "2011-01-29",
+            "CY2010",
+            67390000000,
+            "2013-03-20"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-01-30",
+            "2011-04-30",
+            null,
+            15935000000,
+            "2011-05-26"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-01-30",
+            "2011-04-30",
+            null,
+            15935000000,
+            "2012-03-15"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-01-30",
+            "2011-04-30",
+            null,
+            15935000000,
+            "2012-05-23"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-01-30",
+            "2011-04-30",
+            "CY2011Q1",
+            15935000000,
+            "2013-03-20"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-01-30",
+            "2011-07-30",
+            null,
+            32175000000,
+            "2011-08-25"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-05-01",
+            "2011-07-30",
+            null,
+            16240000000,
+            "2011-08-25"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-05-01",
+            "2011-07-30",
+            null,
+            16240000000,
+            "2012-03-15"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-01-30",
+            "2011-07-30",
+            null,
+            32175000000,
+            "2012-08-23"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-05-01",
+            "2011-07-30",
+            null,
+            16240000000,
+            "2012-08-23"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-05-01",
+            "2011-07-30",
+            "CY2011Q2",
+            16240000000,
+            "2013-03-20"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-01-30",
+            "2011-10-29",
+            null,
+            48577000000,
+            "2011-11-23"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-07-31",
+            "2011-10-29",
+            null,
+            16402000000,
+            "2011-11-23"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-07-31",
+            "2011-10-29",
+            null,
+            16402000000,
+            "2012-03-15"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-01-30",
+            "2011-10-29",
+            null,
+            48577000000,
+            "2012-11-21"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-07-31",
+            "2011-10-29",
+            null,
+            16402000000,
+            "2012-11-21"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-07-31",
+            "2011-10-29",
+            "CY2011Q3",
+            16402000000,
+            "2013-03-20"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-01-30",
+            "2012-01-28",
+            null,
+            69865000000,
+            "2012-03-15"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-10-30",
+            "2012-01-28",
+            null,
+            21288000000,
+            "2012-03-15"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-01-30",
+            "2012-01-28",
+            null,
+            69865000000,
+            "2013-03-20"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-10-30",
+            "2012-01-28",
+            "CY2011Q4",
+            21288000000,
+            "2013-03-20"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2011-01-30",
+            "2012-01-28",
+            "CY2011",
+            69865000000,
+            "2014-03-14"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-01-29",
+            "2012-04-28",
+            null,
+            16867000000,
+            "2012-05-23"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-01-29",
+            "2012-04-28",
+            null,
+            16867000000,
+            "2013-03-20"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-01-29",
+            "2012-04-28",
+            null,
+            16867000000,
+            "2013-05-30"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-01-29",
+            "2012-04-28",
+            "CY2012Q1",
+            16867000000,
+            "2014-03-14"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-01-29",
+            "2012-07-28",
+            null,
+            33646000000,
+            "2012-08-23"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-04-29",
+            "2012-07-28",
+            null,
+            16779000000,
+            "2012-08-23"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-04-29",
+            "2012-07-28",
+            null,
+            16779000000,
+            "2013-03-20"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-01-29",
+            "2012-07-28",
+            null,
+            33646000000,
+            "2013-08-28"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-04-29",
+            "2012-07-28",
+            null,
+            16779000000,
+            "2013-08-28"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-04-29",
+            "2012-07-28",
+            "CY2012Q2",
+            16779000000,
+            "2014-03-14"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-01-29",
+            "2012-10-27",
+            null,
+            50575000000,
+            "2012-11-21"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-07-29",
+            "2012-10-27",
+            null,
+            16929000000,
+            "2012-11-21"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-07-29",
+            "2012-10-27",
+            null,
+            16929000000,
+            "2013-03-20"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-01-29",
+            "2012-10-27",
+            null,
+            50575000000,
+            "2013-11-27"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-07-29",
+            "2012-10-27",
+            null,
+            16929000000,
+            "2013-11-27"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-07-29",
+            "2012-10-27",
+            "CY2012Q3",
+            16929000000,
+            "2014-03-14"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-01-29",
+            "2013-02-02",
+            null,
+            73301000000,
+            "2013-03-20"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-10-28",
+            "2013-02-02",
+            null,
+            22726000000,
+            "2013-03-20"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-01-29",
+            "2013-02-02",
+            null,
+            73301000000,
+            "2014-03-14"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-10-28",
+            "2013-02-02",
+            "CY2012Q4",
+            22726000000,
+            "2014-03-14"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2012-01-29",
+            "2013-02-02",
+            "CY2012",
+            73301000000,
+            "2015-03-13"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2013-02-03",
+            "2013-05-04",
+            null,
+            16706000000,
+            "2013-05-30"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2013-02-03",
+            "2013-05-04",
+            "CY2013Q1",
+            16706000000,
+            "2014-03-14"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2013-02-03",
+            "2013-08-03",
+            null,
+            33823000000,
+            "2013-08-28"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2013-05-05",
+            "2013-08-03",
+            null,
+            17117000000,
+            "2013-08-28"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2013-05-05",
+            "2013-08-03",
+            "CY2013Q2",
+            17117000000,
+            "2014-03-14"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2013-02-03",
+            "2013-11-02",
+            null,
+            51081000000,
+            "2013-11-27"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2013-08-04",
+            "2013-11-02",
+            null,
+            17258000000,
+            "2013-11-27"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2013-08-04",
+            "2013-11-02",
+            "CY2013Q3",
+            17258000000,
+            "2014-03-14"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2013-02-03",
+            "2014-02-01",
+            null,
+            72596000000,
+            "2014-03-14"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2013-11-03",
+            "2014-02-01",
+            "CY2013Q4",
+            21516000000,
+            "2014-03-14"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2013-02-03",
+            "2014-02-01",
+            "CY2013",
+            71279000000,
+            "2015-03-13"
+          ],
+          [
+            "Retail Trade",
+            "0000027419",
+            "2014-02-02",
+            "2015-01-31",
+            "CY2014",
+            72618000000,
+            "2015-03-13"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2014-01-01",
+            "2014-12-31",
+            "CY2014",
+            144077000000,
+            "2017-02-09"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2015-01-01",
+            "2015-03-31",
+            null,
+            33900000000,
+            "2016-04-28"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2015-01-01",
+            "2015-03-31",
+            "CY2015Q1",
+            33900000000,
+            "2017-02-09"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2015-01-01",
+            "2015-06-30",
+            null,
+            71163000000,
+            "2016-07-28"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2015-04-01",
+            "2015-06-30",
+            null,
+            37263000000,
+            "2016-07-28"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2015-04-01",
+            "2015-06-30",
+            null,
+            37263000000,
+            "2017-02-09"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2015-04-01",
+            "2015-06-30",
+            "CY2015Q2",
+            39485000000,
+            "2018-02-08"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2015-01-01",
+            "2015-09-30",
+            null,
+            109307000000,
+            "2016-10-27"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2015-07-01",
+            "2015-09-30",
+            null,
+            38144000000,
+            "2016-10-27"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2015-07-01",
+            "2015-09-30",
+            "CY2015Q3",
+            38144000000,
+            "2017-02-09"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2015-01-01",
+            "2015-12-31",
+            null,
+            149558000000,
+            "2017-02-09"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2015-10-01",
+            "2015-12-31",
+            "CY2015Q4",
+            40251000000,
+            "2017-02-09"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2015-01-01",
+            "2015-12-31",
+            "CY2015",
+            149558000000,
+            "2018-02-08"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-01-01",
+            "2016-03-31",
+            null,
+            37718000000,
+            "2016-04-28"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-01-01",
+            "2016-03-31",
+            null,
+            37718000000,
+            "2017-02-09"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-01-01",
+            "2016-03-31",
+            null,
+            37718000000,
+            "2017-04-27"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-01-01",
+            "2016-03-31",
+            "CY2016Q1",
+            37718000000,
+            "2018-02-08"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-01-01",
+            "2016-06-30",
+            null,
+            77203000000,
+            "2016-07-28"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-04-01",
+            "2016-06-30",
+            null,
+            39485000000,
+            "2016-07-28"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-04-01",
+            "2016-06-30",
+            null,
+            39485000000,
+            "2017-02-09"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-01-01",
+            "2016-06-30",
+            null,
+            77203000000,
+            "2017-07-26"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-04-01",
+            "2016-06-30",
+            "CY2016Q2",
+            39485000000,
+            "2017-07-26"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-01-01",
+            "2016-09-30",
+            null,
+            113146000000,
+            "2016-10-27"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-07-01",
+            "2016-09-30",
+            null,
+            35943000000,
+            "2016-10-27"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-07-01",
+            "2016-09-30",
+            null,
+            35943000000,
+            "2017-02-09"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-01-01",
+            "2016-09-30",
+            null,
+            113146000000,
+            "2017-10-26"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-07-01",
+            "2016-09-30",
+            null,
+            35943000000,
+            "2017-10-26"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-07-01",
+            "2016-09-30",
+            "CY2016Q3",
+            35943000000,
+            "2018-02-08"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-01-01",
+            "2016-12-31",
+            null,
+            151800000000,
+            "2017-02-09"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-10-01",
+            "2016-12-31",
+            null,
+            38654000000,
+            "2017-02-09"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-01-01",
+            "2016-12-31",
+            null,
+            151800000000,
+            "2018-02-08"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-10-01",
+            "2016-12-31",
+            "CY2016Q4",
+            38654000000,
+            "2018-02-08"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2016-01-01",
+            "2016-12-31",
+            "CY2016",
+            151800000000,
+            "2019-02-21"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-01-01",
+            "2017-03-31",
+            null,
+            39146000000,
+            "2017-04-27"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-01-01",
+            "2017-03-31",
+            null,
+            39146000000,
+            "2018-02-08"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-01-01",
+            "2017-03-31",
+            null,
+            39146000000,
+            "2018-04-26"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-01-01",
+            "2017-03-31",
+            "CY2017Q1",
+            39146000000,
+            "2019-02-21"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-01-01",
+            "2017-06-30",
+            null,
+            78999000000,
+            "2017-07-26"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-04-01",
+            "2017-06-30",
+            null,
+            39853000000,
+            "2017-07-26"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-04-01",
+            "2017-06-30",
+            null,
+            39853000000,
+            "2018-02-08"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-01-01",
+            "2017-06-30",
+            null,
+            78999000000,
+            "2018-07-26"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-04-01",
+            "2017-06-30",
+            null,
+            39853000000,
+            "2018-07-26"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-04-01",
+            "2017-06-30",
+            "CY2017Q2",
+            39853000000,
+            "2019-02-21"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-01-01",
+            "2017-09-30",
+            null,
+            115450000000,
+            "2017-10-26"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-07-01",
+            "2017-09-30",
+            null,
+            36451000000,
+            "2017-10-26"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-07-01",
+            "2017-09-30",
+            null,
+            36451000000,
+            "2018-02-08"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-01-01",
+            "2017-09-30",
+            null,
+            115450000000,
+            "2018-10-25"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-07-01",
+            "2017-09-30",
+            null,
+            36451000000,
+            "2018-10-25"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-07-01",
+            "2017-09-30",
+            "CY2017Q3",
+            36451000000,
+            "2019-02-21"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-01-01",
+            "2017-12-31",
+            null,
+            156776000000,
+            "2018-02-08"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-10-01",
+            "2017-12-31",
+            null,
+            41326000000,
+            "2018-02-08"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-01-01",
+            "2017-12-31",
+            null,
+            156776000000,
+            "2019-02-21"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-10-01",
+            "2017-12-31",
+            "CY2017Q4",
+            41326000000,
+            "2019-02-21"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2017-01-01",
+            "2017-12-31",
+            "CY2017",
+            156776000000,
+            "2020-02-05"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-01-01",
+            "2018-03-31",
+            null,
+            41959000000,
+            "2018-04-26"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-01-01",
+            "2018-03-31",
+            null,
+            41959000000,
+            "2019-02-21"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-01-01",
+            "2018-03-31",
+            null,
+            41959000000,
+            "2019-04-26"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-01-01",
+            "2018-03-31",
+            "CY2018Q1",
+            41959000000,
+            "2020-02-05"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-01-01",
+            "2018-06-30",
+            null,
+            80879000000,
+            "2018-07-26"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-04-01",
+            "2018-06-30",
+            null,
+            38920000000,
+            "2018-07-26"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-04-01",
+            "2018-06-30",
+            null,
+            38920000000,
+            "2019-02-21"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-01-01",
+            "2018-06-30",
+            null,
+            80879000000,
+            "2019-07-25"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-04-01",
+            "2018-06-30",
+            null,
+            38920000000,
+            "2019-07-25"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-04-01",
+            "2018-06-30",
+            "CY2018Q2",
+            38920000000,
+            "2020-02-05"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-01-01",
+            "2018-09-30",
+            null,
+            118545000000,
+            "2018-10-25"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-07-01",
+            "2018-09-30",
+            null,
+            37666000000,
+            "2018-10-25"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-07-01",
+            "2018-09-30",
+            null,
+            37666000000,
+            "2019-02-21"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-01-01",
+            "2018-09-30",
+            null,
+            118545000000,
+            "2019-10-24"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-07-01",
+            "2018-09-30",
+            null,
+            37666000000,
+            "2019-10-24"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-07-01",
+            "2018-09-30",
+            "CY2018Q3",
+            37666000000,
+            "2020-02-05"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-01-01",
+            "2018-12-31",
+            null,
+            160338000000,
+            "2019-02-21"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-10-01",
+            "2018-12-31",
+            null,
+            41793000000,
+            "2019-02-21"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-01-01",
+            "2018-12-31",
+            null,
+            160338000000,
+            "2020-02-05"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2018-10-01",
+            "2018-12-31",
+            "CY2018Q4",
+            41793000000,
+            "2020-02-05"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2019-01-01",
+            "2019-03-31",
+            null,
+            40342000000,
+            "2019-04-26"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2019-01-01",
+            "2019-03-31",
+            null,
+            40342000000,
+            "2020-02-05"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2019-01-01",
+            "2019-06-30",
+            null,
+            79195000000,
+            "2019-07-25"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2019-04-01",
+            "2019-06-30",
+            null,
+            38853000000,
+            "2019-07-25"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2019-04-01",
+            "2019-06-30",
+            null,
+            38853000000,
+            "2020-02-05"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2019-01-01",
+            "2019-09-30",
+            null,
+            116185000000,
+            "2019-10-24"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2019-07-01",
+            "2019-09-30",
+            null,
+            36990000000,
+            "2019-10-24"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2019-07-01",
+            "2019-09-30",
+            null,
+            36990000000,
+            "2020-02-05"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2019-01-01",
+            "2019-12-31",
+            null,
+            155900000000,
+            "2020-02-05"
+          ],
+          [
+            "Manufacturing",
+            "0000037996",
+            "2019-10-01",
+            "2019-12-31",
+            null,
+            39715000000,
+            "2020-02-05"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2014-01-01",
+            "2014-12-31",
+            "CY2014",
+            92793000000,
+            "2017-02-28"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2015-01-01",
+            "2015-03-31",
+            "CY2015Q1",
+            19590000000,
+            "2016-04-26"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2015-01-01",
+            "2015-06-30",
+            null,
+            40403000000,
+            "2016-07-26"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2015-04-01",
+            "2015-06-30",
+            "CY2015Q2",
+            20813000000,
+            "2016-07-26"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2015-01-01",
+            "2015-09-30",
+            null,
+            59682000000,
+            "2016-10-25"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2015-07-01",
+            "2015-09-30",
+            "CY2015Q3",
+            19280000000,
+            "2016-10-25"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2015-01-01",
+            "2015-12-31",
+            null,
+            81741000000,
+            "2017-02-28"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2015-01-01",
+            "2015-12-31",
+            "CY2015",
+            81741000000,
+            "2018-02-27"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2016-01-01",
+            "2016-03-31",
+            null,
+            18684000000,
+            "2016-04-26"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2016-01-01",
+            "2016-03-31",
+            "CY2016Q1",
+            18684000000,
+            "2017-04-25"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2016-01-01",
+            "2016-06-30",
+            null,
+            38923000000,
+            "2016-07-26"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2016-04-01",
+            "2016-06-30",
+            null,
+            20238000000,
+            "2016-07-26"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2016-01-01",
+            "2016-06-30",
+            null,
+            38923000000,
+            "2017-07-25"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2016-04-01",
+            "2016-06-30",
+            "CY2016Q2",
+            20238000000,
+            "2017-07-25"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2016-01-01",
+            "2016-09-30",
+            null,
+            58149000000,
+            "2016-10-25"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2016-07-01",
+            "2016-09-30",
+            null,
+            19226000000,
+            "2016-10-25"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2016-01-01",
+            "2016-09-30",
+            null,
+            58149000000,
+            "2017-10-31"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2016-07-01",
+            "2016-09-30",
+            "CY2016Q3",
+            19226000000,
+            "2017-10-31"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2016-01-01",
+            "2016-12-31",
+            null,
+            79919000000,
+            "2017-02-28"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2016-01-01",
+            "2016-12-31",
+            null,
+            79919000000,
+            "2018-02-27"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2016-01-01",
+            "2016-12-31",
+            "CY2016",
+            79919000000,
+            "2019-02-26"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2017-01-01",
+            "2017-03-31",
+            null,
+            18155000000,
+            "2017-04-25"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2017-01-01",
+            "2017-03-31",
+            "CY2017Q1",
+            18155000000,
+            "2018-04-24"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2017-01-01",
+            "2017-06-30",
+            null,
+            37443000000,
+            "2017-07-25"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2017-04-01",
+            "2017-06-30",
+            null,
+            19289000000,
+            "2017-07-25"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2017-01-01",
+            "2017-06-30",
+            null,
+            37443000000,
+            "2018-07-31"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2017-04-01",
+            "2017-06-30",
+            "CY2017Q2",
+            19289000000,
+            "2018-07-31"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2017-01-01",
+            "2017-09-30",
+            null,
+            56597000000,
+            "2017-10-31"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2017-07-01",
+            "2017-09-30",
+            null,
+            19153000000,
+            "2017-10-31"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2017-01-01",
+            "2017-09-30",
+            null,
+            56597000000,
+            "2018-10-30"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2017-07-01",
+            "2017-09-30",
+            "CY2017Q3",
+            19153000000,
+            "2018-10-30"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2017-01-01",
+            "2017-12-31",
+            null,
+            79139000000,
+            "2018-02-27"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2017-01-01",
+            "2017-12-31",
+            null,
+            79139000000,
+            "2019-02-26"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2017-01-01",
+            "2017-12-31",
+            "CY2017",
+            79139000000,
+            "2020-02-25"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2018-01-01",
+            "2018-03-31",
+            null,
+            19072000000,
+            "2018-04-24"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2018-01-01",
+            "2018-03-31",
+            "CY2018Q1",
+            19072000000,
+            "2019-04-30"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2018-01-01",
+            "2018-06-30",
+            null,
+            39075000000,
+            "2018-07-31"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2018-04-01",
+            "2018-06-30",
+            null,
+            20003000000,
+            "2018-07-31"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2018-01-01",
+            "2018-06-30",
+            null,
+            39075000000,
+            "2019-07-30"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2018-04-01",
+            "2018-06-30",
+            "CY2018Q2",
+            20003000000,
+            "2019-07-30"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2018-01-01",
+            "2018-09-30",
+            null,
+            57830000000,
+            "2018-10-30"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2018-07-01",
+            "2018-09-30",
+            null,
+            18756000000,
+            "2018-10-30"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2018-01-01",
+            "2018-09-30",
+            null,
+            57830000000,
+            "2019-10-30"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2018-07-01",
+            "2018-09-30",
+            "CY2018Q3",
+            18756000000,
+            "2019-10-30"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2018-01-01",
+            "2018-12-31",
+            null,
+            79591000000,
+            "2019-02-26"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2018-01-01",
+            "2018-12-31",
+            null,
+            79591000000,
+            "2020-02-25"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2019-01-01",
+            "2019-03-31",
+            null,
+            18182000000,
+            "2019-04-30"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2019-01-01",
+            "2019-06-30",
+            null,
+            37342000000,
+            "2019-07-30"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2019-04-01",
+            "2019-06-30",
+            null,
+            19161000000,
+            "2019-07-30"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2019-01-01",
+            "2019-09-30",
+            null,
+            55370000000,
+            "2019-10-30"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2019-07-01",
+            "2019-09-30",
+            null,
+            18028000000,
+            "2019-10-30"
+          ],
+          [
+            "Services",
+            "0000051143",
+            "2019-01-01",
+            "2019-12-31",
+            null,
+            77147000000,
+            "2020-02-25"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2013-02-01",
+            "2014-01-31",
+            "CY2013",
+            476294000000,
+            "2016-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2014-02-01",
+            "2014-04-30",
+            null,
+            114960000000,
+            "2015-06-05"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2014-02-01",
+            "2014-04-30",
+            "CY2014Q1",
+            114960000000,
+            "2016-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2014-02-01",
+            "2014-07-31",
+            null,
+            235085000000,
+            "2015-09-09"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2014-05-01",
+            "2014-07-31",
+            null,
+            120125000000,
+            "2015-09-09"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2014-05-01",
+            "2014-07-31",
+            "CY2014Q2",
+            120125000000,
+            "2016-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2014-02-01",
+            "2014-10-31",
+            null,
+            354086000000,
+            "2015-12-02"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2014-08-01",
+            "2014-10-31",
+            null,
+            119001000000,
+            "2015-12-02"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2014-08-01",
+            "2014-10-31",
+            "CY2014Q3",
+            119001000000,
+            "2016-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2014-02-01",
+            "2015-01-31",
+            null,
+            485651000000,
+            "2016-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2014-11-01",
+            "2015-01-31",
+            "CY2014Q4",
+            131565000000,
+            "2016-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2014-02-01",
+            "2015-01-31",
+            "CY2014",
+            485651000000,
+            "2017-03-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-02-01",
+            "2015-04-30",
+            null,
+            114826000000,
+            "2015-06-05"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-02-01",
+            "2015-04-30",
+            null,
+            114826000000,
+            "2016-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-02-01",
+            "2015-04-30",
+            null,
+            114826000000,
+            "2016-06-03"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-02-01",
+            "2015-04-30",
+            "CY2015Q1",
+            114826000000,
+            "2017-03-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-02-01",
+            "2015-07-31",
+            null,
+            235055000000,
+            "2015-09-09"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-05-01",
+            "2015-07-31",
+            null,
+            120229000000,
+            "2015-09-09"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-05-01",
+            "2015-07-31",
+            null,
+            120229000000,
+            "2016-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-02-01",
+            "2015-07-31",
+            null,
+            235055000000,
+            "2016-08-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-05-01",
+            "2015-07-31",
+            null,
+            120229000000,
+            "2016-08-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-05-01",
+            "2015-07-31",
+            "CY2015Q2",
+            120229000000,
+            "2017-03-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-02-01",
+            "2015-10-31",
+            null,
+            352463000000,
+            "2015-12-02"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-08-01",
+            "2015-10-31",
+            null,
+            117408000000,
+            "2015-12-02"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-08-01",
+            "2015-10-31",
+            null,
+            117408000000,
+            "2016-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-02-01",
+            "2015-10-31",
+            null,
+            352463000000,
+            "2016-12-01"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-08-01",
+            "2015-10-31",
+            null,
+            117408000000,
+            "2016-12-01"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-08-01",
+            "2015-10-31",
+            "CY2015Q3",
+            117408000000,
+            "2017-03-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-02-01",
+            "2016-01-31",
+            null,
+            482130000000,
+            "2016-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-11-01",
+            "2016-01-31",
+            null,
+            129667000000,
+            "2016-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-02-01",
+            "2016-01-31",
+            null,
+            482130000000,
+            "2017-03-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-11-01",
+            "2016-01-31",
+            "CY2015Q4",
+            129667000000,
+            "2017-03-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2015-02-01",
+            "2016-01-31",
+            "CY2015",
+            482130000000,
+            "2018-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-02-01",
+            "2016-04-30",
+            null,
+            115904000000,
+            "2016-06-03"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-02-01",
+            "2016-04-30",
+            null,
+            115904000000,
+            "2017-03-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-02-01",
+            "2016-04-30",
+            null,
+            115904000000,
+            "2017-06-02"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-02-01",
+            "2016-04-30",
+            "CY2016Q1",
+            115904000000,
+            "2018-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-02-01",
+            "2016-07-31",
+            null,
+            236758000000,
+            "2016-08-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-05-01",
+            "2016-07-31",
+            null,
+            120854000000,
+            "2016-08-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-05-01",
+            "2016-07-31",
+            null,
+            120854000000,
+            "2017-03-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-02-01",
+            "2016-07-31",
+            null,
+            236758000000,
+            "2017-08-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-05-01",
+            "2016-07-31",
+            null,
+            120854000000,
+            "2017-08-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-05-01",
+            "2016-07-31",
+            "CY2016Q2",
+            120854000000,
+            "2018-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-02-01",
+            "2016-10-31",
+            null,
+            354937000000,
+            "2016-12-01"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-08-01",
+            "2016-10-31",
+            null,
+            118179000000,
+            "2016-12-01"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-08-01",
+            "2016-10-31",
+            null,
+            118179000000,
+            "2017-03-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-02-01",
+            "2016-10-31",
+            null,
+            354937000000,
+            "2017-12-01"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-08-01",
+            "2016-10-31",
+            null,
+            118179000000,
+            "2017-12-01"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-08-01",
+            "2016-10-31",
+            "CY2016Q3",
+            118179000000,
+            "2018-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-02-01",
+            "2017-01-31",
+            null,
+            485873000000,
+            "2017-03-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-11-01",
+            "2017-01-31",
+            null,
+            130936000000,
+            "2017-03-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-02-01",
+            "2017-01-31",
+            null,
+            485873000000,
+            "2018-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-11-01",
+            "2017-01-31",
+            "CY2016Q4",
+            130936000000,
+            "2018-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2016-02-01",
+            "2017-01-31",
+            "CY2016",
+            485873000000,
+            "2019-03-28"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-02-01",
+            "2017-04-30",
+            null,
+            117542000000,
+            "2017-06-02"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-02-01",
+            "2017-04-30",
+            null,
+            117542000000,
+            "2018-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-02-01",
+            "2017-04-30",
+            null,
+            117542000000,
+            "2018-06-04"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-02-01",
+            "2017-04-30",
+            "CY2017Q1",
+            117542000000,
+            "2019-03-28"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-02-01",
+            "2017-07-31",
+            null,
+            240897000000,
+            "2017-08-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-05-01",
+            "2017-07-31",
+            null,
+            123355000000,
+            "2017-08-31"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-05-01",
+            "2017-07-31",
+            null,
+            123355000000,
+            "2018-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-02-01",
+            "2017-07-31",
+            null,
+            240897000000,
+            "2018-09-06"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-05-01",
+            "2017-07-31",
+            null,
+            123355000000,
+            "2018-09-06"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-05-01",
+            "2017-07-31",
+            "CY2017Q2",
+            123355000000,
+            "2019-03-28"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-02-01",
+            "2017-10-31",
+            null,
+            364076000000,
+            "2017-12-01"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-08-01",
+            "2017-10-31",
+            null,
+            123179000000,
+            "2017-12-01"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-08-01",
+            "2017-10-31",
+            null,
+            123179000000,
+            "2018-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-02-01",
+            "2017-10-31",
+            null,
+            364076000000,
+            "2018-11-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-08-01",
+            "2017-10-31",
+            null,
+            123179000000,
+            "2018-11-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-08-01",
+            "2017-10-31",
+            "CY2017Q3",
+            123179000000,
+            "2019-03-28"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-02-01",
+            "2018-01-31",
+            null,
+            500343000000,
+            "2018-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-11-01",
+            "2018-01-31",
+            null,
+            136267000000,
+            "2018-03-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-02-01",
+            "2018-01-31",
+            null,
+            500343000000,
+            "2019-03-28"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2017-11-01",
+            "2018-01-31",
+            "CY2017Q4",
+            136267000000,
+            "2019-03-28"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2018-02-01",
+            "2018-04-30",
+            null,
+            122690000000,
+            "2018-06-04"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2018-02-01",
+            "2018-04-30",
+            null,
+            122690000000,
+            "2019-03-28"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2018-02-01",
+            "2018-07-31",
+            null,
+            250718000000,
+            "2018-09-06"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2018-05-01",
+            "2018-07-31",
+            null,
+            128028000000,
+            "2018-09-06"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2018-05-01",
+            "2018-07-31",
+            null,
+            128028000000,
+            "2019-03-28"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2018-02-01",
+            "2018-10-31",
+            null,
+            375612000000,
+            "2018-11-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2018-08-01",
+            "2018-10-31",
+            null,
+            124894000000,
+            "2018-11-30"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2018-08-01",
+            "2018-10-31",
+            null,
+            124894000000,
+            "2019-03-28"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2018-02-01",
+            "2019-01-31",
+            null,
+            514405000000,
+            "2019-03-28"
+          ],
+          [
+            "Retail Trade",
+            "0000104169",
+            "2018-11-01",
+            "2019-01-31",
+            null,
+            138793000000,
+            "2019-03-28"
+          ],
+          [
+            "Manufacturing",
+            "0000320193",
+            "2015-09-27",
+            "2016-09-24",
+            "CY2016",
+            215639000000,
+            "2018-11-05"
+          ],
+          [
+            "Manufacturing",
+            "0000320193",
+            "2016-09-25",
+            "2016-12-31",
+            "CY2016Q4",
+            78351000000,
+            "2018-11-05"
+          ],
+          [
+            "Manufacturing",
+            "0000320193",
+            "2017-01-01",
+            "2017-04-01",
+            "CY2017Q1",
+            52896000000,
+            "2018-11-05"
+          ],
+          [
+            "Manufacturing",
+            "0000320193",
+            "2017-04-02",
+            "2017-07-01",
+            "CY2017Q2",
+            45408000000,
+            "2018-11-05"
+          ],
+          [
+            "Manufacturing",
+            "0000320193",
+            "2016-09-25",
+            "2017-09-30",
+            "CY2017",
+            229234000000,
+            "2018-11-05"
+          ],
+          [
+            "Manufacturing",
+            "0000320193",
+            "2017-07-02",
+            "2017-09-30",
+            "CY2017Q3",
+            52579000000,
+            "2018-11-05"
+          ],
+          [
+            "Manufacturing",
+            "0000320193",
+            "2017-10-01",
+            "2017-12-30",
+            "CY2017Q4",
+            88293000000,
+            "2018-11-05"
+          ],
+          [
+            "Manufacturing",
+            "0000320193",
+            "2017-12-31",
+            "2018-03-31",
+            "CY2018Q1",
+            61137000000,
+            "2018-11-05"
+          ],
+          [
+            "Manufacturing",
+            "0000320193",
+            "2018-04-01",
+            "2018-06-30",
+            "CY2018Q2",
+            53265000000,
+            "2018-11-05"
+          ],
+          [
+            "Manufacturing",
+            "0000320193",
+            "2017-10-01",
+            "2018-09-29",
+            "CY2018",
+            265595000000,
+            "2018-11-05"
+          ],
+          [
+            "Manufacturing",
+            "0000320193",
+            "2018-07-01",
+            "2018-09-29",
+            "CY2018Q3",
+            62900000000,
+            "2018-11-05"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2014-01-01",
+            "2014-12-31",
+            "CY2014",
+            3198356000,
+            "2017-03-01"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2015-01-01",
+            "2015-03-31",
+            null,
+            939880000,
+            "2016-05-10"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2015-01-01",
+            "2015-03-31",
+            "CY2015Q1",
+            939880000,
+            "2017-03-01"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2015-01-01",
+            "2015-06-30",
+            null,
+            1894856000,
+            "2016-08-05"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2015-04-01",
+            "2015-06-30",
+            null,
+            954976000,
+            "2016-08-05"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2015-04-01",
+            "2015-06-30",
+            "CY2015Q2",
+            954976000,
+            "2017-03-01"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2015-01-01",
+            "2015-09-30",
+            null,
+            2831645000,
+            "2016-11-02"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2015-07-01",
+            "2015-09-30",
+            null,
+            936789000,
+            "2016-11-02"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2015-07-01",
+            "2015-09-30",
+            "CY2015Q3",
+            936789000,
+            "2017-03-01"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2015-01-01",
+            "2015-12-31",
+            null,
+            4046025000,
+            "2017-03-01"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2015-10-01",
+            "2015-12-31",
+            "CY2015Q4",
+            1214379000,
+            "2017-03-01"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2015-01-01",
+            "2015-12-31",
+            "CY2015",
+            4046025000,
+            "2018-02-23"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-01-01",
+            "2016-03-31",
+            null,
+            1147048000,
+            "2016-05-10"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-01-01",
+            "2016-03-31",
+            null,
+            1147048000,
+            "2017-03-01"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-01-01",
+            "2016-03-31",
+            null,
+            1147048000,
+            "2017-05-10"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-01-01",
+            "2016-03-31",
+            "CY2016Q1",
+            1147048000,
+            "2018-02-23"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-01-01",
+            "2016-06-30",
+            null,
+            2417065000,
+            "2016-08-05"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-04-01",
+            "2016-06-30",
+            null,
+            1270017000,
+            "2016-08-05"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-04-01",
+            "2016-06-30",
+            null,
+            1270017000,
+            "2017-03-01"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-01-01",
+            "2016-06-30",
+            null,
+            2417065000,
+            "2017-08-04"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-04-01",
+            "2016-06-30",
+            null,
+            1270017000,
+            "2017-08-04"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-04-01",
+            "2016-06-30",
+            "CY2016Q2",
+            1270017000,
+            "2018-02-23"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-01-01",
+            "2016-09-30",
+            null,
+            4715501000,
+            "2016-11-02"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-07-01",
+            "2016-09-30",
+            null,
+            2298436000,
+            "2016-11-02"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-07-01",
+            "2016-09-30",
+            null,
+            2298436000,
+            "2017-03-01"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-01-01",
+            "2016-09-30",
+            null,
+            4715501000,
+            "2017-11-03"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-07-01",
+            "2016-09-30",
+            null,
+            2298436000,
+            "2017-11-03"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-07-01",
+            "2016-09-30",
+            "CY2016Q3",
+            2298436000,
+            "2018-02-23"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-01-01",
+            "2016-12-31",
+            null,
+            7000132000,
+            "2017-03-01"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-10-01",
+            "2016-12-31",
+            null,
+            2284631000,
+            "2017-03-01"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-01-01",
+            "2016-12-31",
+            null,
+            7000132000,
+            "2018-02-23"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-10-01",
+            "2016-12-31",
+            "CY2016Q4",
+            2284631000,
+            "2018-02-23"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2016-01-01",
+            "2016-12-31",
+            "CY2016",
+            7000132000,
+            "2019-02-19"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-01-01",
+            "2017-03-31",
+            null,
+            2696270000,
+            "2017-05-10"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-01-01",
+            "2017-03-31",
+            null,
+            2696270000,
+            "2018-02-23"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-01-01",
+            "2017-03-31",
+            null,
+            2696270000,
+            "2018-05-07"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-01-01",
+            "2017-03-31",
+            "CY2017Q1",
+            2696270000,
+            "2019-02-19"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-01-01",
+            "2017-06-30",
+            null,
+            5485827000,
+            "2017-08-04"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-04-01",
+            "2017-06-30",
+            null,
+            2789557000,
+            "2017-08-04"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-04-01",
+            "2017-06-30",
+            null,
+            2789557000,
+            "2018-02-23"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-01-01",
+            "2017-06-30",
+            null,
+            5485827000,
+            "2018-08-06"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-04-01",
+            "2017-06-30",
+            null,
+            2789557000,
+            "2018-08-06"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-04-01",
+            "2017-06-30",
+            "CY2017Q2",
+            2789557000,
+            "2019-02-19"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-01-01",
+            "2017-09-30",
+            null,
+            8470502000,
+            "2017-11-03"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-07-01",
+            "2017-09-30",
+            null,
+            2984675000,
+            "2017-11-03"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-07-01",
+            "2017-09-30",
+            null,
+            2984675000,
+            "2018-02-23"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-01-01",
+            "2017-09-30",
+            null,
+            8470502000,
+            "2018-11-02"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-07-01",
+            "2017-09-30",
+            null,
+            2984675000,
+            "2018-11-02"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-07-01",
+            "2017-09-30",
+            "CY2017Q3",
+            2984675000,
+            "2019-02-19"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-01-01",
+            "2017-12-31",
+            null,
+            11758751000,
+            "2018-02-23"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-10-01",
+            "2017-12-31",
+            null,
+            3288249000,
+            "2018-02-23"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-01-01",
+            "2017-12-31",
+            null,
+            11758751000,
+            "2019-02-19"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-10-01",
+            "2017-12-31",
+            "CY2017Q4",
+            3288249000,
+            "2019-02-19"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2017-01-01",
+            "2017-12-31",
+            "CY2017",
+            11759000000,
+            "2020-02-13"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-01-01",
+            "2018-03-31",
+            null,
+            3408751000,
+            "2018-05-07"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-01-01",
+            "2018-03-31",
+            null,
+            3408751000,
+            "2019-02-19"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-01-01",
+            "2018-03-31",
+            null,
+            3408751000,
+            "2019-04-29"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-01-01",
+            "2018-03-31",
+            "CY2018Q1",
+            3409000000,
+            "2020-02-13"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-01-01",
+            "2018-06-30",
+            null,
+            7410982000,
+            "2018-08-06"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-04-01",
+            "2018-06-30",
+            null,
+            4002231000,
+            "2018-08-06"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-04-01",
+            "2018-06-30",
+            null,
+            4002231000,
+            "2019-02-19"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-01-01",
+            "2018-06-30",
+            null,
+            7410982000,
+            "2019-07-29"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-04-01",
+            "2018-06-30",
+            null,
+            4002231000,
+            "2019-07-29"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-04-01",
+            "2018-06-30",
+            "CY2018Q2",
+            4002000000,
+            "2020-02-13"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-01-01",
+            "2018-09-30",
+            null,
+            14235395000,
+            "2018-11-02"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-07-01",
+            "2018-09-30",
+            null,
+            6824413000,
+            "2018-11-02"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-07-01",
+            "2018-09-30",
+            null,
+            6824413000,
+            "2019-02-19"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-01-01",
+            "2018-09-30",
+            null,
+            14235000000,
+            "2019-10-29"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-07-01",
+            "2018-09-30",
+            null,
+            6824000000,
+            "2019-10-29"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-07-01",
+            "2018-09-30",
+            "CY2018Q3",
+            6824000000,
+            "2020-02-13"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-01-01",
+            "2018-12-31",
+            null,
+            21461268000,
+            "2019-02-19"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-10-01",
+            "2018-12-31",
+            null,
+            7225873000,
+            "2019-02-19"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-01-01",
+            "2018-12-31",
+            null,
+            21461000000,
+            "2020-02-13"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2018-10-01",
+            "2018-12-31",
+            "CY2018Q4",
+            7226000000,
+            "2020-02-13"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2019-01-01",
+            "2019-03-31",
+            null,
+            4541464000,
+            "2019-04-29"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2019-01-01",
+            "2019-03-31",
+            null,
+            4541000000,
+            "2020-02-13"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2019-01-01",
+            "2019-06-30",
+            null,
+            10891140000,
+            "2019-07-29"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2019-04-01",
+            "2019-06-30",
+            null,
+            6349676000,
+            "2019-07-29"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2019-04-01",
+            "2019-06-30",
+            null,
+            6350000000,
+            "2020-02-13"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2019-01-01",
+            "2019-09-30",
+            null,
+            17194000000,
+            "2019-10-29"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2019-07-01",
+            "2019-09-30",
+            null,
+            6303000000,
+            "2019-10-29"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2019-07-01",
+            "2019-09-30",
+            null,
+            6303000000,
+            "2020-02-13"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2019-01-01",
+            "2019-12-31",
+            null,
+            24578000000,
+            "2020-02-13"
+          ],
+          [
+            "Manufacturing",
+            "0001318605",
+            "2019-10-01",
+            "2019-12-31",
+            null,
+            7384000000,
+            "2020-02-13"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2013-06-01",
+            "2014-05-31",
+            "CY2013",
+            38275000000,
+            "2016-06-22"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2014-06-01",
+            "2014-08-31",
+            "CY2014Q3",
+            8596000000,
+            "2015-09-18"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2014-06-01",
+            "2014-11-30",
+            null,
+            18194000000,
+            "2015-12-18"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2014-09-01",
+            "2014-11-30",
+            "CY2014Q4",
+            9598000000,
+            "2015-12-18"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2014-06-01",
+            "2015-02-28",
+            null,
+            27520000000,
+            "2016-03-18"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2014-12-01",
+            "2015-02-28",
+            "CY2015Q1",
+            9327000000,
+            "2016-03-18"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2014-06-01",
+            "2015-05-31",
+            null,
+            38226000000,
+            "2016-06-22"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2014-06-01",
+            "2015-05-31",
+            "CY2014",
+            38226000000,
+            "2017-06-27"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2015-06-01",
+            "2015-08-31",
+            null,
+            8448000000,
+            "2015-09-18"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2015-06-01",
+            "2015-08-31",
+            "CY2015Q3",
+            8448000000,
+            "2016-09-19"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2015-06-01",
+            "2015-11-30",
+            null,
+            17441000000,
+            "2015-12-18"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2015-09-01",
+            "2015-11-30",
+            null,
+            8993000000,
+            "2015-12-18"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2015-06-01",
+            "2015-11-30",
+            null,
+            17441000000,
+            "2016-12-19"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2015-09-01",
+            "2015-11-30",
+            "CY2015Q4",
+            8993000000,
+            "2016-12-19"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2015-06-01",
+            "2016-02-29",
+            null,
+            26453000000,
+            "2016-03-18"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2015-12-01",
+            "2016-02-29",
+            null,
+            9012000000,
+            "2016-03-18"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2015-06-01",
+            "2016-02-29",
+            null,
+            26453000000,
+            "2017-03-17"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2015-12-01",
+            "2016-02-29",
+            "CY2016Q1",
+            9012000000,
+            "2017-03-17"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2015-06-01",
+            "2016-05-31",
+            null,
+            37047000000,
+            "2016-06-22"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2015-06-01",
+            "2016-05-31",
+            null,
+            37047000000,
+            "2017-06-27"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2015-06-01",
+            "2016-05-31",
+            "CY2015",
+            37047000000,
+            "2018-06-22"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2016-06-01",
+            "2016-08-31",
+            null,
+            8595000000,
+            "2016-09-19"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2016-06-01",
+            "2016-08-31",
+            "CY2016Q3",
+            8595000000,
+            "2017-09-18"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2016-06-01",
+            "2016-11-30",
+            null,
+            17630000000,
+            "2016-12-19"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2016-09-01",
+            "2016-11-30",
+            null,
+            9035000000,
+            "2016-12-19"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2016-06-01",
+            "2016-11-30",
+            null,
+            17630000000,
+            "2017-12-18"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2016-09-01",
+            "2016-11-30",
+            "CY2016Q4",
+            9035000000,
+            "2017-12-18"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2016-06-01",
+            "2017-02-28",
+            null,
+            26835000000,
+            "2017-03-17"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2016-12-01",
+            "2017-02-28",
+            null,
+            9205000000,
+            "2017-03-17"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2016-06-01",
+            "2017-02-28",
+            null,
+            26835000000,
+            "2018-03-21"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2016-12-01",
+            "2017-02-28",
+            "CY2017Q1",
+            9205000000,
+            "2018-03-21"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2016-06-01",
+            "2017-05-31",
+            null,
+            37728000000,
+            "2017-06-27"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2016-06-01",
+            "2017-05-31",
+            null,
+            37728000000,
+            "2018-06-22"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2016-06-01",
+            "2017-05-31",
+            "CY2016",
+            37792000000,
+            "2019-06-21"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2017-06-01",
+            "2017-08-31",
+            "CY2017Q3",
+            9187000000,
+            "2017-09-18"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2017-06-01",
+            "2017-11-30",
+            null,
+            18809000000,
+            "2017-12-18"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2017-09-01",
+            "2017-11-30",
+            "CY2017Q4",
+            9621000000,
+            "2017-12-18"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2017-06-01",
+            "2018-02-28",
+            null,
+            28579000000,
+            "2018-03-21"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2017-12-01",
+            "2018-02-28",
+            "CY2018Q1",
+            9771000000,
+            "2018-03-21"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2017-06-01",
+            "2018-05-31",
+            null,
+            39831000000,
+            "2018-06-22"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2017-06-01",
+            "2018-05-31",
+            "CY2017",
+            39383000000,
+            "2019-06-21"
+          ],
+          [
+            "Services",
+            "0001341439",
+            "2018-06-01",
+            "2019-05-31",
+            "CY2018",
+            39506000000,
+            "2019-06-21"
+          ]
+        ],
+        "row_count": 458,
+        "truncated": false
+      },
+      "result_sha256": "c6b11ff304ab9f37bd5ab64118684f6023a75900e24c03d1320a769c9990af8f",
+      "rerun": "exhibit-a rerun ex_88488aba9cb9fae0",
+      "case_id": "case_d6ae091f2661a801",
+      "agent": "LeadInvestigator"
+    },
+    {
+      "id": "ex_4cd9ee0ebd706544",
+      "ts": "2026-10-22T15:44:29.672Z",
+      "kind": "baseline",
+      "source": "code",
+      "transport": "code",
+      "title": "corrected annual series (one value per cik and period_frame)",
+      "tool": "canonical_series",
+      "sql": "SELECT s.sic_division, f.cik, f.period_start, f.period_end, f.period_frame, f.value_usd, f.filed_date\nFROM (\n  SELECT * FROM edgar.apple_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ibm_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.oracle_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.walmart_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.target_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ford_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.tesla_revenue_table\n) f\nLEFT JOIN sic_edgar_usl s ON s.cik = f.cik\nORDER BY f.cik, f.period_end, f.filed_date",
+      "sql_sha256": "12bb3a2a429e3d4f50b3ff8b3ce733e7dae7e05be4d06b8adca122de3d953ba5",
+      "args": {
+        "source_exhibit_id": "ex_88488aba9cb9fae0",
+        "rule": "latest_filed_per_cik_frame"
+      },
+      "result": {
+        "columns": [
+          "sic_division",
+          "period_frame",
+          "revenue_usd"
+        ],
+        "rows": [
+          [
+            "Manufacturing",
+            "CY2014",
+            147275356000
+          ],
+          [
+            "Manufacturing",
+            "CY2015",
+            153604025000
+          ],
+          [
+            "Manufacturing",
+            "CY2016",
+            374439132000
+          ],
+          [
+            "Manufacturing",
+            "CY2017",
+            397769000000
+          ],
+          [
+            "Manufacturing",
+            "CY2018",
+            447394000000
+          ],
+          [
+            "Manufacturing",
+            "CY2019",
+            180478000000
+          ],
+          [
+            "Retail Trade",
+            "CY2007",
+            63367000000
+          ],
+          [
+            "Retail Trade",
+            "CY2008",
+            64948000000
+          ],
+          [
+            "Retail Trade",
+            "CY2009",
+            65357000000
+          ],
+          [
+            "Retail Trade",
+            "CY2010",
+            67390000000
+          ],
+          [
+            "Retail Trade",
+            "CY2011",
+            69865000000
+          ],
+          [
+            "Retail Trade",
+            "CY2012",
+            73301000000
+          ],
+          [
+            "Retail Trade",
+            "CY2013",
+            547573000000
+          ],
+          [
+            "Retail Trade",
+            "CY2014",
+            558269000000
+          ],
+          [
+            "Retail Trade",
+            "CY2015",
+            482130000000
+          ],
+          [
+            "Retail Trade",
+            "CY2016",
+            485873000000
+          ],
+          [
+            "Retail Trade",
+            "CY2017",
+            500343000000
+          ],
+          [
+            "Retail Trade",
+            "CY2018",
+            514405000000
+          ],
+          [
+            "Services",
+            "CY2013",
+            38275000000
+          ],
+          [
+            "Services",
+            "CY2014",
+            131019000000
+          ],
+          [
+            "Services",
+            "CY2015",
+            118788000000
+          ],
+          [
+            "Services",
+            "CY2016",
+            117711000000
+          ],
+          [
+            "Services",
+            "CY2017",
+            118522000000
+          ],
+          [
+            "Services",
+            "CY2018",
+            119097000000
+          ],
+          [
+            "Services",
+            "CY2019",
+            77147000000
+          ]
+        ],
+        "row_count": 25,
+        "truncated": false,
+        "rule": "latest_filed_per_cik_frame",
+        "sources": 25
+      },
+      "result_sha256": "3d2bca9bf44f217b4b0463972a693f6e15a8e60b3e922d9c84c59d8cb64925ee",
+      "rerun": "exhibit-a rerun ex_4cd9ee0ebd706544",
+      "case_id": "case_d6ae091f2661a801",
+      "agent": "LeadInvestigator"
+    },
+    {
+      "id": "ex_e99d22f17d675b07",
+      "ts": "2026-10-22T15:44:29.672Z",
+      "kind": "second_channel",
+      "source": "sec",
+      "transport": "cassette",
+      "title": "SEC frames Revenues/USD/CY2017",
+      "tool": "second_channel",
+      "args": {
+        "kind": "sec_frames",
+        "concept": "Revenues",
+        "unit": "USD",
+        "period": "CY2017",
+        "cik_filter": [
+          "0000320193",
+          "0000051143",
+          "0001341439",
+          "0000104169",
+          "0000027419",
+          "0000037996",
+          "0001318605"
+        ]
+      },
+      "result": {
+        "frame": "CY2017",
+        "concept": "Revenues",
+        "unit": "USD",
+        "source_url": "https://data.sec.gov/api/xbrl/frames/us-gaap/Revenues/USD/CY2017.json",
+        "count": 6,
+        "rows": [
+          {
+            "cik": "0000037996",
+            "entity_name": "FORD MOTOR CO",
+            "value_usd": 156776000000
+          },
+          {
+            "cik": "0000051143",
+            "entity_name": "INTERNATIONAL BUSINESS MACHINES CORPORATION",
+            "value_usd": 79139000000
+          },
+          {
+            "cik": "0000104169",
+            "entity_name": "Walmart Inc.",
+            "value_usd": 500343000000
+          },
+          {
+            "cik": "0000320193",
+            "entity_name": "Apple Inc.",
+            "value_usd": 229234000000
+          },
+          {
+            "cik": "0001318605",
+            "entity_name": "Tesla, Inc.",
+            "value_usd": 11759000000
+          },
+          {
+            "cik": "0001341439",
+            "entity_name": "Oracle Corporation",
+            "value_usd": 39383000000
+          }
+        ]
+      },
+      "result_sha256": "5170a0f1a6ab171733433d2693f7c29840c2a0e873a453d835835866ae2c33cf",
+      "rerun": "exhibit-a rerun ex_e99d22f17d675b07",
+      "case_id": "case_d6ae091f2661a801",
+      "agent": "SourceScout"
+    },
+    {
+      "id": "ex_bc6a5ceafe99df8d",
+      "ts": "2026-10-22T15:44:29.672Z",
+      "kind": "second_channel",
+      "source": "sec",
+      "transport": "cassette",
+      "title": "SEC frames Revenues/USD/CY2018",
+      "tool": "second_channel",
+      "args": {
+        "kind": "sec_frames",
+        "concept": "Revenues",
+        "unit": "USD",
+        "period": "CY2018",
+        "cik_filter": [
+          "0000320193",
+          "0000051143",
+          "0001341439",
+          "0000104169",
+          "0000027419",
+          "0000037996",
+          "0001318605"
+        ]
+      },
+      "result": {
+        "frame": "CY2018",
+        "concept": "Revenues",
+        "unit": "USD",
+        "source_url": "https://data.sec.gov/api/xbrl/frames/us-gaap/Revenues/USD/CY2018.json",
+        "count": 6,
+        "rows": [
+          {
+            "cik": "0000037996",
+            "entity_name": "FORD MOTOR CO",
+            "value_usd": 160338000000
+          },
+          {
+            "cik": "0000051143",
+            "entity_name": "INTERNATIONAL BUSINESS MACHINES CORPORATION",
+            "value_usd": 79591000000
+          },
+          {
+            "cik": "0000104169",
+            "entity_name": "Walmart Inc.",
+            "value_usd": 514405000000
+          },
+          {
+            "cik": "0000320193",
+            "entity_name": "Apple Inc.",
+            "value_usd": 265595000000
+          },
+          {
+            "cik": "0001318605",
+            "entity_name": "Tesla, Inc.",
+            "value_usd": 21461000000
+          },
+          {
+            "cik": "0001341439",
+            "entity_name": "Oracle Corporation",
+            "value_usd": 39506000000
+          }
+        ]
+      },
+      "result_sha256": "b95d3716e5459d97f8e04815845abb4c9040ae806eec793c3470cfddc2c63783",
+      "rerun": "exhibit-a rerun ex_bc6a5ceafe99df8d",
+      "case_id": "case_d6ae091f2661a801",
+      "agent": "SourceScout"
+    },
+    {
+      "id": "ex_ee08051dcadf46c6",
+      "ts": "2026-10-22T15:44:29.672Z",
+      "kind": "second_channel",
+      "source": "sec",
+      "transport": "cassette",
+      "title": "SEC companyconcept CIK0000320193 Revenues",
+      "tool": "second_channel",
+      "args": {
+        "kind": "sec_companyconcept",
+        "cik": "0000320193",
+        "concept": "Revenues"
+      },
+      "result": {
+        "cik": "0000320193",
+        "concept": "Revenues",
+        "entity_name": "Apple Inc.",
+        "count": 11,
+        "first_period": "2015-09-27",
+        "last_period": "2018-09-29",
+        "forms": [
+          "10-K"
+        ],
+        "source_url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0000320193/us-gaap/Revenues.json"
+      },
+      "result_sha256": "66dc7ed7cdc39fb01011cb2e9659be6cfe979b0f823153358941196e9fbe9a14",
+      "rerun": "exhibit-a rerun ex_ee08051dcadf46c6",
+      "case_id": "case_d6ae091f2661a801",
+      "agent": "SourceScout"
+    },
+    {
+      "id": "ex_ff9265f46acb2505",
+      "ts": "2026-10-22T15:44:29.673Z",
+      "kind": "profile",
+      "source": "code",
+      "transport": "code",
+      "title": "counterfactual Manufacturing 2018: one annual value per cik",
+      "tool": "counterfactual",
+      "sql": "SELECT s.sic_division, f.cik, f.period_start, f.period_end, f.period_frame, f.value_usd, f.filed_date\nFROM (\n  SELECT * FROM edgar.apple_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ibm_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.oracle_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.walmart_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.target_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ford_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.tesla_revenue_table\n) f\nLEFT JOIN sic_edgar_usl s ON s.cik = f.cik\nORDER BY f.cik, f.period_end, f.filed_date",
+      "sql_sha256": "12bb3a2a429e3d4f50b3ff8b3ce733e7dae7e05be4d06b8adca122de3d953ba5",
+      "args": {
+        "view": "analytics.sector_revenue_by_year",
+        "segment": "Manufacturing",
+        "onset_period": 2018,
+        "prior_period": 2017,
+        "naive_delta": 1294999084000,
+        "source_exhibit_id": "ex_4cd9ee0ebd706544"
+      },
+      "result": {
+        "metric": "analytics.sector_revenue_by_year",
+        "segment": "Manufacturing",
+        "prior_period": 2017,
+        "onset_period": 2018,
+        "naive_delta": 1294999084000,
+        "corrected_prior": 397769000000,
+        "corrected_now": 447394000000,
+        "corrected_delta": 49625000000,
+        "explained_share": 0.96168,
+        "unexplained_share": 0.03832,
+        "rule": "explained share = 1 - (corrected period delta / reported period delta)"
+      },
+      "result_sha256": "ce0fbe51284a60643fa6504db7b8c255d7746a47597d8e995beb844472cd1516",
+      "rerun": "exhibit-a rerun ex_ff9265f46acb2505",
+      "case_id": "case_d6ae091f2661a801",
+      "agent": "LeadInvestigator"
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "hyp_e84d7ea81c3f6404",
+      "cause": "filing_year_duplication",
+      "statement": "The 2018 movement in Manufacturing is inflated because analytics.sector_revenue_by_year sums value_usd grouped by the filing's fiscal_year, so prior-year comparatives, quarterly facts and year-to-date facts are counted again under the later filing year.",
+      "blamed": [
+        "edgar.*_revenue_table",
+        "analytics.sector_revenue_by_year"
+      ],
+      "status": "confirmed",
+      "exhibit_ids": [
+        "ex_9cab09c6142b1094",
+        "ex_8083e9e3c5aefad9",
+        "ex_19cd406462c7d979",
+        "ex_4195053f4dbf1402"
+      ],
+      "note": "FY2018 holds 100 rows across 32 distinct period_end dates; 322 duplicate rows across the seven tables."
+    },
+    {
+      "id": "hyp_6b4b169d14cc9ee9",
+      "cause": "concept_switch_missing_history",
+      "statement": "The 2018 bucket gains a company that is absent from 2017, because a filer's Revenues concept stops after one filing and its whole fact history lands in a single fiscal_year.",
+      "blamed": [
+        "edgar.apple_revenue_table",
+        "edgar.target_revenue_table"
+      ],
+      "status": "confirmed",
+      "exhibit_ids": [
+        "ex_19cd406462c7d979",
+        "ex_ee08051dcadf46c6"
+      ],
+      "note": "Apple Inc. has 11 Revenues facts, all in fiscal_year 2018; that contributes $1205.3B of the $1295.0B jump. Target Corporation has no Revenues fact after fiscal_year 2014."
+    },
+    {
+      "id": "hyp_af208a1dd6e85abe",
+      "cause": "real_change",
+      "statement": "Revenue in Manufacturing genuinely grew between 2017 and 2018; the increase should survive deduplication and agree with an independent SEC frames value.",
+      "blamed": [
+        "analytics.sector_revenue_by_year",
+        "edgar.*_revenue_table"
+      ],
+      "status": "confirmed",
+      "exhibit_ids": [
+        "ex_4cd9ee0ebd706544",
+        "ex_e99d22f17d675b07",
+        "ex_bc6a5ceafe99df8d",
+        "ex_6ed4059e5c01912f"
+      ],
+      "share": 0.038320490425922185,
+      "note": "Corrected Manufacturing is 1.125x ($49.6B); that is 3.8% of the reported jump. SEC frames parity 12/12."
+    },
+    {
+      "id": "hyp_1f9c97159eb2c7a2",
+      "cause": "tesla_short_history",
+      "statement": "Tesla's short filing history explains the 2018 movement in Manufacturing.",
+      "blamed": [
+        "edgar.tesla_revenue_table"
+      ],
+      "status": "eliminated",
+      "exhibit_ids": [
+        "ex_19cd406462c7d979",
+        "ex_8083e9e3c5aefad9"
+      ],
+      "note": "Tesla, Inc. has rows in both FY2017 and FY2018; its share of the reported jump is 4.3%."
+    },
+    {
+      "id": "hyp_079e223b0cbacff0",
+      "cause": "ingestion_gap",
+      "statement": "The artifact is an ingestion gap: Zetaris lost facts that the SEC endpoint still returns, so the naive series is missing rows rather than duplicating them.",
+      "blamed": [
+        "edgar.apple_revenue_table",
+        "zetaris.ingest"
+      ],
+      "status": "eliminated",
+      "exhibit_ids": [
+        "ex_ee08051dcadf46c6",
+        "ex_19cd406462c7d979",
+        "ex_e99d22f17d675b07",
+        "ex_bc6a5ceafe99df8d"
+      ],
+      "note": "Zetaris holds 11 Apple Inc. facts; the SEC companyconcept endpoint returns 11. Nothing is missing."
+    }
+  ],
+  "baseline": {
+    "metric": "analytics.sector_revenue_by_year",
+    "grain": "fiscal_year",
+    "band": {
+      "lo": 0.67,
+      "hi": 1.5
+    },
+    "segments": 3,
+    "periods": 4,
+    "explanation": "Manufacturing 2018 is 1.89x 2017 (+1295.0B), outside the 0.67-1.5x band",
+    "onset": {
+      "segment": "Manufacturing",
+      "period": 2018,
+      "prior_period": 2017,
+      "value": 2750941773000,
+      "prior_value": 1455942689000,
+      "ratio": 1.8894574585826984,
+      "delta": 1294999084000
+    }
+  },
+  "verdict": {
+    "kind": "MIXED",
+    "causes": [
+      {
+        "cause": "filing_year_duplication",
+        "kind": "artifact",
+        "share": 0.96168,
+        "exhibit_ids": [
+          "ex_9cab09c6142b1094",
+          "ex_8083e9e3c5aefad9",
+          "ex_19cd406462c7d979",
+          "ex_4195053f4dbf1402",
+          "ex_e99d22f17d675b07",
+          "ex_bc6a5ceafe99df8d",
+          "ex_ee08051dcadf46c6",
+          "ex_ff9265f46acb2505"
+        ]
+      },
+      {
+        "cause": "real_change",
+        "kind": "real",
+        "share": 0.03832,
+        "exhibit_ids": [
+          "ex_4cd9ee0ebd706544",
+          "ex_e99d22f17d675b07",
+          "ex_bc6a5ceafe99df8d",
+          "ex_6ed4059e5c01912f",
+          "ex_ff9265f46acb2505"
+        ]
+      }
+    ],
+    "unexplained_share": 0,
+    "exhibit_ids": [
+      "ex_9cab09c6142b1094",
+      "ex_8083e9e3c5aefad9",
+      "ex_19cd406462c7d979",
+      "ex_4195053f4dbf1402",
+      "ex_e99d22f17d675b07",
+      "ex_bc6a5ceafe99df8d",
+      "ex_ee08051dcadf46c6",
+      "ex_ff9265f46acb2505",
+      "ex_4cd9ee0ebd706544",
+      "ex_6ed4059e5c01912f"
+    ],
+    "notes": [
+      "Concept switch / missing history is confirmed as a data-quality finding but carries no separate share: deduplicating by period recovers Apple's prior-year facts, so it does not add to the reported jump.",
+      "Tesla short history and an ingestion gap were eliminated with exhibits, not left as possibilities.",
+      "Defense Counsel model critique did not run (no NVIDIA_API_KEY or NIM model); the code gate is final and no model prose can promote a cause.",
+      "SAMPLE_MODE: tool results replayed from the labelled cassette; no live inference."
+    ]
+  }
+}

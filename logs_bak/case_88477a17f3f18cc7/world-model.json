@@ -1,0 +1,11 @@
+{
+  "case_id": "case_88477a17f3f18cc7",
+  "view": "analytics.sector_revenue_by_year",
+  "built_at": "2026-10-22T15:03:30.296Z",
+  "nodes": [
+    "analytics.sector_revenue_by_year"
+  ],
+  "edges": [],
+  "sources": [],
+  "columns": []
+}

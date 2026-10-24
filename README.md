@@ -15,6 +15,10 @@ Every claim carries an *exhibit*: the exact SQL that ran, its result hash, and a
 
 Outputs are **data-quality findings on public filings, not investment advice.**
 
+## Who it is for
+
+Dana is an analytics engineer. Her revenue dashboard runs on seven SEC filing tables behind one naive metric view, and Manufacturing revenue just doubled. The CFO meeting is in an hour. Last quarter a number like this went into the board deck; it was a duplicate, and trust in the dashboard has not recovered. Duplication, a missing source, a concept switch, an ingestion gap and real growth look identical on a chart, and a confident paragraph cannot be re-run. Exhibit A gives her a verdict she can defend: the share of the move that is an artifact, the share that is real, the SQL behind each claim, and a proven, approved fix.
+
 ## Quick start (no keys, no GPU)
 
 ```bash

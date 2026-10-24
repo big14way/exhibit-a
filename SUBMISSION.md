@@ -10,7 +10,7 @@ Outputs are **data-quality findings on public filings, not investment advice.**
 
 ## The problem and the user
 
-A revenue dashboard moves. The analyst has seven fragmented SEC-derived tables, a naive metric view, and a meeting in an hour. The expensive question is not "what is the new number?" It is "is this number real, and which source caused it?" The usual failure modes are duplication, a missing source, a concept/unit/schema change, an ingestion gap, or genuine growth. Most tools return a chart or a fluent paragraph. Exhibit A returns an auditable adjudication and, when the number is wrong, a proven and approved fix.
+Dana, an analytics engineer, watches Manufacturing revenue double on a dashboard built from seven fragmented SEC-derived tables behind a naive metric view. The CFO meeting is in an hour. Last quarter a number like this went into the board deck; it was a duplicate, and trust in the dashboard has not recovered. The expensive question is not "what is the new number?" It is "is this number real, and which source caused it?" The usual failure modes are duplication, a missing source, a concept/unit/schema change, an ingestion gap, or genuine growth. Most tools return a chart or a fluent paragraph. Exhibit A returns an auditable adjudication and, when the number is wrong, a proven and approved fix.
 
 The primary user is a data-quality or analytics engineer who has to explain a movement to a CFO, a data council, or an incident review. The secondary user is an agent that needs a trustworthy case record to reuse.
 
