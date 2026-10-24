@@ -3,107 +3,146 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Exhibit A — case viewer</title>
+    <title>Exhibit A</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
     <header class="topbar">
-      <div>
-        <div class="brand">EXHIBIT A</div>
-        <div class="tagline">Evidence, not prose. A data-quality investigation viewer.</div>
-      </div>
+      <a class="wordmark" href="/">
+        <span class="mark" aria-hidden="true">A</span>
+        <span>Exhibit A</span>
+      </a>
+      <nav class="topnav" aria-label="Sections">
+        <a href="#symptom">Symptom</a>
+        <a href="#verdict">Verdict</a>
+        <a href="#hypotheses">Hypotheses</a>
+        <a href="#repair">Repair</a>
+        <a href="#exhibits">Exhibits</a>
+        <a href="#timeline">Timeline</a>
+      </nav>
       <div class="top-actions">
-        <span id="mode-badge" class="badge muted">local</span>
-        <a href="/api/cases" class="link" target="_blank" rel="noreferrer">API</a>
+        <span id="mode-badge" class="pill">viewer</span>
+        <a href="/api/cases" class="pill link" target="_blank" rel="noreferrer">JSON</a>
       </div>
     </header>
 
-    <main class="layout">
-      <aside class="sidebar">
+    <div class="layout">
+      <aside class="sidebar" aria-label="Cases">
         <div class="sidebar-head">
           <h2>Cases</h2>
-          <button id="refresh" class="button small" type="button">Refresh</button>
+          <button id="refresh" class="button ghost small" type="button">Refresh</button>
         </div>
+        <input id="case-filter" class="input" type="search" placeholder="Filter by question or metric" />
         <div id="case-list" class="case-list"><div class="empty">Loading cases…</div></div>
+        <div class="sidebar-foot">
+          Read-only. Approval and writeback stay in the CLI so the operator gate cannot be clicked away.
+        </div>
       </aside>
 
-      <section class="content">
-        <div id="empty-state" class="empty panel">
-          No case selected. Run <code>npm run cli -- investigate "is the FY2018 jump real?" --metric analytics.sector_revenue_by_year</code> and refresh.
+      <main class="content">
+        <div id="empty-state" class="empty-state">
+          <h1>No case selected</h1>
+          <p>Run an investigation, then refresh:</p>
+          <pre>npm run cli -- investigate "is the FY2018 jump real?" --metric analytics.sector_revenue_by_year</pre>
         </div>
 
         <div id="case-view" class="hidden">
-          <div class="case-head">
-            <div>
-              <div class="eyebrow" id="case-id"></div>
+          <section class="case-head">
+            <div class="case-title">
+              <div class="eyebrow"><span id="case-id"></span> · <span id="case-source"></span></div>
               <h1 id="case-question"></h1>
               <div class="meta-row">
                 <span id="case-metric" class="mono"></span>
-                <span id="case-mode" class="badge"></span>
-                <span id="case-stage" class="badge stage"></span>
+                <span id="case-mode" class="pill"></span>
+                <span id="case-stage" class="pill"></span>
+                <span id="case-date" class="muted"></span>
               </div>
             </div>
-            <div class="verdict-big" id="verdict-kind"></div>
-          </div>
+            <div class="verdict-hero" id="verdict-hero"></div>
+          </section>
 
-          <div id="stage-strip" class="stage-strip"></div>
+          <section class="stage-strip" id="stage-strip" aria-label="Pipeline"></section>
 
-          <div class="grid two">
-            <article class="panel">
-              <h2>Verdict</h2>
-              <div id="verdict-body"></div>
-            </article>
-            <article class="panel">
-              <h2>Writeback</h2>
-              <div id="writeback-body"></div>
-            </article>
-          </div>
-
-          <div class="grid two">
-            <article class="panel">
-              <h2>Hypotheses</h2>
-              <div id="hypotheses-body"></div>
-            </article>
-            <article class="panel">
-              <h2>Evidence channels</h2>
-              <div id="channels-body"></div>
-            </article>
-          </div>
-
-          <article class="panel">
-            <div class="panel-head">
-              <h2>Lineage</h2>
-              <span class="hint">World Model reference graph</span>
+          <section id="symptom" class="card">
+            <div class="card-head">
+              <div>
+                <h2>Symptom</h2>
+                <p class="sub" id="symptom-sub"></p>
+              </div>
+              <div class="legend" id="symptom-legend"></div>
             </div>
-            <div id="lineage-body" class="lineage"></div>
-          </article>
+            <div class="symptom-grid">
+              <div id="symptom-chart" class="chart"></div>
+              <div id="symptom-facts" class="facts"></div>
+            </div>
+          </section>
 
-          <article class="panel">
-            <div class="panel-head">
+          <div class="grid two">
+            <section id="verdict" class="card">
+              <div class="card-head"><h2>Verdict</h2><span class="hint">code gate · shares from the counterfactual</span></div>
+              <div id="verdict-body"></div>
+            </section>
+            <section id="channels" class="card">
+              <div class="card-head"><h2>Model roles &amp; memory</h2><span class="hint">advisory · the gate decides</span></div>
+              <div id="channels-body"></div>
+            </section>
+          </div>
+
+          <section id="hypotheses" class="card">
+            <div class="card-head"><h2>Hypotheses on trial</h2><span class="hint" id="hypotheses-hint"></span></div>
+            <div id="hypotheses-body"></div>
+          </section>
+
+          <div class="grid two">
+            <section id="repair" class="card">
+              <div class="card-head"><h2>Repair &amp; shadow verifier</h2><span class="hint">isolated shadow · signed contract</span></div>
+              <div id="repair-body"></div>
+            </section>
+            <section id="writeback" class="card">
+              <div class="card-head"><h2>Operator approval &amp; writeback</h2><span class="hint">verify-after-write</span></div>
+              <div id="writeback-body"></div>
+            </section>
+          </div>
+
+          <section id="lineage" class="card">
+            <div class="card-head"><h2>Lineage</h2><span class="hint">World Model graph from INFER SQLTABLE</span></div>
+            <div id="lineage-body" class="lineage"></div>
+          </section>
+
+          <section id="exhibits" class="card">
+            <div class="card-head">
               <h2>Exhibits</h2>
               <div class="filters">
-                <input id="exhibit-search" type="search" placeholder="Filter exhibits…" />
-                <select id="exhibit-kind"><option value="">All kinds</option></select>
+                <input id="exhibit-search" class="input" type="search" placeholder="Filter exhibits" />
+                <select id="exhibit-kind" class="input"><option value="">All kinds</option></select>
               </div>
             </div>
             <div class="split">
               <div id="exhibit-list" class="exhibit-list"></div>
               <div id="exhibit-detail" class="exhibit-detail">
-                <div class="empty">Select an exhibit to inspect its SQL and result hash.</div>
+                <div class="empty">Select an exhibit.</div>
               </div>
             </div>
-          </article>
+          </section>
 
-          <article class="panel">
-            <div class="panel-head">
-              <h2>Timeline</h2>
-              <span class="hint">Agent activity, in order</span>
-            </div>
+          <section id="timeline" class="card">
+            <div class="card-head"><h2>Timeline</h2><span class="hint" id="timeline-hint"></span></div>
             <div id="timeline-body" class="timeline"></div>
-          </article>
+          </section>
+
+          <footer class="foot">
+            Data-quality findings on public filings, not investment advice.
+          </footer>
         </div>
-      </section>
-    </main>
+      </main>
+    </div>
 
     <script type="module" src="/app.js"></script>
   </body>

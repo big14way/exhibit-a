@@ -9,9 +9,7 @@ import {
 import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  findExhibit,
   loadCassette,
-  loadExhibits,
   type CaseState,
   type Exhibit,
   type TraceLine,
@@ -27,8 +25,17 @@ const PORT = Number(process.env.WEB_PORT ?? 4173);
 
 loadEnv(ROOT);
 
+/**
+ * Cases come from two places: the gitignored `logs/` directory (what the
+ * operator ran on this machine) and the committed `fixtures/cases/<source>/`
+ * directories (the recorded live Zetaris close and the curated sample). The
+ * viewer never writes a case; it only reads them and re-runs exhibits.
+ */
+type CaseSource = { id: string; dir: string; source: string };
+
 type CaseSummary = {
   id: string;
+  source: string;
   reported_at: string;
   question: string;
   metric: string;
@@ -55,51 +62,77 @@ function text(res: ServerResponse, status: number, body: string, type: string): 
   res.end(body);
 }
 
-function caseDir(caseId: string): string {
-  return join(ROOT, "logs", caseId);
-}
-
 function safeCaseId(value: string): string {
   if (!/^case_[a-z0-9_]+$/i.test(value)) throw new Error("invalid case id");
   return value;
 }
 
-function readState(caseId: string): CaseState {
-  const id = safeCaseId(caseId);
-  const path = join(caseDir(id), "state.json");
-  if (!existsSync(path)) throw new Error(`case not found: ${id}`);
-  return JSON.parse(readFileSync(path, "utf8")) as CaseState;
+function caseDirsUnder(base: string, source: string): CaseSource[] {
+  if (!existsSync(base)) return [];
+  const found: CaseSource[] = [];
+  for (const name of readdirSync(base)) {
+    if (!name.startsWith("case_")) continue;
+    const dir = join(base, name);
+    if (!statSync(dir).isDirectory() || !existsSync(join(dir, "state.json"))) continue;
+    found.push({ id: name, dir, source });
+  }
+  return found;
 }
 
-function readTrace(caseId: string): TraceLine[] {
-  const path = join(caseDir(safeCaseId(caseId)), "trace.jsonl");
+function caseSources(): CaseSource[] {
+  // Committed fixtures win over a local copy with the same id, so the
+  // recorded live close is always labelled as what it is.
+  const byId = new Map<string, CaseSource>();
+  for (const source of caseDirsUnder(join(ROOT, "logs"), "local")) byId.set(source.id, source);
+  const fixtures = join(ROOT, "fixtures", "cases");
+  if (existsSync(fixtures)) {
+    for (const name of readdirSync(fixtures)) {
+      const dir = join(fixtures, name);
+      if (!statSync(dir).isDirectory()) continue;
+      for (const source of caseDirsUnder(dir, name)) byId.set(source.id, source);
+    }
+  }
+  return [...byId.values()];
+}
+
+function findCase(caseId: string): CaseSource {
+  const id = safeCaseId(caseId);
+  const hit = caseSources().find((source) => source.id === id);
+  if (!hit) throw new Error(`case not found: ${id}`);
+  return hit;
+}
+
+function readState(source: CaseSource): CaseState {
+  return JSON.parse(readFileSync(join(source.dir, "state.json"), "utf8")) as CaseState;
+}
+
+function readJsonl<T>(path: string): T[] {
   if (!existsSync(path)) return [];
   return readFileSync(path, "utf8")
     .split("\n")
     .filter(Boolean)
-    .map((line) => JSON.parse(line) as TraceLine);
+    .map((line) => JSON.parse(line) as T);
 }
 
-function readGraph(caseId: string): unknown {
-  const path = join(caseDir(safeCaseId(caseId)), "world-model.json");
+function readGraph(source: CaseSource): unknown {
+  const path = join(source.dir, "world-model.json");
   if (!existsSync(path)) return null;
   return JSON.parse(readFileSync(path, "utf8"));
 }
 
+function exhibitsFor(source: CaseSource, state: CaseState): Exhibit[] {
+  if (state.exhibits.length) return state.exhibits;
+  return readJsonl<Exhibit>(join(source.dir, "exhibits.jsonl"));
+}
+
 function listCases(): CaseSummary[] {
-  const logs = join(ROOT, "logs");
-  if (!existsSync(logs)) return [];
   const rows: CaseSummary[] = [];
-  for (const name of readdirSync(logs)) {
-    if (!name.startsWith("case_")) continue;
-    const dir = join(logs, name);
-    if (!statSync(dir).isDirectory()) continue;
-    const path = join(dir, "state.json");
-    if (!existsSync(path)) continue;
+  for (const source of caseSources()) {
     try {
-      const state = JSON.parse(readFileSync(path, "utf8")) as CaseState;
+      const state = readState(source);
       rows.push({
         id: state.id,
+        source: source.source,
         reported_at: state.reported_at,
         question: state.question,
         metric: state.metric,
@@ -110,22 +143,17 @@ function listCases(): CaseSummary[] {
           cause: cause.cause,
           share: cause.share,
         })),
-        exhibits: state.exhibits.length,
+        exhibits: exhibitsFor(source, state).length,
         writeback_ok: state.writeback?.ok ?? null,
         contract_id: state.write_contract?.id ?? null,
-        updated_at: statSync(path).mtime.toISOString(),
+        updated_at: statSync(join(source.dir, "state.json")).mtime.toISOString(),
       });
     } catch {
       // A half-written or malformed case log is skipped rather than breaking
       // the whole case list.
     }
   }
-  return rows.sort((a, b) => b.updated_at.localeCompare(a.updated_at));
-}
-
-function exhibitsFor(state: CaseState): Exhibit[] {
-  if (state.exhibits.length) return state.exhibits;
-  return loadExhibits(ROOT, state.id);
+  return rows.sort((a, b) => b.reported_at.localeCompare(a.reported_at));
 }
 
 async function handleApi(req: IncomingMessage, res: ServerResponse, url: URL): Promise<void> {
@@ -140,19 +168,22 @@ async function handleApi(req: IncomingMessage, res: ServerResponse, url: URL): P
 
   const caseMatch = url.pathname.match(/^\/api\/cases\/([^/]+)$/);
   if (caseMatch) {
-    const state = readState(caseMatch[1]!);
+    const source = findCase(caseMatch[1]!);
+    const state = readState(source);
     json(res, 200, {
-      state: { ...state, exhibits: exhibitsFor(state) },
-      trace: readTrace(state.id),
-      graph: readGraph(state.id),
+      source: source.source,
+      state: { ...state, exhibits: exhibitsFor(source, state) },
+      trace: readJsonl<TraceLine>(join(source.dir, "trace.jsonl")),
+      graph: readGraph(source),
     });
     return;
   }
 
   const rerunMatch = url.pathname.match(/^\/api\/cases\/([^/]+)\/rerun\/([^/]+)$/);
   if (rerunMatch && req.method === "POST") {
-    const state = readState(rerunMatch[1]!);
-    const exhibit = findExhibit(ROOT, rerunMatch[2]!);
+    const source = findCase(rerunMatch[1]!);
+    const state = readState(source);
+    const exhibit = exhibitsFor(source, state).find((row) => row.id === rerunMatch[2]);
     if (!exhibit) {
       json(res, 404, { error: `exhibit not found: ${rerunMatch[2]}` });
       return;
@@ -164,9 +195,11 @@ async function handleApi(req: IncomingMessage, res: ServerResponse, url: URL): P
       sampleMode: state.sample_mode,
       cassette,
     });
+    rt.agent = "Rerun";
     const result = await rerunExhibit(rt, exhibit);
     json(res, 200, {
       same: result.same,
+      mode: state.sample_mode ? "cassette replay" : "live Zetaris",
       expected_sha256: exhibit.result_sha256,
       rerun_sha256: result.exhibit.result_sha256,
       exhibit: result.exhibit,
@@ -174,20 +207,15 @@ async function handleApi(req: IncomingMessage, res: ServerResponse, url: URL): P
     return;
   }
 
-  const exhibitMatch = url.pathname.match(/^\/api\/cases\/([^/]+)\/exhibits\/([^/]+)$/);
-  if (exhibitMatch) {
-    const state = readState(exhibitMatch[1]!);
-    const exhibit = exhibitsFor(state).find((row) => row.id === exhibitMatch[2]);
-    if (!exhibit) {
-      json(res, 404, { error: "exhibit not found" });
-      return;
-    }
-    json(res, 200, { exhibit });
-    return;
-  }
-
   json(res, 404, { error: "not found" });
 }
+
+const TYPES: Record<string, string> = {
+  ".js": "text/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".html": "text/html; charset=utf-8",
+};
 
 function serveStatic(res: ServerResponse, pathname: string): void {
   const file = pathname === "/" ? "index.html" : pathname.replace(/^\/+/, "");
@@ -200,13 +228,7 @@ function serveStatic(res: ServerResponse, pathname: string): void {
     text(res, 404, "not found", "text/plain");
     return;
   }
-  const type =
-    extname(path) === ".js"
-      ? "text/javascript; charset=utf-8"
-      : extname(path) === ".css"
-        ? "text/css; charset=utf-8"
-        : "text/html; charset=utf-8";
-  text(res, 200, readFileSync(path, "utf8"), type);
+  text(res, 200, readFileSync(path, "utf8"), TYPES[extname(path)] ?? "text/plain; charset=utf-8");
 }
 
 const server = createServer((req, res) => {
@@ -222,5 +244,5 @@ const server = createServer((req, res) => {
 
 server.listen(PORT, "127.0.0.1", () => {
   console.log(`Exhibit A viewer: http://127.0.0.1:${PORT}`);
-  console.log(`cases: ${join(ROOT, "logs")}`);
+  console.log(`cases: ${join(ROOT, "logs")} + ${join(ROOT, "fixtures", "cases")}`);
 });
