@@ -1,7 +1,7 @@
 # Exhibit A submission media
 
-- `exhibit-a-deck.pdf` — 10-slide submission deck. Rasterised from the editable PPTX so the layout is stable on any viewer.
-- `exhibit-a-deck.pptx` — editable source deck (16:9, 13.333 × 7.5 in).
-- `exhibit-a-demo.mp4` — 3:44 narrated walkthrough, 1920×1080, H.264/AAC. It combines slides with a rendered still of the actual sample CLI replay (verdict, gate, shadow verifier, and approval boundary). It is not a live screen recording.
+- `exhibit-a-deck.pdf` — 10-slide submission deck, exported from the editable PPTX.
+- `exhibit-a-deck.pptx` — editable source deck (16:9).
+- `exhibit-a-demo.mp4` — narrated demo, 1920×1080, H.264/AAC. Every product scene is a real screen recording of the viewer served from this repository (`npm run web`) and of the CLI output (`npm run cli -- investigate / approve / writeback`), replayed from the committed `SAMPLE_MODE` cassette; the Zetaris writeback scene shows the recorded live close committed under `fixtures/cases/live`. Slides, narration and the brand background are generated; no stock footage or music.
 
-The demo is deliberately labelled as a walkthrough rather than a live inference run. The reproducible path is `npm run eval`; the live close evidence is recorded in `SUBMISSION.md` and the case log.
+The video is built from a config (`docs/video/` holds the Playwright scratch install); the reproducible path for a judge is `npm run eval` and `npm run web`.
