@@ -1,0 +1,308 @@
+1
+00:00:00,350 --> 00:00:00,953
+Exhibit A.
+
+2
+00:00:01,003 --> 00:00:02,913
+A number in a dashboard moved.
+
+3
+00:00:02,963 --> 00:00:08,204
+Exhibit A puts every explanation on trial and returns a verdict with evidence for
+
+4
+00:00:08,254 --> 00:00:08,988
+every claim.
+
+5
+00:00:09,717 --> 00:00:14,813
+In October 2020, 15,841 positive tests went missing from England's COVID dashboard
+
+6
+00:00:14,863 --> 00:00:17,888
+because a case file hit a spreadsheet size limit.
+
+7
+00:00:17,938 --> 00:00:19,332
+The patients were told;
+
+8
+00:00:19,382 --> 00:00:23,223
+an estimated 50,000 of their close contacts were never traced.
+
+9
+00:00:23,273 --> 00:00:27,428
+Analytics teams meet the same failure every week at smaller stakes:
+
+10
+00:00:27,478 --> 00:00:32,637
+a number moves, and duplication, a missing source, a concept switch and real growth
+
+11
+00:00:32,687 --> 00:00:34,269
+look identical on a chart.
+
+12
+00:00:34,319 --> 00:00:37,219
+Is the number real, and which source caused it?
+
+13
+00:00:37,269 --> 00:00:39,667
+A confident paragraph cannot be re-run.
+
+14
+00:00:40,217 --> 00:00:42,132
+Exhibit A changes three things.
+
+15
+00:00:42,182 --> 00:00:44,097
+Every claim becomes an exhibit:
+
+16
+00:00:44,147 --> 00:00:47,646
+the SQL that ran, its result hash, a one-command re-run.
+
+17
+00:00:47,696 --> 00:00:52,083
+Every explanation is a hypothesis confirmed or eliminated by evidence.
+
+18
+00:00:52,133 --> 00:00:55,887
+And the verdict is decided by a code gate, never by a model.
+
+19
+00:00:56,450 --> 00:00:58,632
+Here is the case in the viewer.
+
+20
+00:00:58,682 --> 00:01:03,888
+The reported Manufacturing series jumps 1.89x, outside the baseline band.
+
+21
+00:01:03,938 --> 00:01:09,648
+The dashed line is the corrected series, one annual fact per company and period.
+
+22
+00:01:09,698 --> 00:01:11,592
+The jump almost disappears:
+
+23
+00:01:11,642 --> 00:01:14,976
+$1.29 trillion reported, $49 billion corrected.
+
+24
+00:01:15,450 --> 00:01:16,768
+The verdict is mixed.
+
+25
+00:01:16,818 --> 00:01:20,416
+96.2% of the move is a filing-year duplication artifact;
+
+26
+00:01:20,466 --> 00:01:21,263
+3.8% is real.
+
+27
+00:01:21,313 --> 00:01:26,279
+The shares come from a counterfactual, and the gate checks that each cause is
+
+28
+00:01:26,329 --> 00:01:31,751
+located in the lineage, quantified, corroborated by an independent source, and timed
+
+29
+00:01:31,801 --> 00:01:32,728
+to the symptom.
+
+30
+00:01:33,183 --> 00:01:34,721
+Five hypotheses go on trial.
+
+31
+00:01:34,771 --> 00:01:36,990
+The suspects are selected from the data.
+
+32
+00:01:37,040 --> 00:01:40,280
+The filer whose facts all land in the onset year is Apple.
+
+33
+00:01:40,330 --> 00:01:43,570
+The filer whose history stops before the window is Target.
+
+34
+00:01:43,620 --> 00:01:47,937
+The fastest-growing filer in the segment is Tesla, cleared at 4% of the jump.
+
+35
+00:01:47,987 --> 00:01:49,525
+No company is named in code.
+
+36
+00:01:49,983 --> 00:01:52,034
+Three Nemotron roles, all bounded.
+
+37
+00:01:52,084 --> 00:01:56,976
+Embeddings re-score memory recall, so this warm case finds the closed one at 72%
+
+38
+00:01:57,026 --> 00:01:57,656
+similarity.
+
+39
+00:01:57,706 --> 00:02:02,351
+The Defense Counsel critic raises five objections and cannot change a share.
+
+40
+00:02:02,401 --> 00:02:06,181
+The content-safety model labels the finding as a second guard.
+
+41
+00:02:06,650 --> 00:02:11,490
+When the verdict is an artifact, the repair is proven first on an isolated shadow
+
+42
+00:02:11,540 --> 00:02:16,319
+view under a signed contract, with 7 invariants and two deliberately bad repairs
+
+43
+00:02:16,369 --> 00:02:17,224
+that must fail.
+
+44
+00:02:17,274 --> 00:02:22,054
+Then approval is a separate operator action that signs exactly 7 statements, and
+
+45
+00:02:22,104 --> 00:02:25,857
+writeback executes only those and re-reads everything it wrote:
+
+46
+00:02:25,907 --> 00:02:26,400
+8 checks.
+
+47
+00:02:26,883 --> 00:02:29,519
+This is the recorded live close on Zetaris:
+
+48
+00:02:29,569 --> 00:02:34,764
+the corrected view, a USL with a composite key and a data-quality rule, zero invalid
+
+49
+00:02:34,814 --> 00:02:37,637
+records, and the original view hash unchanged.
+
+50
+00:02:37,687 --> 00:02:39,697
+The full case log is in the repo.
+
+51
+00:02:40,650 --> 00:02:42,560
+Generality is shown, not claimed.
+
+52
+00:02:42,610 --> 00:02:45,412
+The same investigator runs on sector net income.
+
+53
+00:02:45,462 --> 00:02:47,253
+Services looks like it doubled;
+
+54
+00:02:47,303 --> 00:02:52,005
+the suspect this time is IBM, whose earlier periods were filed under a different
+
+55
+00:02:52,055 --> 00:02:54,856
+concept, and the corrected series actually fell.
+
+56
+00:02:54,906 --> 00:02:55,332
+Verdict:
+
+57
+00:02:55,382 --> 00:02:56,163
+DATA_ARTIFACT.
+
+58
+00:02:56,213 --> 00:02:58,480
+Nothing in the hypothesis code changed.
+
+59
+00:02:59,450 --> 00:03:01,042
+Zetaris is the fact path:
+
+60
+00:03:01,092 --> 00:03:05,770
+federated SQL, inferred lineage, schema-store views and a keyed USL with
+
+61
+00:03:05,820 --> 00:03:08,726
+data-quality rules, behind a read-only guard.
+
+62
+00:03:08,776 --> 00:03:13,783
+Meterless contracts carry memory, bounded context, lineage and signed intent.
+
+63
+00:03:13,833 --> 00:03:16,344
+Nemotron critiques, guards and recalls.
+
+64
+00:03:16,917 --> 00:03:17,440
+69 tests.
+
+65
+00:03:17,490 --> 00:03:22,476
+20 claim checks across a cold run, a warm run, an ablation and a second metric,
+
+66
+00:03:22,526 --> 00:03:25,281
+reproducing their result file byte for byte.
+
+67
+00:03:25,331 --> 00:03:30,381
+A Docker image, a static viewer on GitHub Pages, and the live close committed as
+
+68
+00:03:30,431 --> 00:03:30,955
+evidence.
+
+69
+00:03:31,517 --> 00:03:35,976
+Track one asks for a clever ability to discover and work across fragmented data
+
+70
+00:03:36,026 --> 00:03:36,433
+sources.
+
+71
+00:03:36,483 --> 00:03:41,170
+Exhibit A infers the sources behind a metric, finds the concept a filer moved to or
+
+72
+00:03:41,220 --> 00:03:45,908
+from, corroborates through a second channel, and writes the fix back where the data
+
+73
+00:03:45,958 --> 00:03:46,358
+lives.
+
+74
+00:03:46,817 --> 00:03:47,624
+Exhibit A.
+
+75
+00:03:47,674 --> 00:03:50,369
+Adjudication, not summarization.
+
+76
+00:03:50,419 --> 00:03:55,858
+The repo, the evals, the live case and a read-only viewer are at
+
+77
+00:03:55,908 --> 00:03:58,431
+github.com/big14way/exhibit-a.
+

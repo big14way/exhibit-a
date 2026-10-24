@@ -549,17 +549,17 @@
       "status": "ran",
       "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
       "objections": 5,
-      "cited_unknown": 0,
+      "cited_unknown": 1,
       "usage": {
-        "prompt_tokens": 2719,
-        "completion_tokens": 3360
+        "prompt_tokens": 2739,
+        "completion_tokens": 5353
       }
     },
     "safety": {
       "ok": true,
       "policy": "data-quality-finding-no-investment-advice",
       "findings": [],
-      "checked_chars": 2718,
+      "checked_chars": 2771,
       "action": "allow",
       "model": {
         "status": "ran",
@@ -570,7 +570,7 @@
         "detail": "user safe, response safe",
         "raw": "User Safety: safe\nResponse Safety: safe",
         "usage": {
-          "prompt_tokens": 882,
+          "prompt_tokens": 889,
           "completion_tokens": 10
         }
       }

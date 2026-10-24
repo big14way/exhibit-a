@@ -67,7 +67,7 @@ type CriticPayload = {
   };
   hypotheses: { cause: string; status: string; note: string }[];
   counterfactual: CounterfactualResult | null;
-  memory: { cold_start: boolean; hits: { case_id: string; match: string[]; verdict: string }[] };
+  memory: { cold_start: boolean; hits: { match: string[]; verdict: string; causes: string[] }[] };
   evidence: CriticEvidence[];
 };
 
@@ -179,10 +179,12 @@ export function buildCriticRequest(input: {
     counterfactual: input.counterfactual ?? null,
     memory: {
       cold_start: input.memory?.cold_start ?? true,
+      // No case ids: the request must hash the same whichever closed case
+      // was recalled, so the recorded response replays for any run.
       hits: (input.memory?.hits ?? []).map((hit) => ({
-        case_id: hit.case_id,
         match: hit.match,
         verdict: hit.verdict_kind,
+        causes: hit.causes,
       })),
     },
     evidence,

@@ -1,6 +1,6 @@
 {
   "id": "case_sample_revenue_closed",
-  "reported_at": "2026-10-24T12:34:01.016Z",
+  "reported_at": "2026-10-24T14:01:43.127Z",
   "question": "is the FY2018 jump real?",
   "metric": "analytics.sector_revenue_by_year",
   "stage": "CLOSED",
@@ -9,8 +9,8 @@
   "cassette_recorded_at": "2026-10-24",
   "exhibits": [
     {
-      "id": "ex_b7d3203a8845e702",
-      "ts": "2026-10-24T12:34:01.017Z",
+      "id": "ex_1f1c1b13bc2a41c1",
+      "ts": "2026-10-24T14:01:43.128Z",
       "kind": "memory",
       "source": "hmem",
       "transport": "code",
@@ -23,7 +23,7 @@
         "embedding_model": "nvidia/nemotron-3.5-embed-1b"
       },
       "result": {
-        "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-sample-cases-6aIuA9/logs/memory/index.json",
+        "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-sample-cases-Soxo0l/logs/memory/index.json",
         "cold_start": true,
         "query": {
           "metric": "analytics.sector_revenue_by_year",
@@ -49,14 +49,14 @@
         },
         "implementation": "H-MEM reference (Meterless contract; local JSON index)"
       },
-      "result_sha256": "1fb12f6f76cf6c01dd0f5a11255a1bb7b60a6bba8f26c4832210b454af06f597",
-      "rerun": "exhibit-a rerun ex_b7d3203a8845e702",
+      "result_sha256": "756ae0e0737b4aa1d6333f61cbe501ce236414816930d2bdb9a7ef85cdce80b7",
+      "rerun": "exhibit-a rerun ex_1f1c1b13bc2a41c1",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_c8f8e8f283a29b79",
-      "ts": "2026-10-24T12:34:01.018Z",
+      "id": "ex_750da964e8131ceb",
+      "ts": "2026-10-24T14:01:43.129Z",
       "kind": "metadata",
       "source": "zetaris",
       "transport": "cassette",
@@ -87,13 +87,13 @@
         "truncated": false
       },
       "result_sha256": "50cec15cf32167ace4c65f81cbf6062cc8315089fcf1cb17eeb247633bfeb19a",
-      "rerun": "exhibit-a rerun ex_c8f8e8f283a29b79",
+      "rerun": "exhibit-a rerun ex_750da964e8131ceb",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_d71dacecef5e43ee",
-      "ts": "2026-10-24T12:34:01.018Z",
+      "id": "ex_9b47078ec1af5902",
+      "ts": "2026-10-24T14:01:43.129Z",
       "kind": "metadata",
       "source": "zetaris",
       "transport": "cassette",
@@ -128,13 +128,13 @@
         "truncated": false
       },
       "result_sha256": "7b3848c1656c6f45c8560a63999baf373cea4d9a281c07cb7dc2097f07fae35a",
-      "rerun": "exhibit-a rerun ex_d71dacecef5e43ee",
+      "rerun": "exhibit-a rerun ex_9b47078ec1af5902",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_323c347699c18924",
-      "ts": "2026-10-24T12:34:01.019Z",
+      "id": "ex_9625e2ee46649c51",
+      "ts": "2026-10-24T14:01:43.129Z",
       "kind": "lineage",
       "source": "zetaris",
       "transport": "cassette",
@@ -189,13 +189,13 @@
         "truncated": false
       },
       "result_sha256": "c0758636c68f41cf96da3838a006767b05f70ff243d19ee3059b42aa89cb269e",
-      "rerun": "exhibit-a rerun ex_323c347699c18924",
+      "rerun": "exhibit-a rerun ex_9625e2ee46649c51",
       "case_id": "case_sample_revenue_closed",
       "agent": "SourceScout"
     },
     {
-      "id": "ex_a81ac657d6f69423",
-      "ts": "2026-10-24T12:34:01.019Z",
+      "id": "ex_764266510118c26e",
+      "ts": "2026-10-24T14:01:43.130Z",
       "kind": "lineage",
       "source": "zetaris",
       "transport": "cassette",
@@ -334,13 +334,13 @@
         "truncated": false
       },
       "result_sha256": "1793dc88097ace1c8e2879227f8a4cfe70b1c562159130a599a429999a005670",
-      "rerun": "exhibit-a rerun ex_a81ac657d6f69423",
+      "rerun": "exhibit-a rerun ex_764266510118c26e",
       "case_id": "case_sample_revenue_closed",
       "agent": "SourceScout"
     },
     {
-      "id": "ex_ce8d02a8190c00de",
-      "ts": "2026-10-24T12:34:01.019Z",
+      "id": "ex_719ccdf23ac32cf0",
+      "ts": "2026-10-24T14:01:43.130Z",
       "kind": "baseline",
       "source": "zetaris",
       "transport": "cassette",
@@ -425,13 +425,13 @@
         "truncated": false
       },
       "result_sha256": "a68f561a6786ebf87fc7a41329f58e3fc4831f7323592d9bb8c046bf5a568886",
-      "rerun": "exhibit-a rerun ex_ce8d02a8190c00de",
+      "rerun": "exhibit-a rerun ex_719ccdf23ac32cf0",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_683744b0f59adfb0",
-      "ts": "2026-10-24T12:34:01.020Z",
+      "id": "ex_bfff8898ce32190f",
+      "ts": "2026-10-24T14:01:43.131Z",
       "kind": "baseline",
       "source": "code",
       "transport": "code",
@@ -446,7 +446,7 @@
           "lo": 0.67,
           "hi": 1.5
         },
-        "source_exhibit_id": "ex_ce8d02a8190c00de"
+        "source_exhibit_id": "ex_719ccdf23ac32cf0"
       },
       "result": {
         "metric": "analytics.sector_revenue_by_year",
@@ -469,13 +469,13 @@
         }
       },
       "result_sha256": "b682ba3114cc26b0be0fede591669acc250f26c826af00d132a088f2c47b11d4",
-      "rerun": "exhibit-a rerun ex_683744b0f59adfb0",
+      "rerun": "exhibit-a rerun ex_bfff8898ce32190f",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_6c07bdd91a950f59",
-      "ts": "2026-10-24T12:34:01.020Z",
+      "id": "ex_35f27bab076e36d6",
+      "ts": "2026-10-24T14:01:43.132Z",
       "kind": "sql",
       "source": "zetaris",
       "transport": "cassette",
@@ -717,13 +717,13 @@
         "truncated": false
       },
       "result_sha256": "bfdc376020910ef941b56f6321ef0257e7c9d4bafa3a938f3f7b06128e3932bf",
-      "rerun": "exhibit-a rerun ex_6c07bdd91a950f59",
+      "rerun": "exhibit-a rerun ex_35f27bab076e36d6",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_1edff725844a3015",
-      "ts": "2026-10-24T12:34:01.020Z",
+      "id": "ex_df0fbcc3dd9f6473",
+      "ts": "2026-10-24T14:01:43.132Z",
       "kind": "sql",
       "source": "zetaris",
       "transport": "cassette",
@@ -789,13 +789,13 @@
         "truncated": false
       },
       "result_sha256": "f0ab60383ba97b9eab89abc8681fa811a6506eea48793ff7a576dff07aa4cab3",
-      "rerun": "exhibit-a rerun ex_1edff725844a3015",
+      "rerun": "exhibit-a rerun ex_df0fbcc3dd9f6473",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_97d5ed8bec97bbbc",
-      "ts": "2026-10-24T12:34:01.021Z",
+      "id": "ex_4179618e77dd6985",
+      "ts": "2026-10-24T14:01:43.132Z",
       "kind": "sql",
       "source": "zetaris",
       "transport": "cassette",
@@ -843,13 +843,13 @@
         "truncated": false
       },
       "result_sha256": "1553669f41f4e50e80d76d83ee424f0043e9f4873d0334ee8b0ed9615c16e757",
-      "rerun": "exhibit-a rerun ex_97d5ed8bec97bbbc",
+      "rerun": "exhibit-a rerun ex_4179618e77dd6985",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_fb72d33cf4c754fe",
-      "ts": "2026-10-24T12:34:01.021Z",
+      "id": "ex_c25041ff1c465bcd",
+      "ts": "2026-10-24T14:01:43.133Z",
       "kind": "sql",
       "source": "zetaris",
       "transport": "cassette",
@@ -4998,13 +4998,13 @@
         "truncated": false
       },
       "result_sha256": "c6b11ff304ab9f37bd5ab64118684f6023a75900e24c03d1320a769c9990af8f",
-      "rerun": "exhibit-a rerun ex_fb72d33cf4c754fe",
+      "rerun": "exhibit-a rerun ex_c25041ff1c465bcd",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_f245e614ab407d53",
-      "ts": "2026-10-24T12:34:01.030Z",
+      "id": "ex_4562493badb3b72c",
+      "ts": "2026-10-24T14:01:43.142Z",
       "kind": "baseline",
       "source": "code",
       "transport": "code",
@@ -5013,7 +5013,7 @@
       "sql": "SELECT s.sic_division, f.cik, f.period_start, f.period_end, f.period_frame, f.value_usd, f.filed_date\nFROM (\n  SELECT * FROM edgar.apple_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ibm_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.oracle_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.walmart_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.target_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.ford_revenue_table\n  UNION ALL\n  SELECT * FROM edgar.tesla_revenue_table\n) f\nLEFT JOIN sic_edgar_usl s ON s.cik = f.cik\nORDER BY f.cik, f.period_end, f.filed_date",
       "sql_sha256": "12bb3a2a429e3d4f50b3ff8b3ce733e7dae7e05be4d06b8adca122de3d953ba5",
       "args": {
-        "source_exhibit_id": "ex_fb72d33cf4c754fe",
+        "source_exhibit_id": "ex_c25041ff1c465bcd",
         "rule": "latest_filed_per_cik_frame"
       },
       "result": {
@@ -5155,13 +5155,13 @@
         "sources": 25
       },
       "result_sha256": "3d2bca9bf44f217b4b0463972a693f6e15a8e60b3e922d9c84c59d8cb64925ee",
-      "rerun": "exhibit-a rerun ex_f245e614ab407d53",
+      "rerun": "exhibit-a rerun ex_4562493badb3b72c",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_8d7e948d0bf1f7bb",
-      "ts": "2026-10-24T12:34:01.030Z",
+      "id": "ex_97e6dce7f7f46024",
+      "ts": "2026-10-24T14:01:43.142Z",
       "kind": "discovery",
       "source": "sec",
       "transport": "cassette",
@@ -5233,13 +5233,13 @@
         "rule": "revenue concept must have USD annual 10-K facts (330-400 days), a chain ending within 421 days, and extend the stopped concept"
       },
       "result_sha256": "4153389715fd937ccc0d45d6c937e86f1709097f54ca1b29d5e55a372d4de7aa",
-      "rerun": "exhibit-a rerun ex_8d7e948d0bf1f7bb",
+      "rerun": "exhibit-a rerun ex_97e6dce7f7f46024",
       "case_id": "case_sample_revenue_closed",
       "agent": "SourceScout"
     },
     {
-      "id": "ex_d3910faffc4998a0",
-      "ts": "2026-10-24T12:34:01.031Z",
+      "id": "ex_6a98d3de0afe227a",
+      "ts": "2026-10-24T14:01:43.143Z",
       "kind": "second_channel",
       "source": "sec",
       "transport": "cassette",
@@ -5300,13 +5300,13 @@
         ]
       },
       "result_sha256": "5170a0f1a6ab171733433d2693f7c29840c2a0e873a453d835835866ae2c33cf",
-      "rerun": "exhibit-a rerun ex_d3910faffc4998a0",
+      "rerun": "exhibit-a rerun ex_6a98d3de0afe227a",
       "case_id": "case_sample_revenue_closed",
       "agent": "SourceScout"
     },
     {
-      "id": "ex_3b0b0048057e5803",
-      "ts": "2026-10-24T12:34:01.031Z",
+      "id": "ex_8e68dfd63ce62e4a",
+      "ts": "2026-10-24T14:01:43.143Z",
       "kind": "second_channel",
       "source": "sec",
       "transport": "cassette",
@@ -5367,13 +5367,13 @@
         ]
       },
       "result_sha256": "b95d3716e5459d97f8e04815845abb4c9040ae806eec793c3470cfddc2c63783",
-      "rerun": "exhibit-a rerun ex_3b0b0048057e5803",
+      "rerun": "exhibit-a rerun ex_8e68dfd63ce62e4a",
       "case_id": "case_sample_revenue_closed",
       "agent": "SourceScout"
     },
     {
-      "id": "ex_eb30c44f65ac91d0",
-      "ts": "2026-10-24T12:34:01.031Z",
+      "id": "ex_0aa5536c6210d556",
+      "ts": "2026-10-24T14:01:43.143Z",
       "kind": "second_channel",
       "source": "sec",
       "transport": "cassette",
@@ -5397,13 +5397,13 @@
         "source_url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0000320193/us-gaap/Revenues.json"
       },
       "result_sha256": "66dc7ed7cdc39fb01011cb2e9659be6cfe979b0f823153358941196e9fbe9a14",
-      "rerun": "exhibit-a rerun ex_eb30c44f65ac91d0",
+      "rerun": "exhibit-a rerun ex_0aa5536c6210d556",
       "case_id": "case_sample_revenue_closed",
       "agent": "SourceScout"
     },
     {
-      "id": "ex_4571a20bcc000319",
-      "ts": "2026-10-24T12:34:01.032Z",
+      "id": "ex_3de0be4f3b2e68f9",
+      "ts": "2026-10-24T14:01:43.144Z",
       "kind": "profile",
       "source": "code",
       "transport": "code",
@@ -5417,7 +5417,7 @@
         "onset_period": 2018,
         "prior_period": 2017,
         "naive_delta": 1294999084000,
-        "source_exhibit_id": "ex_f245e614ab407d53"
+        "source_exhibit_id": "ex_4562493badb3b72c"
       },
       "result": {
         "corrected_direction": "same",
@@ -5434,13 +5434,13 @@
         "rule": "explained share = 1 - (corrected period delta / reported period delta), clamped to [0, 1]; opposite-direction corrected moves count as fully explained"
       },
       "result_sha256": "6564b5d5d4dc3122942fc2943d7f18daac6ce9771c739767f5c1d6652124ca7d",
-      "rerun": "exhibit-a rerun ex_4571a20bcc000319",
+      "rerun": "exhibit-a rerun ex_3de0be4f3b2e68f9",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_d0a2034f42a9322c",
-      "ts": "2026-10-24T12:34:01.033Z",
+      "id": "ex_7a2b4d7c295d153e",
+      "ts": "2026-10-24T14:01:43.145Z",
       "kind": "critic",
       "source": "nvidia-nim",
       "transport": "code",
@@ -5539,13 +5539,13 @@
         }
       },
       "result_sha256": "6726d2618f198614f93216ccc86ae213f55a143941ba0abcb5b85be91eee5be1",
-      "rerun": "exhibit-a rerun ex_d0a2034f42a9322c",
+      "rerun": "exhibit-a rerun ex_7a2b4d7c295d153e",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_c56b759e3a5e8733",
-      "ts": "2026-10-24T12:34:01.035Z",
+      "id": "ex_00dd9efef7f1b645",
+      "ts": "2026-10-24T14:01:43.147Z",
       "kind": "safety",
       "source": "safety+nvidia-nim",
       "transport": "code",
@@ -5579,21 +5579,21 @@
         }
       },
       "result_sha256": "a43e4d9de6b4a8c13871a27f1924573795e477eeda1989b4d4c9a19fee6078f3",
-      "rerun": "exhibit-a rerun ex_c56b759e3a5e8733",
+      "rerun": "exhibit-a rerun ex_00dd9efef7f1b645",
       "case_id": "case_sample_revenue_closed",
       "agent": "SafetyGuard"
     },
     {
-      "id": "ex_6f6826115df8cc97",
-      "ts": "2026-10-24T12:34:01.036Z",
+      "id": "ex_7a9c9956c51fe0c2",
+      "ts": "2026-10-24T14:01:43.148Z",
       "kind": "writeback",
       "source": "code",
       "transport": "code",
-      "title": "signed shadow contract contract_57f71c1cd8d17e4d",
+      "title": "signed shadow contract contract_6b6d0fca914d0fcf",
       "tool": "write_contract",
       "args": {
         "contract": {
-          "id": "contract_57f71c1cd8d17e4d",
+          "id": "contract_6b6d0fca914d0fcf",
           "case_id": "case_sample_revenue_closed",
           "intent": "Create a verifier sandbox for analytics.sector_revenue_by_year; do not modify the reported view",
           "scope": [
@@ -5605,15 +5605,15 @@
           ],
           "statements_sha256": "135539078175ec17eafd286166a05f4d13cb7fcf3e6ecdcd66682af3b6e0113d",
           "cost_ceiling": 0,
-          "expires_at": "2027-10-24T12:34:01.035Z",
+          "expires_at": "2027-10-24T14:01:43.147Z",
           "signer": "ScoutIntent",
-          "signature": "ab82cf46aba8f6b5eb21dbce751f8ed370670eaab74842167e082bff469af936",
+          "signature": "675784dceded8ab7ece2d286c3da9aff08adce2767d5995a3f53dd1e50b140f5",
           "approved": false
         },
         "sample_mode": true
       },
       "result": {
-        "contract_id": "contract_57f71c1cd8d17e4d",
+        "contract_id": "contract_6b6d0fca914d0fcf",
         "scope": [
           "exhibit_a_shadow.sector_revenue_by_year"
         ],
@@ -5623,14 +5623,14 @@
         "original_view_touched": false,
         "approval": "shadow-only; operator approval still required for writeback"
       },
-      "result_sha256": "35d5de6375cac71349697221418325aa696053adfc1ae76700083ccdadd6a90f",
-      "rerun": "exhibit-a rerun ex_6f6826115df8cc97",
+      "result_sha256": "f781218c68127d460dbe4d179b214be15851ceb878b0009469937222ecee5781",
+      "rerun": "exhibit-a rerun ex_7a9c9956c51fe0c2",
       "case_id": "case_sample_revenue_closed",
       "agent": "RepairEngineer"
     },
     {
-      "id": "ex_f94b29692ea40e3f",
-      "ts": "2026-10-24T12:34:01.036Z",
+      "id": "ex_984d8dbe50a59658",
+      "ts": "2026-10-24T14:01:43.148Z",
       "kind": "test",
       "source": "zetaris",
       "transport": "cassette",
@@ -5708,13 +5708,13 @@
         "truncated": false
       },
       "result_sha256": "984d9c181c859e644e0505be5b72cb7682a9fc78d08d1660ec64fa09d2a730e9",
-      "rerun": "exhibit-a rerun ex_f94b29692ea40e3f",
+      "rerun": "exhibit-a rerun ex_984d8dbe50a59658",
       "case_id": "case_sample_revenue_closed",
       "agent": "Verifier"
     },
     {
-      "id": "ex_1b6ea389214c4e27",
-      "ts": "2026-10-24T12:34:01.036Z",
+      "id": "ex_7daafd91b2f60840",
+      "ts": "2026-10-24T14:01:43.148Z",
       "kind": "baseline",
       "source": "zetaris",
       "transport": "cassette",
@@ -5799,13 +5799,13 @@
         "truncated": false
       },
       "result_sha256": "a68f561a6786ebf87fc7a41329f58e3fc4831f7323592d9bb8c046bf5a568886",
-      "rerun": "exhibit-a rerun ex_1b6ea389214c4e27",
+      "rerun": "exhibit-a rerun ex_7daafd91b2f60840",
       "case_id": "case_sample_revenue_closed",
       "agent": "Verifier"
     },
     {
-      "id": "ex_cea7144c478f0516",
-      "ts": "2026-10-24T12:34:01.037Z",
+      "id": "ex_6ff13d628cfc6532",
+      "ts": "2026-10-24T14:01:43.149Z",
       "kind": "test",
       "source": "code",
       "transport": "code",
@@ -5819,7 +5819,7 @@
         "corrected_metric": "exhibit_a.sector_revenue_by_year_v2",
         "corrected_sql": "WITH annual AS (\n  SELECT\n    s.sic_division,\n    f.cik,\n    f.period_start,\n    f.period_end,\n    f.value_usd,\n    f.filed_date,\n    CASE\n      WHEN MONTH(f.period_end) <= 6 THEN YEAR(f.period_end) - 1\n      ELSE YEAR(f.period_end)\n    END AS period_year,\n    ROW_NUMBER() OVER (\n      PARTITION BY f.cik, f.period_end\n      ORDER BY f.filed_date DESC, f.value_usd DESC\n    ) AS rn\n  FROM (\n    SELECT * FROM edgar.apple_revenue_table\n    UNION ALL SELECT * FROM edgar.ibm_revenue_table\n    UNION ALL SELECT * FROM edgar.oracle_revenue_table\n    UNION ALL SELECT * FROM edgar.walmart_revenue_table\n    UNION ALL SELECT * FROM edgar.target_revenue_table\n    UNION ALL SELECT * FROM edgar.ford_revenue_table\n    UNION ALL SELECT * FROM edgar.tesla_revenue_table\n  ) f\n  LEFT JOIN edgar.sic_edgar_usl s ON s.cik = f.cik\n  WHERE DATEDIFF(f.period_end, f.period_start) BETWEEN 330 AND 400\n)\nSELECT\n  sic_division,\n  period_year AS fiscal_year,\n  SUM(value_usd) AS revenue_usd\nFROM annual\nWHERE rn = 1\n  AND period_year BETWEEN 2016 AND 2019\nGROUP BY sic_division, period_year",
         "contract": {
-          "id": "contract_57f71c1cd8d17e4d",
+          "id": "contract_6b6d0fca914d0fcf",
           "case_id": "case_sample_revenue_closed",
           "intent": "Create a verifier sandbox for analytics.sector_revenue_by_year; do not modify the reported view",
           "scope": [
@@ -5831,12 +5831,12 @@
           ],
           "statements_sha256": "135539078175ec17eafd286166a05f4d13cb7fcf3e6ecdcd66682af3b6e0113d",
           "cost_ceiling": 0,
-          "expires_at": "2027-10-24T12:34:01.035Z",
+          "expires_at": "2027-10-24T14:01:43.147Z",
           "signer": "ScoutIntent",
-          "signature": "ab82cf46aba8f6b5eb21dbce751f8ed370670eaab74842167e082bff469af936",
+          "signature": "675784dceded8ab7ece2d286c3da9aff08adce2767d5995a3f53dd1e50b140f5",
           "approved": false
         },
-        "contract_id": "contract_57f71c1cd8d17e4d",
+        "contract_id": "contract_6b6d0fca914d0fcf",
         "baseline": {
           "metric": "analytics.sector_revenue_by_year",
           "grain": "fiscal_year",
@@ -5871,18 +5871,18 @@
           "unexplained_share": 0.03832,
           "rule": "explained share = 1 - (corrected period delta / reported period delta), clamped to [0, 1]; opposite-direction corrected moves count as fully explained"
         },
-        "history_exhibit_id": "ex_ce8d02a8190c00de",
-        "history_reread_exhibit_id": "ex_1b6ea389214c4e27",
-        "canonical_facts_exhibit_id": "ex_fb72d33cf4c754fe",
-        "shadow_exhibit_id": "ex_f94b29692ea40e3f",
+        "history_exhibit_id": "ex_719ccdf23ac32cf0",
+        "history_reread_exhibit_id": "ex_7daafd91b2f60840",
+        "canonical_facts_exhibit_id": "ex_c25041ff1c465bcd",
+        "shadow_exhibit_id": "ex_984d8dbe50a59658",
         "frame_exhibits": [
           {
             "period": "CY2017",
-            "exhibit_id": "ex_d3910faffc4998a0"
+            "exhibit_id": "ex_6a98d3de0afe227a"
           },
           {
             "period": "CY2018",
-            "exhibit_id": "ex_3b0b0048057e5803"
+            "exhibit_id": "ex_8e68dfd63ce62e4a"
           }
         ]
       },
@@ -5945,7 +5945,7 @@
           {
             "name": "shadow_contract",
             "ok": true,
-            "detail": "signed contract contract_57f71c1cd8d17e4d scopes exhibit_a_shadow.sector_revenue_by_year"
+            "detail": "signed contract contract_6b6d0fca914d0fcf scopes exhibit_a_shadow.sector_revenue_by_year"
           },
           {
             "name": "bad_repair_rejected",
@@ -5958,22 +5958,22 @@
         "corrected_delta": 49625000000,
         "corrected_ratio": 1.1247583396393384
       },
-      "result_sha256": "ea1139dcda3286dc3f7c37ddae19dad2f133e5f6138b14373a8aa1fb085063b8",
-      "rerun": "exhibit-a rerun ex_cea7144c478f0516",
+      "result_sha256": "3a8dea6b1b95463ca7eb4567438988482b29558075ffe0ca9c709cba555e3862",
+      "rerun": "exhibit-a rerun ex_6ff13d628cfc6532",
       "case_id": "case_sample_revenue_closed",
       "agent": "Verifier"
     },
     {
-      "id": "ex_962cfd8a3fd14b80",
-      "ts": "2026-10-24T12:34:01.039Z",
+      "id": "ex_76ee8fc04e58e99c",
+      "ts": "2026-10-24T14:01:43.151Z",
       "kind": "writeback",
       "source": "code",
       "transport": "code",
-      "title": "operator-approved writeback contract_7288564669d4bafd",
+      "title": "operator-approved writeback contract_c186837732ef940d",
       "tool": "writeback",
       "args": {
         "contract": {
-          "id": "contract_7288564669d4bafd",
+          "id": "contract_c186837732ef940d",
           "case_id": "case_sample_revenue_closed",
           "intent": "Write the verified deduplicating repair to exhibit_a.sector_revenue_by_year_v2, create the lightning.metastore.exhibit_a.revenue_facts.fact composite-key duplicate detector, and record the case in the USL table description. Never touch the reported analytics view.",
           "scope": [
@@ -5988,42 +5988,42 @@
             "COMPILE USL IF NOT EXISTS revenue_facts DEPLOY NAMESPACE lightning.metastore.exhibit_a DDL\nCREATE TABLE fact (\n  cik varchar(10) NOT NULL,\n  period_end date NOT NULL,\n  period_frame varchar(16),\n  sic_division varchar(200),\n  period_year int NOT NULL,\n  value_usd double,\n  filed_date date,\n  PRIMARY KEY (cik, period_end)\n)",
             "ACTIVATE USL TABLE lightning.metastore.exhibit_a.revenue_facts.fact AS\nWITH annual AS (\n  SELECT\n    s.sic_division,\n    f.cik,\n    f.period_start,\n    f.period_end,\n    f.value_usd,\n    f.filed_date,\n    CASE\n      WHEN MONTH(f.period_end) <= 6 THEN YEAR(f.period_end) - 1\n      ELSE YEAR(f.period_end)\n    END AS period_year,\n    ROW_NUMBER() OVER (\n      PARTITION BY f.cik, f.period_end\n      ORDER BY f.filed_date DESC, f.value_usd DESC\n    ) AS rn\n  FROM (\n    SELECT * FROM edgar.apple_revenue_table\n    UNION ALL SELECT * FROM edgar.ibm_revenue_table\n    UNION ALL SELECT * FROM edgar.oracle_revenue_table\n    UNION ALL SELECT * FROM edgar.walmart_revenue_table\n    UNION ALL SELECT * FROM edgar.target_revenue_table\n    UNION ALL SELECT * FROM edgar.ford_revenue_table\n    UNION ALL SELECT * FROM edgar.tesla_revenue_table\n  ) f\n  LEFT JOIN edgar.sic_edgar_usl s ON s.cik = f.cik\n  WHERE DATEDIFF(f.period_end, f.period_start) BETWEEN 330 AND 400\n)\nSELECT\n  COALESCE(CAST(cik AS STRING), '') AS cik,\n  COALESCE(CAST(period_end AS DATE), CURRENT_DATE) AS period_end,\n  CONCAT('CY', CAST(COALESCE(period_year, 0) AS STRING)) AS period_frame,\n  sic_division,\n  COALESCE(period_year, 0) AS period_year,\n  CAST(value_usd AS DOUBLE) AS value_usd,\n  CAST(filed_date AS DATE) AS filed_date\nFROM annual\nWHERE rn = 1",
             "REGISTER DQ annual_has_frame TABLE lightning.metastore.exhibit_a.revenue_facts.fact AS period_frame IS NOT NULL",
-            "UPDATE USL lightning.metastore.exhibit_a.revenue_facts.fact SET TABLE DESCRIPTION Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_1edff725844a3015, ex_97d5ed8bec97bbbc, ex_6c07bdd91a950f59, ex_ce8d02a8190c00de, ex_d3910faffc4998a0, ex_3b0b0048057e5803, 2026-10-24. Data-quality finding on public filings, not investment advice."
+            "UPDATE USL lightning.metastore.exhibit_a.revenue_facts.fact SET TABLE DESCRIPTION Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_df0fbcc3dd9f6473, ex_4179618e77dd6985, ex_35f27bab076e36d6, ex_719ccdf23ac32cf0, ex_6a98d3de0afe227a, ex_8e68dfd63ce62e4a, 2026-10-24. Data-quality finding on public filings, not investment advice."
           ],
-          "statements_sha256": "980c98209daa2af24a24d2add686faf908fd74ea6bd0ea8a95e7bf8d018346ff",
+          "statements_sha256": "3def9256c4a1dfbc5954f009a0b6b2b3a13dbb539bb2c959ec0b96ec7f27c47a",
           "cost_ceiling": 0,
-          "expires_at": "2027-10-24T12:34:01.038Z",
+          "expires_at": "2027-10-24T14:01:43.150Z",
           "signer": "ScoutIntent",
-          "signature": "bf0d479dfbb84c8dc79251ecc36282295b5d81340113abb380878b26db227b29",
+          "signature": "a2be172801e15d97afbb910efd1006360f3c173ec9ff68aafa3e94fa5a03fdab",
           "approved": true,
           "approved_by": "operator:cli",
-          "approved_at": "2026-10-24T12:34:01.038Z"
+          "approved_at": "2026-10-24T14:01:43.150Z"
         },
         "sample_mode": true,
-        "note": "Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_1edff725844a3015, ex_97d5ed8bec97bbbc, ex_6c07bdd91a950f59, ex_ce8d02a8190c00de, ex_d3910faffc4998a0, ex_3b0b0048057e5803, 2026-10-24. Data-quality finding on public filings, not investment advice."
+        "note": "Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_df0fbcc3dd9f6473, ex_4179618e77dd6985, ex_35f27bab076e36d6, ex_719ccdf23ac32cf0, ex_6a98d3de0afe227a, ex_8e68dfd63ce62e4a, 2026-10-24. Data-quality finding on public filings, not investment advice."
       },
       "result": {
-        "contract_id": "contract_7288564669d4bafd",
+        "contract_id": "contract_c186837732ef940d",
         "scope": [
           "exhibit_a.sector_revenue_by_year_v2",
           "lightning.metastore.exhibit_a",
           "lightning.metastore.exhibit_a.revenue_facts.fact"
         ],
-        "statements_sha256": "980c98209daa2af24a24d2add686faf908fd74ea6bd0ea8a95e7bf8d018346ff",
+        "statements_sha256": "3def9256c4a1dfbc5954f009a0b6b2b3a13dbb539bb2c959ec0b96ec7f27c47a",
         "statements_count": 7,
         "mode": "sample-replay",
         "executed": false,
         "original_view_touched": false,
         "approval": "operator-approved"
       },
-      "result_sha256": "a3a75fe7237a9e2ffdb9a9032332a249fabe6a2a6aee3521b65a9a2980105da5",
-      "rerun": "exhibit-a rerun ex_962cfd8a3fd14b80",
+      "result_sha256": "41128a571f98aa17c37ded930c8346f1b421a7ad781b20bcca7331bd5be3b04a",
+      "rerun": "exhibit-a rerun ex_76ee8fc04e58e99c",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_cab9a2fa109864f2",
-      "ts": "2026-10-24T12:34:01.039Z",
+      "id": "ex_0fa130d5b0259514",
+      "ts": "2026-10-24T14:01:43.151Z",
       "kind": "writeback",
       "source": "sample-replay",
       "transport": "code",
@@ -6099,13 +6099,13 @@
         "truncated": false
       },
       "result_sha256": "984d9c181c859e644e0505be5b72cb7682a9fc78d08d1660ec64fa09d2a730e9",
-      "rerun": "exhibit-a rerun ex_cab9a2fa109864f2",
+      "rerun": "exhibit-a rerun ex_0fa130d5b0259514",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_2c890f54f6d72bee",
-      "ts": "2026-10-24T12:34:01.039Z",
+      "id": "ex_6b97eb6211bd9505",
+      "ts": "2026-10-24T14:01:43.151Z",
       "kind": "test",
       "source": "sample-replay",
       "transport": "code",
@@ -6186,13 +6186,13 @@
         "truncated": false
       },
       "result_sha256": "a68f561a6786ebf87fc7a41329f58e3fc4831f7323592d9bb8c046bf5a568886",
-      "rerun": "exhibit-a rerun ex_2c890f54f6d72bee",
+      "rerun": "exhibit-a rerun ex_6b97eb6211bd9505",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_ff6c32bb5c33f86f",
-      "ts": "2026-10-24T12:34:01.039Z",
+      "id": "ex_f97e48e858e54c1e",
+      "ts": "2026-10-24T14:01:43.151Z",
       "kind": "metadata",
       "source": "sample-replay",
       "transport": "code",
@@ -6207,20 +6207,20 @@
         ],
         "rows": [
           [
-            "{\"namespace\":[\"metastore\",\"exhibit_a\"],\"name\":\"revenue_facts\",\"description\":\"Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_1edff725844a3015, ex_97d5ed8bec97bbbc, ex_6c07bdd91a950f59, ex_ce8d02a8190c00de, ex_d3910faffc4998a0, ex_3b0b0048057e5803, 2026-10-24. Data-quality finding on public filings, not investment advice.\",\"tables\":[{\"name\":\"fact\",\"columnSpecs\":[{\"name\":\"cik\",\"dataType\":\"\\\"varchar(10)\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"period_end\",\"dataType\":\"\\\"date\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"period_frame\",\"dataType\":\"\\\"varchar(16)\\\"\"},{\"name\":\"sic_division\",\"dataType\":\"\\\"varchar(200)\\\"\"},{\"name\":\"period_year\",\"dataType\":\"\\\"int\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"value_usd\",\"dataType\":\"\\\"double\\\"\"},{\"name\":\"filed_date\",\"dataType\":\"\\\"date\\\"\"}],\"primaryKey\":{\"columns\":[\"cik\",\"period_end\"]},\"dqAnnotations\":[{\"name\":\"annual_has_frame\",\"expression\":\"period_frame IS NOT NULL\"}],\"activateQuery\":\"sample replay: canonical-period select\"}]}"
+            "{\"namespace\":[\"metastore\",\"exhibit_a\"],\"name\":\"revenue_facts\",\"description\":\"Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_df0fbcc3dd9f6473, ex_4179618e77dd6985, ex_35f27bab076e36d6, ex_719ccdf23ac32cf0, ex_6a98d3de0afe227a, ex_8e68dfd63ce62e4a, 2026-10-24. Data-quality finding on public filings, not investment advice.\",\"tables\":[{\"name\":\"fact\",\"columnSpecs\":[{\"name\":\"cik\",\"dataType\":\"\\\"varchar(10)\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"period_end\",\"dataType\":\"\\\"date\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"period_frame\",\"dataType\":\"\\\"varchar(16)\\\"\"},{\"name\":\"sic_division\",\"dataType\":\"\\\"varchar(200)\\\"\"},{\"name\":\"period_year\",\"dataType\":\"\\\"int\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"value_usd\",\"dataType\":\"\\\"double\\\"\"},{\"name\":\"filed_date\",\"dataType\":\"\\\"date\\\"\"}],\"primaryKey\":{\"columns\":[\"cik\",\"period_end\"]},\"dqAnnotations\":[{\"name\":\"annual_has_frame\",\"expression\":\"period_frame IS NOT NULL\"}],\"activateQuery\":\"sample replay: canonical-period select\"}]}"
           ]
         ],
         "row_count": 1,
         "truncated": false
       },
-      "result_sha256": "f643eb82f2633ce1e1fde2756ff10b716794056243980645b456c980d408a8eb",
-      "rerun": "exhibit-a rerun ex_ff6c32bb5c33f86f",
+      "result_sha256": "8319daaeb568cbabc151af0b0a7ce60b21182fee5fcadd6761a7c079914dbbc8",
+      "rerun": "exhibit-a rerun ex_f97e48e858e54c1e",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_18d3b71ddb8a926e",
-      "ts": "2026-10-24T12:34:01.039Z",
+      "id": "ex_4168893f6ae29886",
+      "ts": "2026-10-24T14:01:43.151Z",
       "kind": "test",
       "source": "sample-replay",
       "transport": "code",
@@ -6254,13 +6254,13 @@
         "truncated": false
       },
       "result_sha256": "5403f2bb0fdd7f67945f746ab7b949a4cf8c04e13c9a009cd310f480b905e800",
-      "rerun": "exhibit-a rerun ex_18d3b71ddb8a926e",
+      "rerun": "exhibit-a rerun ex_4168893f6ae29886",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_085ff4359c9029ec",
-      "ts": "2026-10-24T12:34:01.040Z",
+      "id": "ex_260672f1bf87a0d0",
+      "ts": "2026-10-24T14:01:43.152Z",
       "kind": "test",
       "source": "sample-replay",
       "transport": "code",
@@ -6292,13 +6292,13 @@
         "truncated": false
       },
       "result_sha256": "e264f2c44f7388c9965c515d8f63c2b0d5238fe238a1b145b3af7924a4a80f40",
-      "rerun": "exhibit-a rerun ex_085ff4359c9029ec",
+      "rerun": "exhibit-a rerun ex_260672f1bf87a0d0",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_30236f1f513f1e7d",
-      "ts": "2026-10-24T12:34:01.040Z",
+      "id": "ex_dad0ee79cf9b60ad",
+      "ts": "2026-10-24T14:01:43.152Z",
       "kind": "test",
       "source": "sample-replay",
       "transport": "code",
@@ -6330,13 +6330,13 @@
         "truncated": false
       },
       "result_sha256": "df43719c284a53718b165fb85a2e3e2fd97b26d0a7c9b675fbd137523f6f3479",
-      "rerun": "exhibit-a rerun ex_30236f1f513f1e7d",
+      "rerun": "exhibit-a rerun ex_dad0ee79cf9b60ad",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_371aa856f70b5008",
-      "ts": "2026-10-24T12:34:01.040Z",
+      "id": "ex_5ca05f4bc067a255",
+      "ts": "2026-10-24T14:01:43.152Z",
       "kind": "metadata",
       "source": "sample-replay",
       "transport": "code",
@@ -6362,13 +6362,13 @@
         "truncated": false
       },
       "result_sha256": "f3b63195a57a53f60d1148bec679721db58111b4e5cff6f27ec03efc7c586ce3",
-      "rerun": "exhibit-a rerun ex_371aa856f70b5008",
+      "rerun": "exhibit-a rerun ex_5ca05f4bc067a255",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_f9d302965bf00545",
-      "ts": "2026-10-24T12:34:01.041Z",
+      "id": "ex_4ad547e986e774dd",
+      "ts": "2026-10-24T14:01:43.152Z",
       "kind": "test",
       "source": "code",
       "transport": "code",
@@ -6377,29 +6377,29 @@
       "sql": "CREATE OR REPLACE SCHEMASTORE VIEW sector_revenue_by_year_v2 WITH CONTAINER exhibit_a AS WITH annual AS (\n  SELECT\n    s.sic_division,\n    f.cik,\n    f.period_start,\n    f.period_end,\n    f.value_usd,\n    f.filed_date,\n    CASE\n      WHEN MONTH(f.period_end) <= 6 THEN YEAR(f.period_end) - 1\n      ELSE YEAR(f.period_end)\n    END AS period_year,\n    ROW_NUMBER() OVER (\n      PARTITION BY f.cik, f.period_end\n      ORDER BY f.filed_date DESC, f.value_usd DESC\n    ) AS rn\n  FROM (\n    SELECT * FROM edgar.apple_revenue_table\n    UNION ALL SELECT * FROM edgar.ibm_revenue_table\n    UNION ALL SELECT * FROM edgar.oracle_revenue_table\n    UNION ALL SELECT * FROM edgar.walmart_revenue_table\n    UNION ALL SELECT * FROM edgar.target_revenue_table\n    UNION ALL SELECT * FROM edgar.ford_revenue_table\n    UNION ALL SELECT * FROM edgar.tesla_revenue_table\n  ) f\n  LEFT JOIN edgar.sic_edgar_usl s ON s.cik = f.cik\n  WHERE DATEDIFF(f.period_end, f.period_start) BETWEEN 330 AND 400\n)\nSELECT\n  sic_division,\n  period_year AS fiscal_year,\n  SUM(value_usd) AS revenue_usd\nFROM annual\nWHERE rn = 1\n  AND period_year BETWEEN 2016 AND 2019\nGROUP BY sic_division, period_year",
       "sql_sha256": "613d55bcb8a90a0541407153dfd95b6e19308cc03faa1f09ee3cf1c6afae5bb0",
       "args": {
-        "contract_id": "contract_7288564669d4bafd",
+        "contract_id": "contract_c186837732ef940d",
         "written_metric": "exhibit_a.sector_revenue_by_year_v2",
-        "note": "Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_1edff725844a3015, ex_97d5ed8bec97bbbc, ex_6c07bdd91a950f59, ex_ce8d02a8190c00de, ex_d3910faffc4998a0, ex_3b0b0048057e5803, 2026-10-24. Data-quality finding on public filings, not investment advice.",
+        "note": "Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_df0fbcc3dd9f6473, ex_4179618e77dd6985, ex_35f27bab076e36d6, ex_719ccdf23ac32cf0, ex_6a98d3de0afe227a, ex_8e68dfd63ce62e4a, 2026-10-24. Data-quality finding on public filings, not investment advice.",
         "write_executed": true,
-        "shadow_exhibit_id": "ex_f94b29692ea40e3f",
-        "final_read_exhibit_id": "ex_cab9a2fa109864f2",
-        "usl_load_exhibit_id": "ex_ff6c32bb5c33f86f",
-        "dq_list_exhibit_id": "ex_18d3b71ddb8a926e",
-        "composite_dq_exhibit_id": "ex_085ff4359c9029ec",
-        "row_dq_exhibit_id": "ex_30236f1f513f1e7d",
-        "views_exhibit_id": "ex_371aa856f70b5008",
-        "original_exhibit_id": "ex_ce8d02a8190c00de",
-        "original_reread_exhibit_id": "ex_2c890f54f6d72bee"
+        "shadow_exhibit_id": "ex_984d8dbe50a59658",
+        "final_read_exhibit_id": "ex_0fa130d5b0259514",
+        "usl_load_exhibit_id": "ex_f97e48e858e54c1e",
+        "dq_list_exhibit_id": "ex_4168893f6ae29886",
+        "composite_dq_exhibit_id": "ex_260672f1bf87a0d0",
+        "row_dq_exhibit_id": "ex_dad0ee79cf9b60ad",
+        "views_exhibit_id": "ex_5ca05f4bc067a255",
+        "original_exhibit_id": "ex_719ccdf23ac32cf0",
+        "original_reread_exhibit_id": "ex_6b97eb6211bd9505"
       },
       "result": {
         "ok": true,
-        "contract_id": "contract_7288564669d4bafd",
+        "contract_id": "contract_c186837732ef940d",
         "written_metric": "exhibit_a.sector_revenue_by_year_v2",
         "checks": [
           {
             "name": "write_contract",
             "ok": true,
-            "detail": "operator-approved contract contract_7288564669d4bafd executed exactly its signed statements"
+            "detail": "operator-approved contract contract_c186837732ef940d executed exactly its signed statements"
           },
           {
             "name": "final_view_readback",
@@ -6464,17 +6464,17 @@
           }
         ],
         "readback_sha256": "984d9c181c859e644e0505be5b72cb7682a9fc78d08d1660ec64fa09d2a730e9",
-        "usl_model": "{\"namespace\":[\"metastore\",\"exhibit_a\"],\"name\":\"revenue_facts\",\"description\":\"Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_1edff725844a3015, ex_97d5ed8bec97bbbc, ex_6c07bdd91a950f59, ex_ce8d02a8190c00de, ex_d3910faffc4998a0, ex_3b0b0048057e5803, 2026-10-24. Data-quality finding on public filings, not investment advice.\",\"tables\":[{\"name\":\"fact\",\"columnSpecs\":[{\"name\":\"cik\",\"dataType\":\"\\\"varchar(10)\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"period_end\",\"dataType\":\"\\\"date\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"period_frame\",\"dataType\":\"\\\"varchar(16)\\\"\"},{\"name\":\"sic_division\",\"dataType\":\"\\\"varchar(200)\\\"\"},{\"name\":\"period_year\",\"dataType\":\"\\\"int\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"value_usd\",\"dataType\":\"\\\"double\\\"\"},{\"name\":\"filed_date\",\"dataType\":\"\\\"date\\\"\"}],\"primaryKey\":{\"columns\":[\"cik\",\"period_end\"]},\"dqAnnotations\":[{\"name\":\"annual_has_frame\",\"expression\":\"period_frame IS NOT NULL\"}],\"activateQuery\":\"sample replay: canonical-period select\"}]}",
-        "memory_note": "Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_1edff725844a3015, ex_97d5ed8bec97bbbc, ex_6c07bdd91a950f59, ex_ce8d02a8190c00de, ex_d3910faffc4998a0, ex_3b0b0048057e5803, 2026-10-24. Data-quality finding on public filings, not investment advice."
+        "usl_model": "{\"namespace\":[\"metastore\",\"exhibit_a\"],\"name\":\"revenue_facts\",\"description\":\"Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_df0fbcc3dd9f6473, ex_4179618e77dd6985, ex_35f27bab076e36d6, ex_719ccdf23ac32cf0, ex_6a98d3de0afe227a, ex_8e68dfd63ce62e4a, 2026-10-24. Data-quality finding on public filings, not investment advice.\",\"tables\":[{\"name\":\"fact\",\"columnSpecs\":[{\"name\":\"cik\",\"dataType\":\"\\\"varchar(10)\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"period_end\",\"dataType\":\"\\\"date\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"period_frame\",\"dataType\":\"\\\"varchar(16)\\\"\"},{\"name\":\"sic_division\",\"dataType\":\"\\\"varchar(200)\\\"\"},{\"name\":\"period_year\",\"dataType\":\"\\\"int\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"value_usd\",\"dataType\":\"\\\"double\\\"\"},{\"name\":\"filed_date\",\"dataType\":\"\\\"date\\\"\"}],\"primaryKey\":{\"columns\":[\"cik\",\"period_end\"]},\"dqAnnotations\":[{\"name\":\"annual_has_frame\",\"expression\":\"period_frame IS NOT NULL\"}],\"activateQuery\":\"sample replay: canonical-period select\"}]}",
+        "memory_note": "Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_df0fbcc3dd9f6473, ex_4179618e77dd6985, ex_35f27bab076e36d6, ex_719ccdf23ac32cf0, ex_6a98d3de0afe227a, ex_8e68dfd63ce62e4a, 2026-10-24. Data-quality finding on public filings, not investment advice."
       },
-      "result_sha256": "c0b89cf51af5af813fb3971a7e67667dfa7541fcb1b4c7062bf8233dd1c0e6d1",
-      "rerun": "exhibit-a rerun ex_f9d302965bf00545",
+      "result_sha256": "0eba23ec0f65a0b88e4f3816b34d668b87c5970744e321c50e44d344dd882f4b",
+      "rerun": "exhibit-a rerun ex_4ad547e986e774dd",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_6a628e92b65cc1d5",
-      "ts": "2026-10-24T12:34:01.041Z",
+      "id": "ex_1496df1e195dcc78",
+      "ts": "2026-10-24T14:01:43.153Z",
       "kind": "memory",
       "source": "code",
       "transport": "code",
@@ -6490,14 +6490,14 @@
               "kind": "artifact",
               "share": 0.96168,
               "exhibit_ids": [
-                "ex_1edff725844a3015",
-                "ex_97d5ed8bec97bbbc",
-                "ex_6c07bdd91a950f59",
-                "ex_ce8d02a8190c00de",
-                "ex_d3910faffc4998a0",
-                "ex_3b0b0048057e5803",
-                "ex_eb30c44f65ac91d0",
-                "ex_4571a20bcc000319"
+                "ex_df0fbcc3dd9f6473",
+                "ex_4179618e77dd6985",
+                "ex_35f27bab076e36d6",
+                "ex_719ccdf23ac32cf0",
+                "ex_6a98d3de0afe227a",
+                "ex_8e68dfd63ce62e4a",
+                "ex_0aa5536c6210d556",
+                "ex_3de0be4f3b2e68f9"
               ]
             },
             {
@@ -6505,26 +6505,26 @@
               "kind": "real",
               "share": 0.03832,
               "exhibit_ids": [
-                "ex_f245e614ab407d53",
-                "ex_d3910faffc4998a0",
-                "ex_3b0b0048057e5803",
-                "ex_683744b0f59adfb0",
-                "ex_4571a20bcc000319"
+                "ex_4562493badb3b72c",
+                "ex_6a98d3de0afe227a",
+                "ex_8e68dfd63ce62e4a",
+                "ex_bfff8898ce32190f",
+                "ex_3de0be4f3b2e68f9"
               ]
             }
           ],
           "unexplained_share": 0,
           "exhibit_ids": [
-            "ex_1edff725844a3015",
-            "ex_97d5ed8bec97bbbc",
-            "ex_6c07bdd91a950f59",
-            "ex_ce8d02a8190c00de",
-            "ex_d3910faffc4998a0",
-            "ex_3b0b0048057e5803",
-            "ex_eb30c44f65ac91d0",
-            "ex_4571a20bcc000319",
-            "ex_f245e614ab407d53",
-            "ex_683744b0f59adfb0"
+            "ex_df0fbcc3dd9f6473",
+            "ex_4179618e77dd6985",
+            "ex_35f27bab076e36d6",
+            "ex_719ccdf23ac32cf0",
+            "ex_6a98d3de0afe227a",
+            "ex_8e68dfd63ce62e4a",
+            "ex_0aa5536c6210d556",
+            "ex_3de0be4f3b2e68f9",
+            "ex_4562493badb3b72c",
+            "ex_bfff8898ce32190f"
           ],
           "notes": [
             "concept_switch_missing_history is confirmed as a data-quality finding but carries no separate share: deduplicating to one annual fact per (cik, period_end) recovers Apple Inc. and Target Corporation's prior-year facts, so it does not add to the reported jump.",
@@ -6534,22 +6534,22 @@
           ]
         },
         "exhibit_ids": [
-          "ex_1edff725844a3015",
-          "ex_97d5ed8bec97bbbc",
-          "ex_6c07bdd91a950f59",
-          "ex_ce8d02a8190c00de",
-          "ex_d3910faffc4998a0",
-          "ex_3b0b0048057e5803",
-          "ex_eb30c44f65ac91d0",
-          "ex_4571a20bcc000319",
-          "ex_f245e614ab407d53",
-          "ex_683744b0f59adfb0"
+          "ex_df0fbcc3dd9f6473",
+          "ex_4179618e77dd6985",
+          "ex_35f27bab076e36d6",
+          "ex_719ccdf23ac32cf0",
+          "ex_6a98d3de0afe227a",
+          "ex_8e68dfd63ce62e4a",
+          "ex_0aa5536c6210d556",
+          "ex_3de0be4f3b2e68f9",
+          "ex_4562493badb3b72c",
+          "ex_bfff8898ce32190f"
         ],
-        "note": "Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_1edff725844a3015, ex_97d5ed8bec97bbbc, ex_6c07bdd91a950f59, ex_ce8d02a8190c00de, ex_d3910faffc4998a0, ex_3b0b0048057e5803, 2026-10-24. Data-quality finding on public filings, not investment advice."
+        "note": "Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_df0fbcc3dd9f6473, ex_4179618e77dd6985, ex_35f27bab076e36d6, ex_719ccdf23ac32cf0, ex_6a98d3de0afe227a, ex_8e68dfd63ce62e4a, 2026-10-24. Data-quality finding on public filings, not investment advice."
       },
       "result": {
         "table": "lightning.metastore.exhibit_a.revenue_facts.fact",
-        "description": "Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_1edff725844a3015, ex_97d5ed8bec97bbbc, ex_6c07bdd91a950f59, ex_ce8d02a8190c00de, ex_d3910faffc4998a0, ex_3b0b0048057e5803, 2026-10-24. Data-quality finding on public filings, not investment advice.",
+        "description": "Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_df0fbcc3dd9f6473, ex_4179618e77dd6985, ex_35f27bab076e36d6, ex_719ccdf23ac32cf0, ex_6a98d3de0afe227a, ex_8e68dfd63ce62e4a, 2026-10-24. Data-quality finding on public filings, not investment advice.",
         "readback": "verified",
         "memory_kind": "USL table description",
         "original_view_touched": false,
@@ -6559,19 +6559,19 @@
           "valid": 1,
           "malformed": 0,
           "duplicates": 0,
-          "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-sample-cases-6aIuA9/logs/memory/index.json",
+          "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-sample-cases-Soxo0l/logs/memory/index.json",
           "recalled": 0
         }
       },
-      "result_sha256": "47b6b9b78d6f758f12a63b9bc12849afb03e56dd2f1a63af755f035d286d918c",
-      "rerun": "exhibit-a rerun ex_6a628e92b65cc1d5",
+      "result_sha256": "d4c23f3b44daa3ce0a955d701ced30d86ab0ac07ecf3384ff02d9a5e140c3225",
+      "rerun": "exhibit-a rerun ex_1496df1e195dcc78",
       "case_id": "case_sample_revenue_closed",
       "agent": "LeadInvestigator"
     }
   ],
   "hypotheses": [
     {
-      "id": "hyp_58b8c1621bfbba96",
+      "id": "hyp_3ce4777b49487270",
       "cause": "filing_year_duplication",
       "statement": "The 2018 movement in Manufacturing is inflated because analytics.sector_revenue_by_year sums value_usd grouped by the filing's fiscal_year, so prior-year comparatives, quarterly facts and year-to-date facts are counted again under the later filing year.",
       "blamed": [
@@ -6580,15 +6580,15 @@
       ],
       "status": "confirmed",
       "exhibit_ids": [
-        "ex_1edff725844a3015",
-        "ex_97d5ed8bec97bbbc",
-        "ex_6c07bdd91a950f59",
-        "ex_ce8d02a8190c00de"
+        "ex_df0fbcc3dd9f6473",
+        "ex_4179618e77dd6985",
+        "ex_35f27bab076e36d6",
+        "ex_719ccdf23ac32cf0"
       ],
       "note": "FY2018 holds 100 rows across 32 distinct period_end dates; 322 duplicate rows across the 7 source tables."
     },
     {
-      "id": "hyp_210b49eadc4eb0eb",
+      "id": "hyp_a421a3965fd2dccc",
       "cause": "concept_switch_missing_history",
       "statement": "The 2018 bucket gains a filer that is absent from 2017, because a filer's Revenues concept stops after one filing and its whole fact history lands in a single fiscal_year.",
       "blamed": [
@@ -6598,9 +6598,9 @@
       ],
       "status": "confirmed",
       "exhibit_ids": [
-        "ex_6c07bdd91a950f59",
-        "ex_eb30c44f65ac91d0",
-        "ex_8d7e948d0bf1f7bb"
+        "ex_35f27bab076e36d6",
+        "ex_0aa5536c6210d556",
+        "ex_97e6dce7f7f46024"
       ],
       "subjects": [
         {
@@ -6617,7 +6617,7 @@
       "note": "Apple Inc. first appears in fiscal_year 2018 (11 facts across 1 fiscal year, none in FY2017); that contributes $1205.3B of the $1295.0B jump. Target Corporation has no fact after fiscal_year 2014. Scout found the replacement concept RevenueFromContractWithCustomerExcludingAssessedTax with 9 annual 10-K facts."
     },
     {
-      "id": "hyp_ff4b4cf24f7a8a9b",
+      "id": "hyp_881e58c24e9b112f",
       "cause": "real_change",
       "statement": "Revenue in Manufacturing genuinely grew between 2017 and 2018; the increase should survive deduplication and agree with an independent SEC frames value.",
       "blamed": [
@@ -6626,16 +6626,16 @@
       ],
       "status": "confirmed",
       "exhibit_ids": [
-        "ex_f245e614ab407d53",
-        "ex_d3910faffc4998a0",
-        "ex_3b0b0048057e5803",
-        "ex_683744b0f59adfb0"
+        "ex_4562493badb3b72c",
+        "ex_6a98d3de0afe227a",
+        "ex_8e68dfd63ce62e4a",
+        "ex_bfff8898ce32190f"
       ],
       "share": 0.038320490425922185,
       "note": "Corrected Manufacturing is 1.125x ($49.6B); that is 3.8% of the reported jump. SEC frames parity 12/12."
     },
     {
-      "id": "hyp_755379a184127a87",
+      "id": "hyp_75eb30cb39780a92",
       "cause": "single_filer_growth",
       "statement": "One fast-growing filer in Manufacturing explains the 2018 movement on its own.",
       "blamed": [
@@ -6644,8 +6644,8 @@
       ],
       "status": "eliminated",
       "exhibit_ids": [
-        "ex_6c07bdd91a950f59",
-        "ex_97d5ed8bec97bbbc"
+        "ex_35f27bab076e36d6",
+        "ex_4179618e77dd6985"
       ],
       "subjects": [
         {
@@ -6657,7 +6657,7 @@
       "note": "Tesla, Inc. is the fastest-growing filer in Manufacturing (1.737x FY2017 to FY2018), but its $55.9B is only 4.3% of the reported jump."
     },
     {
-      "id": "hyp_ce1d6e610e6acf48",
+      "id": "hyp_2f02ac2341eab856",
       "cause": "ingestion_gap",
       "statement": "The artifact is an ingestion gap: Zetaris lost facts that the SEC endpoint still returns, so the naive series is missing rows rather than duplicating them.",
       "blamed": [
@@ -6667,10 +6667,10 @@
       ],
       "status": "eliminated",
       "exhibit_ids": [
-        "ex_eb30c44f65ac91d0",
-        "ex_6c07bdd91a950f59",
-        "ex_d3910faffc4998a0",
-        "ex_3b0b0048057e5803"
+        "ex_0aa5536c6210d556",
+        "ex_35f27bab076e36d6",
+        "ex_6a98d3de0afe227a",
+        "ex_8e68dfd63ce62e4a"
       ],
       "subjects": [
         {
@@ -6683,7 +6683,7 @@
     }
   ],
   "memory": {
-    "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-sample-cases-6aIuA9/logs/memory/index.json",
+    "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-sample-cases-Soxo0l/logs/memory/index.json",
     "cold_start": true,
     "query": {
       "metric": "analytics.sector_revenue_by_year",
@@ -6868,14 +6868,14 @@
         "kind": "artifact",
         "share": 0.96168,
         "exhibit_ids": [
-          "ex_1edff725844a3015",
-          "ex_97d5ed8bec97bbbc",
-          "ex_6c07bdd91a950f59",
-          "ex_ce8d02a8190c00de",
-          "ex_d3910faffc4998a0",
-          "ex_3b0b0048057e5803",
-          "ex_eb30c44f65ac91d0",
-          "ex_4571a20bcc000319"
+          "ex_df0fbcc3dd9f6473",
+          "ex_4179618e77dd6985",
+          "ex_35f27bab076e36d6",
+          "ex_719ccdf23ac32cf0",
+          "ex_6a98d3de0afe227a",
+          "ex_8e68dfd63ce62e4a",
+          "ex_0aa5536c6210d556",
+          "ex_3de0be4f3b2e68f9"
         ]
       },
       {
@@ -6883,26 +6883,26 @@
         "kind": "real",
         "share": 0.03832,
         "exhibit_ids": [
-          "ex_f245e614ab407d53",
-          "ex_d3910faffc4998a0",
-          "ex_3b0b0048057e5803",
-          "ex_683744b0f59adfb0",
-          "ex_4571a20bcc000319"
+          "ex_4562493badb3b72c",
+          "ex_6a98d3de0afe227a",
+          "ex_8e68dfd63ce62e4a",
+          "ex_bfff8898ce32190f",
+          "ex_3de0be4f3b2e68f9"
         ]
       }
     ],
     "unexplained_share": 0,
     "exhibit_ids": [
-      "ex_1edff725844a3015",
-      "ex_97d5ed8bec97bbbc",
-      "ex_6c07bdd91a950f59",
-      "ex_ce8d02a8190c00de",
-      "ex_d3910faffc4998a0",
-      "ex_3b0b0048057e5803",
-      "ex_eb30c44f65ac91d0",
-      "ex_4571a20bcc000319",
-      "ex_f245e614ab407d53",
-      "ex_683744b0f59adfb0"
+      "ex_df0fbcc3dd9f6473",
+      "ex_4179618e77dd6985",
+      "ex_35f27bab076e36d6",
+      "ex_719ccdf23ac32cf0",
+      "ex_6a98d3de0afe227a",
+      "ex_8e68dfd63ce62e4a",
+      "ex_0aa5536c6210d556",
+      "ex_3de0be4f3b2e68f9",
+      "ex_4562493badb3b72c",
+      "ex_bfff8898ce32190f"
     ],
     "notes": [
       "concept_switch_missing_history is confirmed as a data-quality finding but carries no separate share: deduplicating to one annual fact per (cik, period_end) recovers Apple Inc. and Target Corporation's prior-year facts, so it does not add to the reported jump.",
@@ -6920,10 +6920,10 @@
       "CREATE SCHEMASTORE CONTAINER exhibit_a_shadow",
       "CREATE OR REPLACE SCHEMASTORE VIEW sector_revenue_by_year WITH CONTAINER exhibit_a_shadow AS WITH annual AS (\n  SELECT\n    s.sic_division,\n    f.cik,\n    f.period_start,\n    f.period_end,\n    f.value_usd,\n    f.filed_date,\n    CASE\n      WHEN MONTH(f.period_end) <= 6 THEN YEAR(f.period_end) - 1\n      ELSE YEAR(f.period_end)\n    END AS period_year,\n    ROW_NUMBER() OVER (\n      PARTITION BY f.cik, f.period_end\n      ORDER BY f.filed_date DESC, f.value_usd DESC\n    ) AS rn\n  FROM (\n    SELECT * FROM edgar.apple_revenue_table\n    UNION ALL SELECT * FROM edgar.ibm_revenue_table\n    UNION ALL SELECT * FROM edgar.oracle_revenue_table\n    UNION ALL SELECT * FROM edgar.walmart_revenue_table\n    UNION ALL SELECT * FROM edgar.target_revenue_table\n    UNION ALL SELECT * FROM edgar.ford_revenue_table\n    UNION ALL SELECT * FROM edgar.tesla_revenue_table\n  ) f\n  LEFT JOIN edgar.sic_edgar_usl s ON s.cik = f.cik\n  WHERE DATEDIFF(f.period_end, f.period_start) BETWEEN 330 AND 400\n)\nSELECT\n  sic_division,\n  period_year AS fiscal_year,\n  SUM(value_usd) AS revenue_usd\nFROM annual\nWHERE rn = 1\n  AND period_year BETWEEN 2016 AND 2019\nGROUP BY sic_division, period_year"
     ],
-    "created_at": "2026-10-24T12:34:01.036Z"
+    "created_at": "2026-10-24T14:01:43.148Z"
   },
   "contract": {
-    "id": "contract_57f71c1cd8d17e4d",
+    "id": "contract_6b6d0fca914d0fcf",
     "case_id": "case_sample_revenue_closed",
     "intent": "Create a verifier sandbox for analytics.sector_revenue_by_year; do not modify the reported view",
     "scope": [
@@ -6935,9 +6935,9 @@
     ],
     "statements_sha256": "135539078175ec17eafd286166a05f4d13cb7fcf3e6ecdcd66682af3b6e0113d",
     "cost_ceiling": 0,
-    "expires_at": "2027-10-24T12:34:01.035Z",
+    "expires_at": "2027-10-24T14:01:43.147Z",
     "signer": "ScoutIntent",
-    "signature": "ab82cf46aba8f6b5eb21dbce751f8ed370670eaab74842167e082bff469af936",
+    "signature": "675784dceded8ab7ece2d286c3da9aff08adce2767d5995a3f53dd1e50b140f5",
     "approved": false
   },
   "verification": {
@@ -6999,7 +6999,7 @@
       {
         "name": "shadow_contract",
         "ok": true,
-        "detail": "signed contract contract_57f71c1cd8d17e4d scopes exhibit_a_shadow.sector_revenue_by_year"
+        "detail": "signed contract contract_6b6d0fca914d0fcf scopes exhibit_a_shadow.sector_revenue_by_year"
       },
       {
         "name": "bad_repair_rejected",
@@ -7033,7 +7033,7 @@
     }
   },
   "write_contract": {
-    "id": "contract_7288564669d4bafd",
+    "id": "contract_c186837732ef940d",
     "case_id": "case_sample_revenue_closed",
     "intent": "Write the verified deduplicating repair to exhibit_a.sector_revenue_by_year_v2, create the lightning.metastore.exhibit_a.revenue_facts.fact composite-key duplicate detector, and record the case in the USL table description. Never touch the reported analytics view.",
     "scope": [
@@ -7048,27 +7048,27 @@
       "COMPILE USL IF NOT EXISTS revenue_facts DEPLOY NAMESPACE lightning.metastore.exhibit_a DDL\nCREATE TABLE fact (\n  cik varchar(10) NOT NULL,\n  period_end date NOT NULL,\n  period_frame varchar(16),\n  sic_division varchar(200),\n  period_year int NOT NULL,\n  value_usd double,\n  filed_date date,\n  PRIMARY KEY (cik, period_end)\n)",
       "ACTIVATE USL TABLE lightning.metastore.exhibit_a.revenue_facts.fact AS\nWITH annual AS (\n  SELECT\n    s.sic_division,\n    f.cik,\n    f.period_start,\n    f.period_end,\n    f.value_usd,\n    f.filed_date,\n    CASE\n      WHEN MONTH(f.period_end) <= 6 THEN YEAR(f.period_end) - 1\n      ELSE YEAR(f.period_end)\n    END AS period_year,\n    ROW_NUMBER() OVER (\n      PARTITION BY f.cik, f.period_end\n      ORDER BY f.filed_date DESC, f.value_usd DESC\n    ) AS rn\n  FROM (\n    SELECT * FROM edgar.apple_revenue_table\n    UNION ALL SELECT * FROM edgar.ibm_revenue_table\n    UNION ALL SELECT * FROM edgar.oracle_revenue_table\n    UNION ALL SELECT * FROM edgar.walmart_revenue_table\n    UNION ALL SELECT * FROM edgar.target_revenue_table\n    UNION ALL SELECT * FROM edgar.ford_revenue_table\n    UNION ALL SELECT * FROM edgar.tesla_revenue_table\n  ) f\n  LEFT JOIN edgar.sic_edgar_usl s ON s.cik = f.cik\n  WHERE DATEDIFF(f.period_end, f.period_start) BETWEEN 330 AND 400\n)\nSELECT\n  COALESCE(CAST(cik AS STRING), '') AS cik,\n  COALESCE(CAST(period_end AS DATE), CURRENT_DATE) AS period_end,\n  CONCAT('CY', CAST(COALESCE(period_year, 0) AS STRING)) AS period_frame,\n  sic_division,\n  COALESCE(period_year, 0) AS period_year,\n  CAST(value_usd AS DOUBLE) AS value_usd,\n  CAST(filed_date AS DATE) AS filed_date\nFROM annual\nWHERE rn = 1",
       "REGISTER DQ annual_has_frame TABLE lightning.metastore.exhibit_a.revenue_facts.fact AS period_frame IS NOT NULL",
-      "UPDATE USL lightning.metastore.exhibit_a.revenue_facts.fact SET TABLE DESCRIPTION Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_1edff725844a3015, ex_97d5ed8bec97bbbc, ex_6c07bdd91a950f59, ex_ce8d02a8190c00de, ex_d3910faffc4998a0, ex_3b0b0048057e5803, 2026-10-24. Data-quality finding on public filings, not investment advice."
+      "UPDATE USL lightning.metastore.exhibit_a.revenue_facts.fact SET TABLE DESCRIPTION Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_df0fbcc3dd9f6473, ex_4179618e77dd6985, ex_35f27bab076e36d6, ex_719ccdf23ac32cf0, ex_6a98d3de0afe227a, ex_8e68dfd63ce62e4a, 2026-10-24. Data-quality finding on public filings, not investment advice."
     ],
-    "statements_sha256": "980c98209daa2af24a24d2add686faf908fd74ea6bd0ea8a95e7bf8d018346ff",
+    "statements_sha256": "3def9256c4a1dfbc5954f009a0b6b2b3a13dbb539bb2c959ec0b96ec7f27c47a",
     "cost_ceiling": 0,
-    "expires_at": "2027-10-24T12:34:01.038Z",
+    "expires_at": "2027-10-24T14:01:43.150Z",
     "signer": "ScoutIntent",
-    "signature": "bf0d479dfbb84c8dc79251ecc36282295b5d81340113abb380878b26db227b29",
+    "signature": "a2be172801e15d97afbb910efd1006360f3c173ec9ff68aafa3e94fa5a03fdab",
     "approved": true,
     "approved_by": "operator:cli",
-    "approved_at": "2026-10-24T12:34:01.038Z"
+    "approved_at": "2026-10-24T14:01:43.150Z"
   },
-  "writeback_note": "Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_1edff725844a3015, ex_97d5ed8bec97bbbc, ex_6c07bdd91a950f59, ex_ce8d02a8190c00de, ex_d3910faffc4998a0, ex_3b0b0048057e5803, 2026-10-24. Data-quality finding on public filings, not investment advice.",
+  "writeback_note": "Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_df0fbcc3dd9f6473, ex_4179618e77dd6985, ex_35f27bab076e36d6, ex_719ccdf23ac32cf0, ex_6a98d3de0afe227a, ex_8e68dfd63ce62e4a, 2026-10-24. Data-quality finding on public filings, not investment advice.",
   "writeback": {
     "ok": true,
-    "contract_id": "contract_7288564669d4bafd",
+    "contract_id": "contract_c186837732ef940d",
     "written_metric": "exhibit_a.sector_revenue_by_year_v2",
     "checks": [
       {
         "name": "write_contract",
         "ok": true,
-        "detail": "operator-approved contract contract_7288564669d4bafd executed exactly its signed statements"
+        "detail": "operator-approved contract contract_c186837732ef940d executed exactly its signed statements"
       },
       {
         "name": "final_view_readback",
@@ -7133,8 +7133,8 @@
       }
     ],
     "readback_sha256": "984d9c181c859e644e0505be5b72cb7682a9fc78d08d1660ec64fa09d2a730e9",
-    "usl_model": "{\"namespace\":[\"metastore\",\"exhibit_a\"],\"name\":\"revenue_facts\",\"description\":\"Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_1edff725844a3015, ex_97d5ed8bec97bbbc, ex_6c07bdd91a950f59, ex_ce8d02a8190c00de, ex_d3910faffc4998a0, ex_3b0b0048057e5803, 2026-10-24. Data-quality finding on public filings, not investment advice.\",\"tables\":[{\"name\":\"fact\",\"columnSpecs\":[{\"name\":\"cik\",\"dataType\":\"\\\"varchar(10)\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"period_end\",\"dataType\":\"\\\"date\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"period_frame\",\"dataType\":\"\\\"varchar(16)\\\"\"},{\"name\":\"sic_division\",\"dataType\":\"\\\"varchar(200)\\\"\"},{\"name\":\"period_year\",\"dataType\":\"\\\"int\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"value_usd\",\"dataType\":\"\\\"double\\\"\"},{\"name\":\"filed_date\",\"dataType\":\"\\\"date\\\"\"}],\"primaryKey\":{\"columns\":[\"cik\",\"period_end\"]},\"dqAnnotations\":[{\"name\":\"annual_has_frame\",\"expression\":\"period_frame IS NOT NULL\"}],\"activateQuery\":\"sample replay: canonical-period select\"}]}",
-    "memory_note": "Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_1edff725844a3015, ex_97d5ed8bec97bbbc, ex_6c07bdd91a950f59, ex_ce8d02a8190c00de, ex_d3910faffc4998a0, ex_3b0b0048057e5803, 2026-10-24. Data-quality finding on public filings, not investment advice."
+    "usl_model": "{\"namespace\":[\"metastore\",\"exhibit_a\"],\"name\":\"revenue_facts\",\"description\":\"Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_df0fbcc3dd9f6473, ex_4179618e77dd6985, ex_35f27bab076e36d6, ex_719ccdf23ac32cf0, ex_6a98d3de0afe227a, ex_8e68dfd63ce62e4a, 2026-10-24. Data-quality finding on public filings, not investment advice.\",\"tables\":[{\"name\":\"fact\",\"columnSpecs\":[{\"name\":\"cik\",\"dataType\":\"\\\"varchar(10)\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"period_end\",\"dataType\":\"\\\"date\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"period_frame\",\"dataType\":\"\\\"varchar(16)\\\"\"},{\"name\":\"sic_division\",\"dataType\":\"\\\"varchar(200)\\\"\"},{\"name\":\"period_year\",\"dataType\":\"\\\"int\\\"\",\"notNull\":{\"columns\":[]}},{\"name\":\"value_usd\",\"dataType\":\"\\\"double\\\"\"},{\"name\":\"filed_date\",\"dataType\":\"\\\"date\\\"\"}],\"primaryKey\":{\"columns\":[\"cik\",\"period_end\"]},\"dqAnnotations\":[{\"name\":\"annual_has_frame\",\"expression\":\"period_frame IS NOT NULL\"}],\"activateQuery\":\"sample replay: canonical-period select\"}]}",
+    "memory_note": "Exhibit A case_sample_revenue_closed verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_df0fbcc3dd9f6473, ex_4179618e77dd6985, ex_35f27bab076e36d6, ex_719ccdf23ac32cf0, ex_6a98d3de0afe227a, ex_8e68dfd63ce62e4a, 2026-10-24. Data-quality finding on public filings, not investment advice."
   },
   "hmem": {
     "record_id": "case_sample_revenue_closed",
@@ -7142,7 +7142,7 @@
     "valid": 1,
     "malformed": 0,
     "duplicates": 0,
-    "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-sample-cases-6aIuA9/logs/memory/index.json",
+    "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-sample-cases-Soxo0l/logs/memory/index.json",
     "recalled": 0
   }
 }

@@ -9414,6 +9414,32 @@
         },
         "model": "nvidia/nemotron-3.5-content-safety"
       }
+    },
+    {
+      "agent": "DefenseCounsel",
+      "request_sha256": "a31b659f11a4ece00bc1a42f3f62f0ba01f87c91f76cce98755590916aca114a",
+      "response": {
+        "content": "{\n  \"objections\": [\n    {\n      \"claim\": \"FY2018 contains 100 rows across 32 period_end dates with 322 duplicate rows\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"f0ab60383ba97b9eab89abc8681fa811a6506eea48793ff7a576dff07aa4cab3\"\n    },\n    {\n      \"claim\": \"Apple first appears in FY2018, contributing $1205.3B of the jump due to concept switch\",\n      \"severity\": \"high\",\n      \"exhibit_sha256\": \"4153389715fd937ccc0d45d6c937e86f1709097f54ca1b29d5e55a372d4de7aa\"\n    },\n    {\n      \"claim\": \"Corrected Manufacturing shows 1.125x increase ($49.6B) representing 3.8% of reported jump\",\n      \"severity\": \"low\",\n      \"exhibit_sha256\": \"3d2bca9bf44f217b4b0463972a693f6e15a8e60b3e922d9c84c59d8cb64925ee\"\n    },\n    {\n      \"claim\": \"Tesla's 1.737x growth contributes 4.3% of the jump, but is eliminated\",\n      \"severity\": \"low\",\n      \"exhibit_sha256\": \"c6b11ff304ab9f37bd5ab64118684f6023a75900e24c03d1320a769c03d1320a7690af8f\"\n    },\n    {\n      \"claim\": \"No ingestion gaps; Zetaris holds 11 Apple Inc. facts\",\n      \"severity\": \"low\",\n      \"exhibit_sha256\": \"a68f561a6786ebf87fc7a41329f58e3fc4831f7323592d9bb8c046bf5a568886\"\n    }\n  ],\n  \"summary\": \"Each claimed cause is challenged by missing controls, stale or mismatched sources, or insufficient evidence, but the deterministic verdict that the FY2018 jump is explained remains unchanged.\"\n}",
+        "tool_calls": [],
+        "usage": {
+          "prompt_tokens": 2739,
+          "completion_tokens": 5353
+        },
+        "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"
+      }
+    },
+    {
+      "agent": "SafetyGuard",
+      "request_sha256": "30fd51081ab22ab998755231a8787eec06ddf0acce2ba887c88c54623927efcc",
+      "response": {
+        "content": "User Safety: safe\nResponse Safety: safe",
+        "tool_calls": [],
+        "usage": {
+          "prompt_tokens": 889,
+          "completion_tokens": 10
+        },
+        "model": "nvidia/nemotron-3.5-content-safety"
+      }
     }
   ]
 }

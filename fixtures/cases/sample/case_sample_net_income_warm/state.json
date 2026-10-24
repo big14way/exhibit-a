@@ -1,6 +1,6 @@
 {
   "id": "case_sample_net_income_warm",
-  "reported_at": "2026-10-24T12:34:01.065Z",
+  "reported_at": "2026-10-24T14:01:43.177Z",
   "question": "is the FY2017 Services net income jump real?",
   "metric": "analytics.sector_net_income_by_year",
   "stage": "SHADOW_VERIFIED",
@@ -9,8 +9,8 @@
   "cassette_recorded_at": "2026-10-24",
   "exhibits": [
     {
-      "id": "ex_0e5adb7f45532ca9",
-      "ts": "2026-10-24T12:34:01.065Z",
+      "id": "ex_e61ef4b3d2d9bd95",
+      "ts": "2026-10-24T14:01:43.177Z",
       "kind": "memory",
       "source": "hmem",
       "transport": "code",
@@ -23,7 +23,7 @@
         "embedding_model": "nvidia/nemotron-3.5-embed-1b"
       },
       "result": {
-        "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-sample-cases-Pk1BL9/logs/memory/index.json",
+        "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-sample-cases-bwZHFs/logs/memory/index.json",
         "cold_start": false,
         "query": {
           "metric": "analytics.sector_net_income_by_year",
@@ -39,7 +39,7 @@
             "causes": [
               "filing_year_duplication=100.0%"
             ],
-            "closed_at": "2026-10-24T12:34:01.064Z",
+            "closed_at": "2026-10-24T14:01:43.176Z",
             "score": 24,
             "match": [
               "same metric",
@@ -47,7 +47,7 @@
               "DATA_ARTIFACT",
               "embedding similarity 0.78"
             ],
-            "excerpt": "Exhibit A case_sample_net_income_closed verdict DATA_ARTIFACT (filing_year_duplication=100.0%), exhibits ex_2d75360c4fe81864, ex_f567555b64a70319, ex_ae3ae2a880c64973, ex_a23d39f94eb25596, ex_d7120a17336923a6, ex_bdd41c709605c568, 2026-10-24. Data-quality finding on public filings, not investment advice.",
+            "excerpt": "Exhibit A case_sample_net_income_closed verdict DATA_ARTIFACT (filing_year_duplication=100.0%), exhibits ex_a0412daf61c769a3, ex_e876a12c685867c9, ex_0511b87e8054067b, ex_83de38c08f5748e6, ex_f7dd3e82b650126c, ex_e1f8e7442c65c4b8, 2026-10-24. Data-quality finding on public filings, not investment advice.",
             "similarity": 0.7789
           }
         ],
@@ -69,14 +69,14 @@
         },
         "implementation": "H-MEM reference (Meterless contract; local JSON index)"
       },
-      "result_sha256": "d68ae1a8fdf219f235147539536361fcf29b7b51db7c28dd68af729a4c77c7d0",
-      "rerun": "exhibit-a rerun ex_0e5adb7f45532ca9",
+      "result_sha256": "a4d02092b53c224cdff876ffe64785b1e5ee27b6e318679e79ab639df8d3d355",
+      "rerun": "exhibit-a rerun ex_e61ef4b3d2d9bd95",
       "case_id": "case_sample_net_income_warm",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_28aef62a1685399c",
-      "ts": "2026-10-24T12:34:01.066Z",
+      "id": "ex_1bb4a82c7b4d389e",
+      "ts": "2026-10-24T14:01:43.178Z",
       "kind": "metadata",
       "source": "zetaris",
       "transport": "cassette",
@@ -107,13 +107,13 @@
         "truncated": false
       },
       "result_sha256": "50cec15cf32167ace4c65f81cbf6062cc8315089fcf1cb17eeb247633bfeb19a",
-      "rerun": "exhibit-a rerun ex_28aef62a1685399c",
+      "rerun": "exhibit-a rerun ex_1bb4a82c7b4d389e",
       "case_id": "case_sample_net_income_warm",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_796b789c43381b1d",
-      "ts": "2026-10-24T12:34:01.066Z",
+      "id": "ex_87c78e48a16b19e5",
+      "ts": "2026-10-24T14:01:43.178Z",
       "kind": "metadata",
       "source": "zetaris",
       "transport": "cassette",
@@ -148,13 +148,13 @@
         "truncated": false
       },
       "result_sha256": "1a6a061a65f7e672c81472be5f1cfe84ffd9bb436b21a006df68b7eadebee220",
-      "rerun": "exhibit-a rerun ex_796b789c43381b1d",
+      "rerun": "exhibit-a rerun ex_87c78e48a16b19e5",
       "case_id": "case_sample_net_income_warm",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_9b918a0351a12551",
-      "ts": "2026-10-24T12:34:01.066Z",
+      "id": "ex_4f6c54025a22a362",
+      "ts": "2026-10-24T14:01:43.178Z",
       "kind": "lineage",
       "source": "zetaris",
       "transport": "cassette",
@@ -209,13 +209,13 @@
         "truncated": false
       },
       "result_sha256": "a181c0218a7f4fee215d30da4c1acf901ace40a1a0621779ff3e4c927967a123",
-      "rerun": "exhibit-a rerun ex_9b918a0351a12551",
+      "rerun": "exhibit-a rerun ex_4f6c54025a22a362",
       "case_id": "case_sample_net_income_warm",
       "agent": "SourceScout"
     },
     {
-      "id": "ex_6027b39a82a19f1f",
-      "ts": "2026-10-24T12:34:01.066Z",
+      "id": "ex_4ab13e33374eaff3",
+      "ts": "2026-10-24T14:01:43.178Z",
       "kind": "lineage",
       "source": "zetaris",
       "transport": "cassette",
@@ -354,13 +354,13 @@
         "truncated": false
       },
       "result_sha256": "9ceafd753ea71c636f1c6cca756cbadff274ce2e3fdef50f0600ce503b4f2edd",
-      "rerun": "exhibit-a rerun ex_6027b39a82a19f1f",
+      "rerun": "exhibit-a rerun ex_4ab13e33374eaff3",
       "case_id": "case_sample_net_income_warm",
       "agent": "SourceScout"
     },
     {
-      "id": "ex_13af03dc7d9c5f42",
-      "ts": "2026-10-24T12:34:01.066Z",
+      "id": "ex_0475af76f6417296",
+      "ts": "2026-10-24T14:01:43.179Z",
       "kind": "baseline",
       "source": "zetaris",
       "transport": "cassette",
@@ -445,13 +445,13 @@
         "truncated": false
       },
       "result_sha256": "cc28e206b255c90542bb5749e89154498be4bf6f578e9ff2b8a3f3697cc60f50",
-      "rerun": "exhibit-a rerun ex_13af03dc7d9c5f42",
+      "rerun": "exhibit-a rerun ex_0475af76f6417296",
       "case_id": "case_sample_net_income_warm",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_dd47a3e4b8d95db0",
-      "ts": "2026-10-24T12:34:01.066Z",
+      "id": "ex_1b26ceff0bedf147",
+      "ts": "2026-10-24T14:01:43.179Z",
       "kind": "baseline",
       "source": "code",
       "transport": "code",
@@ -466,7 +466,7 @@
           "lo": 0.67,
           "hi": 1.5
         },
-        "source_exhibit_id": "ex_13af03dc7d9c5f42"
+        "source_exhibit_id": "ex_0475af76f6417296"
       },
       "result": {
         "metric": "analytics.sector_net_income_by_year",
@@ -489,13 +489,13 @@
         }
       },
       "result_sha256": "1b2dd8e1e013ff7c7cc6d3aa2d108f2a24735c5d261df24ff65608c0023cb764",
-      "rerun": "exhibit-a rerun ex_dd47a3e4b8d95db0",
+      "rerun": "exhibit-a rerun ex_1b26ceff0bedf147",
       "case_id": "case_sample_net_income_warm",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_4a32e770409a56b9",
-      "ts": "2026-10-24T12:34:01.067Z",
+      "id": "ex_80cec1dbda3e560f",
+      "ts": "2026-10-24T14:01:43.179Z",
       "kind": "sql",
       "source": "zetaris",
       "transport": "cassette",
@@ -745,13 +745,13 @@
         "truncated": false
       },
       "result_sha256": "aa45880580fbc4f6829fff555390d7493582481407434eac3e2bfaebd25fea00",
-      "rerun": "exhibit-a rerun ex_4a32e770409a56b9",
+      "rerun": "exhibit-a rerun ex_80cec1dbda3e560f",
       "case_id": "case_sample_net_income_warm",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_9cae338b8d5fd802",
-      "ts": "2026-10-24T12:34:01.067Z",
+      "id": "ex_de2c2380b17ca2f4",
+      "ts": "2026-10-24T14:01:43.179Z",
       "kind": "sql",
       "source": "zetaris",
       "transport": "cassette",
@@ -817,13 +817,13 @@
         "truncated": false
       },
       "result_sha256": "e1ab0dccf5611067faef7ce21d8d1be5d07deb4c3f9b323b8479502655cf586c",
-      "rerun": "exhibit-a rerun ex_9cae338b8d5fd802",
+      "rerun": "exhibit-a rerun ex_de2c2380b17ca2f4",
       "case_id": "case_sample_net_income_warm",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_4b12e1ae79976738",
-      "ts": "2026-10-24T12:34:01.067Z",
+      "id": "ex_bf6fe91cdaa304bf",
+      "ts": "2026-10-24T14:01:43.179Z",
       "kind": "sql",
       "source": "zetaris",
       "transport": "cassette",
@@ -871,13 +871,13 @@
         "truncated": false
       },
       "result_sha256": "db7a54ee4c27d201c6ad1350e2386cae91fd33bcaf9242327193836fa2fea423",
-      "rerun": "exhibit-a rerun ex_4b12e1ae79976738",
+      "rerun": "exhibit-a rerun ex_bf6fe91cdaa304bf",
       "case_id": "case_sample_net_income_warm",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_e006029a15ff6897",
-      "ts": "2026-10-24T12:34:01.067Z",
+      "id": "ex_25ada27fc6e3ad0a",
+      "ts": "2026-10-24T14:01:43.179Z",
       "kind": "sql",
       "source": "zetaris",
       "transport": "cassette",
@@ -5575,13 +5575,13 @@
         "truncated": false
       },
       "result_sha256": "cac77163a1f079952201adb2e5001128dc26835cdb970db1f3c8f8fb114266cb",
-      "rerun": "exhibit-a rerun ex_e006029a15ff6897",
+      "rerun": "exhibit-a rerun ex_25ada27fc6e3ad0a",
       "case_id": "case_sample_net_income_warm",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_bf29383ed3e27b87",
-      "ts": "2026-10-24T12:34:01.068Z",
+      "id": "ex_598ecc8b31a34061",
+      "ts": "2026-10-24T14:01:43.180Z",
       "kind": "baseline",
       "source": "code",
       "transport": "code",
@@ -5590,7 +5590,7 @@
       "sql": "SELECT s.sic_division, f.cik, f.period_start, f.period_end, f.period_frame, f.value_usd, f.filed_date\nFROM (\n  SELECT * FROM edgar.apple_netincome_table\n  UNION ALL\n  SELECT * FROM edgar.ibm_netincome_table\n  UNION ALL\n  SELECT * FROM edgar.oracle_netincome_table\n  UNION ALL\n  SELECT * FROM edgar.walmart_netincome_table\n  UNION ALL\n  SELECT * FROM edgar.target_netincome_table\n  UNION ALL\n  SELECT * FROM edgar.ford_netincome_table\n  UNION ALL\n  SELECT * FROM edgar.tesla_netincome_table\n) f\nLEFT JOIN sic_edgar_usl s ON s.cik = f.cik\nORDER BY f.cik, f.period_end, f.filed_date",
       "sql_sha256": "f4be7245262958542fc8436255896609f0f3ed4f8f9c0fb3947e13f0662a5eb6",
       "args": {
-        "source_exhibit_id": "ex_e006029a15ff6897",
+        "source_exhibit_id": "ex_25ada27fc6e3ad0a",
         "rule": "latest_filed_per_cik_frame"
       },
       "result": {
@@ -5732,13 +5732,13 @@
         "sources": 25
       },
       "result_sha256": "5883972536cfe371e55b97508f3d91c2105fc78c830be10748699bb7273cc703",
-      "rerun": "exhibit-a rerun ex_bf29383ed3e27b87",
+      "rerun": "exhibit-a rerun ex_598ecc8b31a34061",
       "case_id": "case_sample_net_income_warm",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_8b7774ddd7fdd1e2",
-      "ts": "2026-10-24T12:34:01.068Z",
+      "id": "ex_fbbaaf51e6054382",
+      "ts": "2026-10-24T14:01:43.180Z",
       "kind": "discovery",
       "source": "sec",
       "transport": "cassette",
@@ -5806,13 +5806,13 @@
         "rule": "NetIncomeLoss family concept must have USD annual 10-K facts (330-400 days) and either extend the current chain (ending within 421 days) or precede it"
       },
       "result_sha256": "9f2802dcf155352bb07d605e17e6b2542381dac3afe1233ceb19b7642c4c4092",
-      "rerun": "exhibit-a rerun ex_8b7774ddd7fdd1e2",
+      "rerun": "exhibit-a rerun ex_fbbaaf51e6054382",
       "case_id": "case_sample_net_income_warm",
       "agent": "SourceScout"
     },
     {
-      "id": "ex_ea6cc65d9a33effd",
-      "ts": "2026-10-24T12:34:01.068Z",
+      "id": "ex_b38e5b88b4947d60",
+      "ts": "2026-10-24T14:01:43.181Z",
       "kind": "second_channel",
       "source": "sec",
       "transport": "cassette",
@@ -5868,13 +5868,13 @@
         ]
       },
       "result_sha256": "bc93981a6a5cb5adbc5f619c3b079ca239ccc6f3d2156c56ed9db96160247407",
-      "rerun": "exhibit-a rerun ex_ea6cc65d9a33effd",
+      "rerun": "exhibit-a rerun ex_b38e5b88b4947d60",
       "case_id": "case_sample_net_income_warm",
       "agent": "SourceScout"
     },
     {
-      "id": "ex_86e1638ffba97eb2",
-      "ts": "2026-10-24T12:34:01.068Z",
+      "id": "ex_e9cc50f80885531a",
+      "ts": "2026-10-24T14:01:43.181Z",
       "kind": "second_channel",
       "source": "sec",
       "transport": "cassette",
@@ -5930,13 +5930,13 @@
         ]
       },
       "result_sha256": "0c8d476943b5158acce16e45a5527a98671d8eaf85994789f19828bbb7bea7e7",
-      "rerun": "exhibit-a rerun ex_86e1638ffba97eb2",
+      "rerun": "exhibit-a rerun ex_e9cc50f80885531a",
       "case_id": "case_sample_net_income_warm",
       "agent": "SourceScout"
     },
     {
-      "id": "ex_d99282f2c98605b9",
-      "ts": "2026-10-24T12:34:01.069Z",
+      "id": "ex_bdf93114d26a2858",
+      "ts": "2026-10-24T14:01:43.181Z",
       "kind": "second_channel",
       "source": "sec",
       "transport": "cassette",
@@ -5961,13 +5961,13 @@
         "source_url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0000051143/us-gaap/NetIncomeLoss.json"
       },
       "result_sha256": "cd610b123124e051d231c7c2854830e6e84206ff826d498e2205f9998825dc25",
-      "rerun": "exhibit-a rerun ex_d99282f2c98605b9",
+      "rerun": "exhibit-a rerun ex_bdf93114d26a2858",
       "case_id": "case_sample_net_income_warm",
       "agent": "SourceScout"
     },
     {
-      "id": "ex_fbf2f23662493b48",
-      "ts": "2026-10-24T12:34:01.069Z",
+      "id": "ex_910041e6a90be523",
+      "ts": "2026-10-24T14:01:43.181Z",
       "kind": "profile",
       "source": "code",
       "transport": "code",
@@ -5981,7 +5981,7 @@
         "onset_period": 2017,
         "prior_period": 2016,
         "naive_delta": 63174000000,
-        "source_exhibit_id": "ex_bf29383ed3e27b87"
+        "source_exhibit_id": "ex_598ecc8b31a34061"
       },
       "result": {
         "corrected_direction": "opposite",
@@ -5998,17 +5998,17 @@
         "rule": "explained share = 1 - (corrected period delta / reported period delta), clamped to [0, 1]; opposite-direction corrected moves count as fully explained"
       },
       "result_sha256": "7c2425e954549d721cb4c1db8040b68adeecdc83378bbc6c6c01c032691d415a",
-      "rerun": "exhibit-a rerun ex_fbf2f23662493b48",
+      "rerun": "exhibit-a rerun ex_910041e6a90be523",
       "case_id": "case_sample_net_income_warm",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_0a8ebbbca3833a88",
-      "ts": "2026-10-24T12:34:01.069Z",
+      "id": "ex_0c0c09c7767f4e77",
+      "ts": "2026-10-24T14:01:43.181Z",
       "kind": "critic",
       "source": "nvidia-nim",
       "transport": "code",
-      "title": "Defense Counsel critique (error)",
+      "title": "Defense Counsel critique (ran)",
       "tool": "critic",
       "args": {
         "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
@@ -6029,20 +6029,87 @@
         ]
       },
       "result": {
-        "status": "error",
+        "status": "ran",
         "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-        "detail": "model critique failed; code gate is final: model cassette miss for DefenseCounsel 9b1c507907dd52ac0b27e13ebe8323b58749cbdd66a5d2bea6a1ff4e907684cd",
-        "content": "",
-        "objections": [],
-        "cited_unknown": [],
-        "unresolved": 0,
+        "detail": "5 objection(s): Each claimed cause is undermined by evidence showing either insufficient duplicate counts, presence of IBM data in earlier years, a real corrected delta, limited Oracle contribution, or incomplete coverage, indicating the data-quality findi; 5 unknown citation(s)",
+        "content": "{\n  \"objections\": [\n    {\n      \"claim\": \"FY2017 holds 89 rows across 34 distinct period_end dates; 378 duplicate rows across the 7 source tables.\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"e1ab0dcc\"\n    },\n    {\n      \"claim\": \"International Business Machines Corporation first appears in fiscal_year 2017 (39 facts across 3 fiscal years, none in FY2016); that contributes $67.8B of the $63.2B jump.\",\n      \"severity\": \"high\",\n      \"exhibit_sha256\": \"cd610b12\"\n    },\n    {\n      \"claim\": \"Corrected Services moved the other way (-$12.0B, 0.438x); the reported jump has no real component.\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"7c2425e9\"\n    },\n    {\n      \"claim\": \"Oracle Corporation is the fastest-growing filer in Services (0.929x FY2016 to FY2017), but its -$4.6B is only 7.3% of the reported jump.\",\n      \"severity\": \"low\",\n      \"exhibit_sha256\": \"aa458805\"\n    },\n    {\n      \"claim\": \"Zetaris holds 39 International Business Machines Corporation facts; the SEC companyconcept endpoint returns 39. Nothing is missing.\",\n      \"severity\": \"low\",\n      \"exhibit_sha256\": \"cc28e206\"\n    }\n  ],\n  \"summary\": \"Each claimed cause is undermined by evidence showing either insufficient duplicate counts, presence of IBM data in earlier years, a real corrected delta, limited Oracle contribution, or incomplete coverage, indicating the data-quality finding that the FY2017 Services net income jump is not genuine.\"\n}",
+        "objections": [
+          {
+            "claim": "FY2017 holds 89 rows across 34 distinct period_end dates; 378 duplicate rows across the 7 source tables.",
+            "severity": "medium",
+            "exhibit_sha256": "e1ab0dcc",
+            "resolved": false
+          },
+          {
+            "claim": "International Business Machines Corporation first appears in fiscal_year 2017 (39 facts across 3 fiscal years, none in FY2016); that contributes $67.8B of the $63.2B jump.",
+            "severity": "high",
+            "exhibit_sha256": "cd610b12",
+            "resolved": false
+          },
+          {
+            "claim": "Corrected Services moved the other way (-$12.0B, 0.438x); the reported jump has no real component.",
+            "severity": "medium",
+            "exhibit_sha256": "7c2425e9",
+            "resolved": false
+          },
+          {
+            "claim": "Oracle Corporation is the fastest-growing filer in Services (0.929x FY2016 to FY2017), but its -$4.6B is only 7.3% of the reported jump.",
+            "severity": "low",
+            "exhibit_sha256": "aa458805",
+            "resolved": false
+          },
+          {
+            "claim": "Zetaris holds 39 International Business Machines Corporation facts; the SEC companyconcept endpoint returns 39. Nothing is missing.",
+            "severity": "low",
+            "exhibit_sha256": "cc28e206",
+            "resolved": false
+          }
+        ],
+        "cited_unknown": [
+          "e1ab0dcc",
+          "cd610b12",
+          "7c2425e9",
+          "aa458805",
+          "cc28e206"
+        ],
+        "unresolved": 5,
         "unsafe": false,
         "safety_findings": [],
-        "context_chunks": 0,
-        "context_chars": 0,
+        "context_chunks": 1,
+        "context_chars": 1620,
+        "context": {
+          "mode": "markovian-bounded",
+          "max_chars": 2500,
+          "total_chars": 1620,
+          "item_count": 12,
+          "chunk_count": 1,
+          "dropped": 0,
+          "chunks": [
+            {
+              "key": "ctx_1a98091595fe",
+              "item_ids": [
+                "canonical_series:58839725",
+                "compare_to_baseline:1b2dd8e1",
+                "counterfactual:7c2425e9",
+                "discover_sources:9f2802dc",
+                "metric_history:cc28e206",
+                "run_sql:cac77163",
+                "run_sql:aa458805",
+                "run_sql:e1ab0dcc",
+                "run_sql:db7a54ee",
+                "second_channel:cd610b12",
+                "second_channel:bc93981a",
+                "second_channel:0c8d4769"
+              ],
+              "chars": 1750,
+              "previous": null,
+              "next": null
+            }
+          ]
+        },
         "usage": {
-          "prompt_tokens": 0,
-          "completion_tokens": 0
+          "prompt_tokens": 2680,
+          "completion_tokens": 4282
         },
         "spend": {
           "calls": 0,
@@ -6051,62 +6118,62 @@
           "spent_usd": 0
         }
       },
-      "result_sha256": "4be7a7ac37d9722b8fa50e1376734f64c4bfcd0b7804576b61b6c491abe98b0d",
-      "rerun": "exhibit-a rerun ex_0a8ebbbca3833a88",
+      "result_sha256": "6a344980073dba3b8593818de3439e77466114056ea84783a5952cee5b2836ac",
+      "rerun": "exhibit-a rerun ex_0c0c09c7767f4e77",
       "case_id": "case_sample_net_income_warm",
       "agent": "LeadInvestigator"
     },
     {
-      "id": "ex_317995f3b085ce44",
-      "ts": "2026-10-24T12:34:01.070Z",
+      "id": "ex_9ed0f6802710e5c7",
+      "ts": "2026-10-24T14:01:43.182Z",
       "kind": "safety",
-      "source": "safety",
+      "source": "safety+nvidia-nim",
       "transport": "code",
       "title": "content-safety guard pass",
       "tool": "safety",
       "args": {
         "policy": "data-quality-finding-no-investment-advice",
-        "text": "is the FY2017 Services net income jump real?\nVerdict: DATA_ARTIFACT (filing_year_duplication=100.0%)\n- FY2017 holds 89 rows across 34 distinct period_end dates; 378 duplicate rows across the 7 source tables.\n- International Business Machines Corporation first appears in fiscal_year 2017 (39 facts across 3 fiscal years, none in FY2016); that contributes $67.8B of the $63.2B jump. Scout found the earlier periods under ProfitLoss (16 annual 10-K facts).\n- Corrected Services moved the other way (-$12.0B, 0.438x); the reported jump has no real component. SEC frames parity 10/10.\n- Oracle Corporation is the fastest-growing filer in Services (0.929x FY2016 to FY2017), but its -$4.6B is only 7.3% of the reported jump.\n- Zetaris holds 39 International Business Machines Corporation facts; the SEC companyconcept endpoint returns 39. Nothing is missing.\nNote: concept_switch_missing_history is confirmed as a data-quality finding but carries no separate share: deduplicating to one annual fact per (cik, period_end) recovers International Business Machines Corporation's prior-year facts, so it does not add to the reported jump.\nNote: Eliminated with exhibits, not left as possibilities: real_change, single_filer_growth, ingestion_gap.\nNote: Defense Counsel critique failed safely (model critique failed; code gate is final: model cassette miss for DefenseCounsel 9b1c507907dd52ac0b27e13ebe8323b58749cbdd66a5d2bea6a1ff4e907684cd); the deterministic code gate is final.\nNote: SAMPLE_MODE: tool results replayed from the labelled cassette; no live inference.",
-        "model": null,
+        "text": "is the FY2017 Services net income jump real?\nVerdict: DATA_ARTIFACT (filing_year_duplication=100.0%)\n- FY2017 holds 89 rows across 34 distinct period_end dates; 378 duplicate rows across the 7 source tables.\n- International Business Machines Corporation first appears in fiscal_year 2017 (39 facts across 3 fiscal years, none in FY2016); that contributes $67.8B of the $63.2B jump. Scout found the earlier periods under ProfitLoss (16 annual 10-K facts).\n- Corrected Services moved the other way (-$12.0B, 0.438x); the reported jump has no real component. SEC frames parity 10/10.\n- Oracle Corporation is the fastest-growing filer in Services (0.929x FY2016 to FY2017), but its -$4.6B is only 7.3% of the reported jump.\n- Zetaris holds 39 International Business Machines Corporation facts; the SEC companyconcept endpoint returns 39. Nothing is missing.\nNote: concept_switch_missing_history is confirmed as a data-quality finding but carries no separate share: deduplicating to one annual fact per (cik, period_end) recovers International Business Machines Corporation's prior-year facts, so it does not add to the reported jump.\nNote: Eliminated with exhibits, not left as possibilities: real_change, single_filer_growth, ingestion_gap.\nNote: Defense Counsel raised 5 objection(s), 5 citing an unknown exhibit; the deterministic code gate is final.\nNote: SAMPLE_MODE: tool results replayed from the labelled cassette; no live inference.\n{\n  \"objections\": [\n    {\n      \"claim\": \"FY2017 holds 89 rows across 34 distinct period_end dates; 378 duplicate rows across the 7 source tables.\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"e1ab0dcc\"\n    },\n    {\n      \"claim\": \"International Business Machines Corporation first appears in fiscal_year 2017 (39 facts across 3 fiscal years, none in FY2016); that contributes $67.8B of the $63.2B jump.\",\n      \"severity\": \"high\",\n      \"exhibit_sha256\": \"cd610b12\"\n    },\n    {\n      \"claim\": \"Corrected Services moved the other way (-$12.0B, 0.438x); the reported jump has no real component.\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"7c2425e9\"\n    },\n    {\n      \"claim\": \"Oracle Corporation is the fastest-growing filer in Services (0.929x FY2016 to FY2017), but its -$4.6B is only 7.3% of the reported jump.\",\n      \"severity\": \"low\",\n      \"exhibit_sha256\": \"aa458805\"\n    },\n    {\n      \"claim\": \"Zetaris holds 39 International Business Machines Corporation facts; the SEC companyconcept endpoint returns 39. Nothing is missing.\",\n      \"severity\": \"low\",\n      \"exhibit_sha256\": \"cc28e206\"\n    }\n  ],\n  \"summary\": \"Each claimed cause is undermined by evidence showing either insufficient duplicate counts, presence of IBM data in earlier years, a real corrected delta, limited Oracle contribution, or incomplete coverage, indicating the data-quality finding that the FY2017 Services net income jump is not genuine.\"\n}",
+        "model": "nvidia/nemotron-3.5-content-safety",
         "question": "is the FY2017 Services net income jump real?",
-        "finding": "Verdict: DATA_ARTIFACT (filing_year_duplication=100.0%)\n- FY2017 holds 89 rows across 34 distinct period_end dates; 378 duplicate rows across the 7 source tables.\n- International Business Machines Corporation first appears in fiscal_year 2017 (39 facts across 3 fiscal years, none in FY2016); that contributes $67.8B of the $63.2B jump. Scout found the earlier periods under ProfitLoss (16 annual 10-K facts).\n- Corrected Services moved the other way (-$12.0B, 0.438x); the reported jump has no real component. SEC frames parity 10/10.\n- Oracle Corporation is the fastest-growing filer in Services (0.929x FY2016 to FY2017), but its -$4.6B is only 7.3% of the reported jump.\n- Zetaris holds 39 International Business Machines Corporation facts; the SEC companyconcept endpoint returns 39. Nothing is missing.\nNote: concept_switch_missing_history is confirmed as a data-quality finding but carries no separate share: deduplicating to one annual fact per (cik, period_end) recovers International Business Machines Corporation's prior-year facts, so it does not add to the reported jump.\nNote: Eliminated with exhibits, not left as possibilities: real_change, single_filer_growth, ingestion_gap.\nNote: Defense Counsel critique failed safely (model critique failed; code gate is final: model cassette miss for DefenseCounsel 9b1c507907dd52ac0b27e13ebe8323b58749cbdd66a5d2bea6a1ff4e907684cd); the deterministic code gate is final.\nNote: SAMPLE_MODE: tool results replayed from the labelled cassette; no live inference."
+        "finding": "Verdict: DATA_ARTIFACT (filing_year_duplication=100.0%)\n- FY2017 holds 89 rows across 34 distinct period_end dates; 378 duplicate rows across the 7 source tables.\n- International Business Machines Corporation first appears in fiscal_year 2017 (39 facts across 3 fiscal years, none in FY2016); that contributes $67.8B of the $63.2B jump. Scout found the earlier periods under ProfitLoss (16 annual 10-K facts).\n- Corrected Services moved the other way (-$12.0B, 0.438x); the reported jump has no real component. SEC frames parity 10/10.\n- Oracle Corporation is the fastest-growing filer in Services (0.929x FY2016 to FY2017), but its -$4.6B is only 7.3% of the reported jump.\n- Zetaris holds 39 International Business Machines Corporation facts; the SEC companyconcept endpoint returns 39. Nothing is missing.\nNote: concept_switch_missing_history is confirmed as a data-quality finding but carries no separate share: deduplicating to one annual fact per (cik, period_end) recovers International Business Machines Corporation's prior-year facts, so it does not add to the reported jump.\nNote: Eliminated with exhibits, not left as possibilities: real_change, single_filer_growth, ingestion_gap.\nNote: Defense Counsel raised 5 objection(s), 5 citing an unknown exhibit; the deterministic code gate is final.\nNote: SAMPLE_MODE: tool results replayed from the labelled cassette; no live inference."
       },
       "result": {
         "ok": true,
         "policy": "data-quality-finding-no-investment-advice",
         "findings": [],
-        "checked_chars": 1558,
+        "checked_chars": 2885,
         "action": "allow",
         "model": {
-          "status": "error",
+          "status": "ran",
           "model": "nvidia/nemotron-3.5-content-safety",
-          "detail": "content-safety model failed; lexical guard decides: model cassette miss for SafetyGuard 310a08d2df2fe30547a340c8937326c1c4ce5323a385863814cfef571b47db6f",
-          "user_safety": null,
-          "response_safety": null,
+          "user_safety": "safe",
+          "response_safety": "safe",
           "categories": [],
-          "raw": "",
+          "detail": "user safe, response safe",
+          "raw": "User Safety: safe\nResponse Safety: safe",
           "usage": {
-            "prompt_tokens": 0,
-            "completion_tokens": 0
+            "prompt_tokens": 862,
+            "completion_tokens": 10
           }
         }
       },
-      "result_sha256": "954bd9ca2d1eda03c92bb0bad68dbdc5f99f6fec71a79a6e774a0b526b4fc2d1",
-      "rerun": "exhibit-a rerun ex_317995f3b085ce44",
+      "result_sha256": "9750e20499d02d65e76f21eac3578748483443c1410b951acffd9eb6d718ac06",
+      "rerun": "exhibit-a rerun ex_9ed0f6802710e5c7",
       "case_id": "case_sample_net_income_warm",
       "agent": "SafetyGuard"
     },
     {
-      "id": "ex_ecea121d233d0030",
-      "ts": "2026-10-24T12:34:01.070Z",
+      "id": "ex_4c26e736481945d6",
+      "ts": "2026-10-24T14:01:43.182Z",
       "kind": "writeback",
       "source": "code",
       "transport": "code",
-      "title": "signed shadow contract contract_fee0662875830d97",
+      "title": "signed shadow contract contract_3b748419be2507a8",
       "tool": "write_contract",
       "args": {
         "contract": {
-          "id": "contract_fee0662875830d97",
+          "id": "contract_3b748419be2507a8",
           "case_id": "case_sample_net_income_warm",
           "intent": "Create a verifier sandbox for analytics.sector_net_income_by_year; do not modify the reported view",
           "scope": [
@@ -6118,15 +6185,15 @@
           ],
           "statements_sha256": "9af6c722dc3f4fbaea76cc52a836c82d1fa86a4a5577de5b286e677fde0f8fdc",
           "cost_ceiling": 0,
-          "expires_at": "2027-10-24T12:34:01.070Z",
+          "expires_at": "2027-10-24T14:01:43.182Z",
           "signer": "ScoutIntent",
-          "signature": "a9541267c15c5d3b0bbd85218cee3094ecb96880148c43c889022cd1530aa41f",
+          "signature": "a115ad1f1de5c09913fe9613f33803920963f7267529e3bb0a2bd818f8719be3",
           "approved": false
         },
         "sample_mode": true
       },
       "result": {
-        "contract_id": "contract_fee0662875830d97",
+        "contract_id": "contract_3b748419be2507a8",
         "scope": [
           "exhibit_a_shadow.sector_net_income_by_year"
         ],
@@ -6136,14 +6203,14 @@
         "original_view_touched": false,
         "approval": "shadow-only; operator approval still required for writeback"
       },
-      "result_sha256": "a0debbd8bf11c9a7c7710e3d01304df930f9f60977cea10c0b29d0672ea56be7",
-      "rerun": "exhibit-a rerun ex_ecea121d233d0030",
+      "result_sha256": "abbc0993570a5ce79d090d32ecf334d54de84c68affcca331191656f858d5cf2",
+      "rerun": "exhibit-a rerun ex_4c26e736481945d6",
       "case_id": "case_sample_net_income_warm",
       "agent": "RepairEngineer"
     },
     {
-      "id": "ex_14edf2fc06b4abd2",
-      "ts": "2026-10-24T12:34:01.070Z",
+      "id": "ex_4faf05c91a797ecc",
+      "ts": "2026-10-24T14:01:43.182Z",
       "kind": "test",
       "source": "zetaris",
       "transport": "cassette",
@@ -6221,13 +6288,13 @@
         "truncated": false
       },
       "result_sha256": "cc70089627f8b3ad0ccf8375c7ddc19a6e65b1bb6b0f4745a10fbd882198f324",
-      "rerun": "exhibit-a rerun ex_14edf2fc06b4abd2",
+      "rerun": "exhibit-a rerun ex_4faf05c91a797ecc",
       "case_id": "case_sample_net_income_warm",
       "agent": "Verifier"
     },
     {
-      "id": "ex_b8c412ebd613b922",
-      "ts": "2026-10-24T12:34:01.070Z",
+      "id": "ex_ae2d211216c82462",
+      "ts": "2026-10-24T14:01:43.182Z",
       "kind": "baseline",
       "source": "zetaris",
       "transport": "cassette",
@@ -6312,13 +6379,13 @@
         "truncated": false
       },
       "result_sha256": "cc28e206b255c90542bb5749e89154498be4bf6f578e9ff2b8a3f3697cc60f50",
-      "rerun": "exhibit-a rerun ex_b8c412ebd613b922",
+      "rerun": "exhibit-a rerun ex_ae2d211216c82462",
       "case_id": "case_sample_net_income_warm",
       "agent": "Verifier"
     },
     {
-      "id": "ex_cda3ee8504f75a06",
-      "ts": "2026-10-24T12:34:01.071Z",
+      "id": "ex_ebaa5cf72c29ca03",
+      "ts": "2026-10-24T14:01:43.183Z",
       "kind": "test",
       "source": "code",
       "transport": "code",
@@ -6332,7 +6399,7 @@
         "corrected_metric": "exhibit_a.sector_net_income_by_year_v2",
         "corrected_sql": "WITH annual AS (\n  SELECT\n    s.sic_division,\n    f.cik,\n    f.period_start,\n    f.period_end,\n    f.value_usd,\n    f.filed_date,\n    CASE\n      WHEN MONTH(f.period_end) <= 6 THEN YEAR(f.period_end) - 1\n      ELSE YEAR(f.period_end)\n    END AS period_year,\n    ROW_NUMBER() OVER (\n      PARTITION BY f.cik, f.period_end\n      ORDER BY f.filed_date DESC, f.value_usd DESC\n    ) AS rn\n  FROM (\n    SELECT * FROM edgar.apple_netincome_table\n    UNION ALL SELECT * FROM edgar.ibm_netincome_table\n    UNION ALL SELECT * FROM edgar.oracle_netincome_table\n    UNION ALL SELECT * FROM edgar.walmart_netincome_table\n    UNION ALL SELECT * FROM edgar.target_netincome_table\n    UNION ALL SELECT * FROM edgar.ford_netincome_table\n    UNION ALL SELECT * FROM edgar.tesla_netincome_table\n  ) f\n  LEFT JOIN edgar.sic_edgar_usl s ON s.cik = f.cik\n  WHERE DATEDIFF(f.period_end, f.period_start) BETWEEN 330 AND 400\n)\nSELECT\n  sic_division,\n  period_year AS fiscal_year,\n  SUM(value_usd) AS net_income_usd\nFROM annual\nWHERE rn = 1\n  AND period_year BETWEEN 2016 AND 2019\nGROUP BY sic_division, period_year",
         "contract": {
-          "id": "contract_fee0662875830d97",
+          "id": "contract_3b748419be2507a8",
           "case_id": "case_sample_net_income_warm",
           "intent": "Create a verifier sandbox for analytics.sector_net_income_by_year; do not modify the reported view",
           "scope": [
@@ -6344,12 +6411,12 @@
           ],
           "statements_sha256": "9af6c722dc3f4fbaea76cc52a836c82d1fa86a4a5577de5b286e677fde0f8fdc",
           "cost_ceiling": 0,
-          "expires_at": "2027-10-24T12:34:01.070Z",
+          "expires_at": "2027-10-24T14:01:43.182Z",
           "signer": "ScoutIntent",
-          "signature": "a9541267c15c5d3b0bbd85218cee3094ecb96880148c43c889022cd1530aa41f",
+          "signature": "a115ad1f1de5c09913fe9613f33803920963f7267529e3bb0a2bd818f8719be3",
           "approved": false
         },
-        "contract_id": "contract_fee0662875830d97",
+        "contract_id": "contract_3b748419be2507a8",
         "baseline": {
           "metric": "analytics.sector_net_income_by_year",
           "grain": "fiscal_year",
@@ -6384,18 +6451,18 @@
           "unexplained_share": 0,
           "rule": "explained share = 1 - (corrected period delta / reported period delta), clamped to [0, 1]; opposite-direction corrected moves count as fully explained"
         },
-        "history_exhibit_id": "ex_13af03dc7d9c5f42",
-        "history_reread_exhibit_id": "ex_b8c412ebd613b922",
-        "canonical_facts_exhibit_id": "ex_e006029a15ff6897",
-        "shadow_exhibit_id": "ex_14edf2fc06b4abd2",
+        "history_exhibit_id": "ex_0475af76f6417296",
+        "history_reread_exhibit_id": "ex_ae2d211216c82462",
+        "canonical_facts_exhibit_id": "ex_25ada27fc6e3ad0a",
+        "shadow_exhibit_id": "ex_4faf05c91a797ecc",
         "frame_exhibits": [
           {
             "period": "CY2016",
-            "exhibit_id": "ex_ea6cc65d9a33effd"
+            "exhibit_id": "ex_b38e5b88b4947d60"
           },
           {
             "period": "CY2017",
-            "exhibit_id": "ex_86e1638ffba97eb2"
+            "exhibit_id": "ex_e9cc50f80885531a"
           }
         ]
       },
@@ -6458,7 +6525,7 @@
           {
             "name": "shadow_contract",
             "ok": true,
-            "detail": "signed contract contract_fee0662875830d97 scopes exhibit_a_shadow.sector_net_income_by_year"
+            "detail": "signed contract contract_3b748419be2507a8 scopes exhibit_a_shadow.sector_net_income_by_year"
           },
           {
             "name": "bad_repair_rejected",
@@ -6471,15 +6538,15 @@
         "corrected_delta": -11984000000,
         "corrected_ratio": 0.4380041268054774
       },
-      "result_sha256": "337179cfd98cbda7aedc69e95993e2fc0b7eed1b3a2848c596140bfc45b91f4f",
-      "rerun": "exhibit-a rerun ex_cda3ee8504f75a06",
+      "result_sha256": "c2867b3e1fa6c04961115a1906a8a9515c1177daa268feb082546c73698113db",
+      "rerun": "exhibit-a rerun ex_ebaa5cf72c29ca03",
       "case_id": "case_sample_net_income_warm",
       "agent": "Verifier"
     }
   ],
   "hypotheses": [
     {
-      "id": "hyp_8e9b4de6c03124ee",
+      "id": "hyp_929eeb85d395908e",
       "cause": "filing_year_duplication",
       "statement": "The 2017 movement in Services is inflated because analytics.sector_net_income_by_year sums value_usd grouped by the filing's fiscal_year, so prior-year comparatives, quarterly facts and year-to-date facts are counted again under the later filing year.",
       "blamed": [
@@ -6488,15 +6555,15 @@
       ],
       "status": "confirmed",
       "exhibit_ids": [
-        "ex_9cae338b8d5fd802",
-        "ex_4b12e1ae79976738",
-        "ex_4a32e770409a56b9",
-        "ex_13af03dc7d9c5f42"
+        "ex_de2c2380b17ca2f4",
+        "ex_bf6fe91cdaa304bf",
+        "ex_80cec1dbda3e560f",
+        "ex_0475af76f6417296"
       ],
       "note": "FY2017 holds 89 rows across 34 distinct period_end dates; 378 duplicate rows across the 7 source tables."
     },
     {
-      "id": "hyp_9c6a8f17d035fd76",
+      "id": "hyp_0fb3bac523878e93",
       "cause": "concept_switch_missing_history",
       "statement": "The 2017 bucket gains a filer that is absent from 2016, because a filer's Revenues concept stops after one filing and its whole fact history lands in a single fiscal_year.",
       "blamed": [
@@ -6505,9 +6572,9 @@
       ],
       "status": "confirmed",
       "exhibit_ids": [
-        "ex_4a32e770409a56b9",
-        "ex_d99282f2c98605b9",
-        "ex_8b7774ddd7fdd1e2"
+        "ex_80cec1dbda3e560f",
+        "ex_bdf93114d26a2858",
+        "ex_fbbaaf51e6054382"
       ],
       "subjects": [
         {
@@ -6519,7 +6586,7 @@
       "note": "International Business Machines Corporation first appears in fiscal_year 2017 (39 facts across 3 fiscal years, none in FY2016); that contributes $67.8B of the $63.2B jump. Scout found the earlier periods under ProfitLoss (16 annual 10-K facts)."
     },
     {
-      "id": "hyp_457f8cd73180e708",
+      "id": "hyp_d7e9e3c089dd011c",
       "cause": "real_change",
       "statement": "Revenue in Services genuinely grew between 2016 and 2017; the increase should survive deduplication and agree with an independent SEC frames value.",
       "blamed": [
@@ -6528,16 +6595,16 @@
       ],
       "status": "eliminated",
       "exhibit_ids": [
-        "ex_bf29383ed3e27b87",
-        "ex_ea6cc65d9a33effd",
-        "ex_86e1638ffba97eb2",
-        "ex_dd47a3e4b8d95db0"
+        "ex_598ecc8b31a34061",
+        "ex_b38e5b88b4947d60",
+        "ex_e9cc50f80885531a",
+        "ex_1b26ceff0bedf147"
       ],
       "share": 0,
       "note": "Corrected Services moved the other way (-$12.0B, 0.438x); the reported jump has no real component. SEC frames parity 10/10."
     },
     {
-      "id": "hyp_b680a8f3066cd0c0",
+      "id": "hyp_4d28d144cf64912a",
       "cause": "single_filer_growth",
       "statement": "One fast-growing filer in Services explains the 2017 movement on its own.",
       "blamed": [
@@ -6546,8 +6613,8 @@
       ],
       "status": "eliminated",
       "exhibit_ids": [
-        "ex_4a32e770409a56b9",
-        "ex_4b12e1ae79976738"
+        "ex_80cec1dbda3e560f",
+        "ex_bf6fe91cdaa304bf"
       ],
       "subjects": [
         {
@@ -6559,7 +6626,7 @@
       "note": "Oracle Corporation is the fastest-growing filer in Services (0.929x FY2016 to FY2017), but its -$4.6B is only 7.3% of the reported jump."
     },
     {
-      "id": "hyp_264343f697735160",
+      "id": "hyp_d75fd0046178447d",
       "cause": "ingestion_gap",
       "statement": "The artifact is an ingestion gap: Zetaris lost facts that the SEC endpoint still returns, so the naive series is missing rows rather than duplicating them.",
       "blamed": [
@@ -6569,10 +6636,10 @@
       ],
       "status": "eliminated",
       "exhibit_ids": [
-        "ex_d99282f2c98605b9",
-        "ex_4a32e770409a56b9",
-        "ex_ea6cc65d9a33effd",
-        "ex_86e1638ffba97eb2"
+        "ex_bdf93114d26a2858",
+        "ex_80cec1dbda3e560f",
+        "ex_b38e5b88b4947d60",
+        "ex_e9cc50f80885531a"
       ],
       "subjects": [
         {
@@ -6585,7 +6652,7 @@
     }
   ],
   "memory": {
-    "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-sample-cases-Pk1BL9/logs/memory/index.json",
+    "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-sample-cases-bwZHFs/logs/memory/index.json",
     "cold_start": false,
     "query": {
       "metric": "analytics.sector_net_income_by_year",
@@ -6601,7 +6668,7 @@
         "causes": [
           "filing_year_duplication=100.0%"
         ],
-        "closed_at": "2026-10-24T12:34:01.064Z",
+        "closed_at": "2026-10-24T14:01:43.176Z",
         "score": 24,
         "match": [
           "same metric",
@@ -6609,7 +6676,7 @@
           "DATA_ARTIFACT",
           "embedding similarity 0.78"
         ],
-        "excerpt": "Exhibit A case_sample_net_income_closed verdict DATA_ARTIFACT (filing_year_duplication=100.0%), exhibits ex_2d75360c4fe81864, ex_f567555b64a70319, ex_ae3ae2a880c64973, ex_a23d39f94eb25596, ex_d7120a17336923a6, ex_bdd41c709605c568, 2026-10-24. Data-quality finding on public filings, not investment advice.",
+        "excerpt": "Exhibit A case_sample_net_income_closed verdict DATA_ARTIFACT (filing_year_duplication=100.0%), exhibits ex_a0412daf61c769a3, ex_e876a12c685867c9, ex_0511b87e8054067b, ex_83de38c08f5748e6, ex_f7dd3e82b650126c, ex_e1f8e7442c65c4b8, 2026-10-24. Data-quality finding on public filings, not investment advice.",
         "similarity": 0.7789
       }
     ],
@@ -6684,20 +6751,87 @@
     "rule": "NetIncomeLoss family concept must have USD annual 10-K facts (330-400 days) and either extend the current chain (ending within 421 days) or precede it"
   },
   "critic": {
-    "status": "error",
+    "status": "ran",
     "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-    "detail": "model critique failed; code gate is final: model cassette miss for DefenseCounsel 9b1c507907dd52ac0b27e13ebe8323b58749cbdd66a5d2bea6a1ff4e907684cd",
-    "content": "",
-    "objections": [],
-    "cited_unknown": [],
-    "unresolved": 0,
+    "detail": "5 objection(s): Each claimed cause is undermined by evidence showing either insufficient duplicate counts, presence of IBM data in earlier years, a real corrected delta, limited Oracle contribution, or incomplete coverage, indicating the data-quality findi; 5 unknown citation(s)",
+    "content": "{\n  \"objections\": [\n    {\n      \"claim\": \"FY2017 holds 89 rows across 34 distinct period_end dates; 378 duplicate rows across the 7 source tables.\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"e1ab0dcc\"\n    },\n    {\n      \"claim\": \"International Business Machines Corporation first appears in fiscal_year 2017 (39 facts across 3 fiscal years, none in FY2016); that contributes $67.8B of the $63.2B jump.\",\n      \"severity\": \"high\",\n      \"exhibit_sha256\": \"cd610b12\"\n    },\n    {\n      \"claim\": \"Corrected Services moved the other way (-$12.0B, 0.438x); the reported jump has no real component.\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"7c2425e9\"\n    },\n    {\n      \"claim\": \"Oracle Corporation is the fastest-growing filer in Services (0.929x FY2016 to FY2017), but its -$4.6B is only 7.3% of the reported jump.\",\n      \"severity\": \"low\",\n      \"exhibit_sha256\": \"aa458805\"\n    },\n    {\n      \"claim\": \"Zetaris holds 39 International Business Machines Corporation facts; the SEC companyconcept endpoint returns 39. Nothing is missing.\",\n      \"severity\": \"low\",\n      \"exhibit_sha256\": \"cc28e206\"\n    }\n  ],\n  \"summary\": \"Each claimed cause is undermined by evidence showing either insufficient duplicate counts, presence of IBM data in earlier years, a real corrected delta, limited Oracle contribution, or incomplete coverage, indicating the data-quality finding that the FY2017 Services net income jump is not genuine.\"\n}",
+    "objections": [
+      {
+        "claim": "FY2017 holds 89 rows across 34 distinct period_end dates; 378 duplicate rows across the 7 source tables.",
+        "severity": "medium",
+        "exhibit_sha256": "e1ab0dcc",
+        "resolved": false
+      },
+      {
+        "claim": "International Business Machines Corporation first appears in fiscal_year 2017 (39 facts across 3 fiscal years, none in FY2016); that contributes $67.8B of the $63.2B jump.",
+        "severity": "high",
+        "exhibit_sha256": "cd610b12",
+        "resolved": false
+      },
+      {
+        "claim": "Corrected Services moved the other way (-$12.0B, 0.438x); the reported jump has no real component.",
+        "severity": "medium",
+        "exhibit_sha256": "7c2425e9",
+        "resolved": false
+      },
+      {
+        "claim": "Oracle Corporation is the fastest-growing filer in Services (0.929x FY2016 to FY2017), but its -$4.6B is only 7.3% of the reported jump.",
+        "severity": "low",
+        "exhibit_sha256": "aa458805",
+        "resolved": false
+      },
+      {
+        "claim": "Zetaris holds 39 International Business Machines Corporation facts; the SEC companyconcept endpoint returns 39. Nothing is missing.",
+        "severity": "low",
+        "exhibit_sha256": "cc28e206",
+        "resolved": false
+      }
+    ],
+    "cited_unknown": [
+      "e1ab0dcc",
+      "cd610b12",
+      "7c2425e9",
+      "aa458805",
+      "cc28e206"
+    ],
+    "unresolved": 5,
     "unsafe": false,
     "safety_findings": [],
-    "context_chunks": 0,
-    "context_chars": 0,
+    "context_chunks": 1,
+    "context_chars": 1620,
+    "context": {
+      "mode": "markovian-bounded",
+      "max_chars": 2500,
+      "total_chars": 1620,
+      "item_count": 12,
+      "chunk_count": 1,
+      "dropped": 0,
+      "chunks": [
+        {
+          "key": "ctx_1a98091595fe",
+          "item_ids": [
+            "canonical_series:58839725",
+            "compare_to_baseline:1b2dd8e1",
+            "counterfactual:7c2425e9",
+            "discover_sources:9f2802dc",
+            "metric_history:cc28e206",
+            "run_sql:cac77163",
+            "run_sql:aa458805",
+            "run_sql:e1ab0dcc",
+            "run_sql:db7a54ee",
+            "second_channel:cd610b12",
+            "second_channel:bc93981a",
+            "second_channel:0c8d4769"
+          ],
+          "chars": 1750,
+          "previous": null,
+          "next": null
+        }
+      ]
+    },
     "usage": {
-      "prompt_tokens": 0,
-      "completion_tokens": 0
+      "prompt_tokens": 2680,
+      "completion_tokens": 4282
     },
     "spend": {
       "calls": 0,
@@ -6710,19 +6844,19 @@
     "ok": true,
     "policy": "data-quality-finding-no-investment-advice",
     "findings": [],
-    "checked_chars": 1558,
+    "checked_chars": 2885,
     "action": "allow",
     "model": {
-      "status": "error",
+      "status": "ran",
       "model": "nvidia/nemotron-3.5-content-safety",
-      "detail": "content-safety model failed; lexical guard decides: model cassette miss for SafetyGuard 310a08d2df2fe30547a340c8937326c1c4ce5323a385863814cfef571b47db6f",
-      "user_safety": null,
-      "response_safety": null,
+      "user_safety": "safe",
+      "response_safety": "safe",
       "categories": [],
-      "raw": "",
+      "detail": "user safe, response safe",
+      "raw": "User Safety: safe\nResponse Safety: safe",
       "usage": {
-        "prompt_tokens": 0,
-        "completion_tokens": 0
+        "prompt_tokens": 862,
+        "completion_tokens": 10
       }
     }
   },
@@ -6734,32 +6868,32 @@
         "kind": "artifact",
         "share": 1,
         "exhibit_ids": [
-          "ex_9cae338b8d5fd802",
-          "ex_4b12e1ae79976738",
-          "ex_4a32e770409a56b9",
-          "ex_13af03dc7d9c5f42",
-          "ex_ea6cc65d9a33effd",
-          "ex_86e1638ffba97eb2",
-          "ex_d99282f2c98605b9",
-          "ex_fbf2f23662493b48"
+          "ex_de2c2380b17ca2f4",
+          "ex_bf6fe91cdaa304bf",
+          "ex_80cec1dbda3e560f",
+          "ex_0475af76f6417296",
+          "ex_b38e5b88b4947d60",
+          "ex_e9cc50f80885531a",
+          "ex_bdf93114d26a2858",
+          "ex_910041e6a90be523"
         ]
       }
     ],
     "unexplained_share": 0,
     "exhibit_ids": [
-      "ex_9cae338b8d5fd802",
-      "ex_4b12e1ae79976738",
-      "ex_4a32e770409a56b9",
-      "ex_13af03dc7d9c5f42",
-      "ex_ea6cc65d9a33effd",
-      "ex_86e1638ffba97eb2",
-      "ex_d99282f2c98605b9",
-      "ex_fbf2f23662493b48"
+      "ex_de2c2380b17ca2f4",
+      "ex_bf6fe91cdaa304bf",
+      "ex_80cec1dbda3e560f",
+      "ex_0475af76f6417296",
+      "ex_b38e5b88b4947d60",
+      "ex_e9cc50f80885531a",
+      "ex_bdf93114d26a2858",
+      "ex_910041e6a90be523"
     ],
     "notes": [
       "concept_switch_missing_history is confirmed as a data-quality finding but carries no separate share: deduplicating to one annual fact per (cik, period_end) recovers International Business Machines Corporation's prior-year facts, so it does not add to the reported jump.",
       "Eliminated with exhibits, not left as possibilities: real_change, single_filer_growth, ingestion_gap.",
-      "Defense Counsel critique failed safely (model critique failed; code gate is final: model cassette miss for DefenseCounsel 9b1c507907dd52ac0b27e13ebe8323b58749cbdd66a5d2bea6a1ff4e907684cd); the deterministic code gate is final.",
+      "Defense Counsel raised 5 objection(s), 5 citing an unknown exhibit; the deterministic code gate is final.",
       "SAMPLE_MODE: tool results replayed from the labelled cassette; no live inference."
     ]
   },
@@ -6772,10 +6906,10 @@
       "CREATE SCHEMASTORE CONTAINER exhibit_a_shadow",
       "CREATE OR REPLACE SCHEMASTORE VIEW sector_net_income_by_year WITH CONTAINER exhibit_a_shadow AS WITH annual AS (\n  SELECT\n    s.sic_division,\n    f.cik,\n    f.period_start,\n    f.period_end,\n    f.value_usd,\n    f.filed_date,\n    CASE\n      WHEN MONTH(f.period_end) <= 6 THEN YEAR(f.period_end) - 1\n      ELSE YEAR(f.period_end)\n    END AS period_year,\n    ROW_NUMBER() OVER (\n      PARTITION BY f.cik, f.period_end\n      ORDER BY f.filed_date DESC, f.value_usd DESC\n    ) AS rn\n  FROM (\n    SELECT * FROM edgar.apple_netincome_table\n    UNION ALL SELECT * FROM edgar.ibm_netincome_table\n    UNION ALL SELECT * FROM edgar.oracle_netincome_table\n    UNION ALL SELECT * FROM edgar.walmart_netincome_table\n    UNION ALL SELECT * FROM edgar.target_netincome_table\n    UNION ALL SELECT * FROM edgar.ford_netincome_table\n    UNION ALL SELECT * FROM edgar.tesla_netincome_table\n  ) f\n  LEFT JOIN edgar.sic_edgar_usl s ON s.cik = f.cik\n  WHERE DATEDIFF(f.period_end, f.period_start) BETWEEN 330 AND 400\n)\nSELECT\n  sic_division,\n  period_year AS fiscal_year,\n  SUM(value_usd) AS net_income_usd\nFROM annual\nWHERE rn = 1\n  AND period_year BETWEEN 2016 AND 2019\nGROUP BY sic_division, period_year"
     ],
-    "created_at": "2026-10-24T12:34:01.070Z"
+    "created_at": "2026-10-24T14:01:43.182Z"
   },
   "contract": {
-    "id": "contract_fee0662875830d97",
+    "id": "contract_3b748419be2507a8",
     "case_id": "case_sample_net_income_warm",
     "intent": "Create a verifier sandbox for analytics.sector_net_income_by_year; do not modify the reported view",
     "scope": [
@@ -6787,9 +6921,9 @@
     ],
     "statements_sha256": "9af6c722dc3f4fbaea76cc52a836c82d1fa86a4a5577de5b286e677fde0f8fdc",
     "cost_ceiling": 0,
-    "expires_at": "2027-10-24T12:34:01.070Z",
+    "expires_at": "2027-10-24T14:01:43.182Z",
     "signer": "ScoutIntent",
-    "signature": "a9541267c15c5d3b0bbd85218cee3094ecb96880148c43c889022cd1530aa41f",
+    "signature": "a115ad1f1de5c09913fe9613f33803920963f7267529e3bb0a2bd818f8719be3",
     "approved": false
   },
   "verification": {
@@ -6851,7 +6985,7 @@
       {
         "name": "shadow_contract",
         "ok": true,
-        "detail": "signed contract contract_fee0662875830d97 scopes exhibit_a_shadow.sector_net_income_by_year"
+        "detail": "signed contract contract_3b748419be2507a8 scopes exhibit_a_shadow.sector_net_income_by_year"
       },
       {
         "name": "bad_repair_rejected",
