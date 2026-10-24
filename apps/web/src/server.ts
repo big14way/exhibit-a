@@ -14,13 +14,12 @@ import {
   type Exhibit,
   type TraceLine,
 } from "@exhibit-a/core";
-import { createRuntime, rerunExhibit } from "@exhibit-a/tools";
+import { createRuntime, metricSpec, rerunExhibit } from "@exhibit-a/tools";
 import { loadEnv } from "../../cli/src/env.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../..");
 const PUBLIC = resolve(HERE, "../public");
-const CASSETTE = resolve(ROOT, "fixtures/cassettes/d2-edgar-investigation.json");
 const PORT = Number(process.env.WEB_PORT ?? 4173);
 
 loadEnv(ROOT);
@@ -188,7 +187,9 @@ async function handleApi(req: IncomingMessage, res: ServerResponse, url: URL): P
       json(res, 404, { error: `exhibit not found: ${rerunMatch[2]}` });
       return;
     }
-    const cassette = state.sample_mode ? loadCassette(CASSETTE) : undefined;
+    const cassette = state.sample_mode
+      ? loadCassette(resolve(ROOT, metricSpec(state.metric).paths.cassette))
+      : undefined;
     const rt = createRuntime({
       root: ROOT,
       caseId: state.id,

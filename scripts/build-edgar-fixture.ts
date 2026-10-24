@@ -7,12 +7,18 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { EDGAR_COMPANIES } from "../packages/tools/src/index.ts";
+import { EDGAR_COMPANIES, secGet } from "../packages/tools/src/index.ts";
+import { loadEnv } from "../apps/cli/src/env.ts";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+loadEnv(ROOT);
 const OUT_DIR = resolve(ROOT, "fixtures/edgar");
 const SEC_BASE = "https://data.sec.gov/api/xbrl";
 const WINDOW = { from: 2016, to: 2019 };
+// Concept and output names are parameters so a second metric can be built from
+// the same script: CONCEPT=NetIncomeLoss OUT=netincome npm run fixture:edgar
+const CONCEPT = process.env.CONCEPT ?? "Revenues";
+const OUT = process.env.OUT ?? "revenue";
 
 type SecFact = {
   start: string;
@@ -27,16 +33,11 @@ type SecFact = {
 };
 
 async function get(url: string): Promise<unknown> {
-  const userAgent = process.env.SEC_USER_AGENT;
-  if (!userAgent || !/[@/]/.test(userAgent)) {
-    throw new Error("SEC_USER_AGENT must include a contact email or URL");
-  }
-  const res = await fetch(url, {
-    headers: { "user-agent": userAgent, accept: "application/json" },
-  });
-  if (!res.ok) throw new Error(`SEC ${res.status} for ${url}`);
+  // Same transport as the live second channel: declared contact in From,
+  // browser-shaped agent because SEC's edge blocks declared non-browser agents.
+  const raw = await secGet(url);
   await new Promise((resolve) => setTimeout(resolve, 150));
-  return res.json();
+  return raw;
 }
 
 async function main(): Promise<void> {
@@ -45,7 +46,7 @@ async function main(): Promise<void> {
   const coverage: Record<string, unknown>[] = [];
 
   for (const company of EDGAR_COMPANIES) {
-    const url = `${SEC_BASE}/companyconcept/CIK${company.cik}/us-gaap/Revenues.json`;
+    const url = `${SEC_BASE}/companyconcept/CIK${company.cik}/us-gaap/${CONCEPT}.json`;
     const raw = (await get(url)) as {
       entityName?: string;
       units?: { USD?: SecFact[] };
@@ -71,7 +72,7 @@ async function main(): Promise<void> {
         cik: company.cik,
         ticker: company.ticker,
         entity_name: company.entity_name,
-        concept: "Revenues",
+        concept: CONCEPT,
         period_start: fact.start,
         period_end: fact.end,
         value_usd: fact.val,
@@ -94,8 +95,8 @@ async function main(): Promise<void> {
   );
 
   const frames: Record<string, unknown>[] = [];
-  for (const period of ["CY2017", "CY2018"]) {
-    const url = `${SEC_BASE}/frames/us-gaap/Revenues/USD/${period}.json`;
+  for (const period of (process.env.FRAMES ?? "CY2017,CY2018").split(",")) {
+    const url = `${SEC_BASE}/frames/us-gaap/${CONCEPT}/USD/${period}.json`;
     const raw = (await get(url)) as {
       frame?: string;
       data?: { cik?: number; entityName?: string; val?: number }[];
@@ -110,7 +111,7 @@ async function main(): Promise<void> {
       }));
     frames.push({
       frame: raw.frame ?? period,
-      concept: "Revenues",
+      concept: CONCEPT,
       unit: "USD",
       source_url: url,
       count: rows.length,
@@ -120,17 +121,16 @@ async function main(): Promise<void> {
   }
 
   const payload = {
-    source: "SEC XBRL companyconcept API, us-gaap/Revenues, USD",
+    source: `SEC XBRL companyconcept API, us-gaap/${CONCEPT}, USD`,
     retrieved_at: new Date().toISOString().slice(0, 10),
     window: WINDOW,
     companies: EDGAR_COMPANIES,
     coverage,
     facts,
   };
-  writeFileSync(resolve(OUT_DIR, "revenue-facts.json"), `${JSON.stringify(payload, null, 2)}\n`);
-  writeFileSync(resolve(OUT_DIR, "sec-frames.json"), `${JSON.stringify({ frames }, null, 2)}\n`);
-  console.log(`wrote fixtures/edgar/revenue-facts.json (${facts.length} facts)`);
-  console.log(`wrote fixtures/edgar/sec-frames.json`);
+  writeFileSync(resolve(OUT_DIR, `${OUT}-facts.json`), `${JSON.stringify(payload, null, 2)}\n`);
+  writeFileSync(resolve(OUT_DIR, OUT === "revenue" ? "sec-frames.json" : `sec-frames-${OUT}.json`), `${JSON.stringify({ frames }, null, 2)}\n`);
+  console.log(`wrote fixtures/edgar/${OUT}-facts.json (${facts.length} facts)`);
 }
 
 main().catch((err) => {

@@ -1,7 +1,7 @@
 {
   "id": "cassette_d2_edgar",
   "recorded_at": "2026-10-24",
-  "label": "labelled SAMPLE_MODE cassette built from a committed SEC companyconcept/frames sample plus recorded Nemotron responses for the critic, content-safety and embedding roles",
+  "label": "labelled SAMPLE_MODE cassette for analytics.sector_revenue_by_year, built from a committed SEC companyconcept/frames sample (Revenues) plus recorded Nemotron responses for the critic, content-safety and embedding roles",
   "entries": [
     {
       "tool": "catalog_search",
@@ -5226,25 +5226,25 @@
   "models": [
     {
       "agent": "DefenseCounsel",
-      "request_sha256": "0b16777976a49e652f5a43f8cd765946a7f7d129a9eb2490af1ce6ff641ecd93",
+      "request_sha256": "8a7c767e8a3282431d81fe1ecd37bb8590424cdfbb70889169b702aa29eb5c70",
       "response": {
-        "content": "{\n  \"objections\": [\n    {\n      \"claim\": \"FY2018 contains 322 duplicate rows across 7 source tables\",\n      \"severity\": \"high\",\n      \"exhibit_sha256\": \"f0ab60383ba97b9eab89abc8681fa811a6506eea48793ff7a576dff07aa4cab3\"\n    },\n    {\n      \"claim\": \"Apple Inc. 11 Revenues facts in 2018 contributed $1205.3B of the jump\",\n      \"severity\": \"high\",\n      \"exhibit_sha256\": \"66dc7ed7cdc39fb01011cb2e9659be6cfe979b0f823153358941196e9fbe9a14\"\n    },\n    {\n      \"claim\": \"Corrected Manufacturing is 1.125x ($49.6B) representing 3.8% of the reported jump\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"c6b11ff304ab9f37bd5ab64118684f6023a75900e24c03d1320a769c9990af8f\"\n    },\n    {\n      \"claim\": \"Tesla, Inc. grew 1.737x FY2017 to FY2018 and contributed $55.9B (4.3% of jump)\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"bfdc376020910ef941b56f6321ef0257e7c9d4bafa3a938f3f7b06128e3932bf\"\n    },\n    {\n      \"claim\": \"No ingestion gap exists because Zetaris holds 11 Apple facts and SEC endpoint returns 11\",\n      \"severity\": \"low\",\n      \"exhibit_sha256\": \"66dc7ed7cdc39fb01011cb2e9659be6cfe979b0f823153358941196e9fbe9a14\"\n    }\n  ],\n  \"summary\": \"Each claimed cause is critiqued for missing controls, unsupported quantitative claims, or insufficient evidence from the provided SHA256 records.\"\n}",
+        "content": "{\n  \"objections\": [\n    {\n      \"claim\": \"FY2018 contains 322 duplicate rows across 7 source tables\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"f0ab60383ba97b9eab89abc8681fa811a6506eea48793ff7a576dff07aa4cab3\"\n    },\n    {\n      \"claim\": \"Apple Inc. first appears in fiscal_year 2018, contributing $1205.3B of the jump\",\n      \"severity\": \"high\",\n      \"exhibit_sha256\": \"5170a0f1a6ab171733433d2693f7c29840c2a0e873a453d835835866ae2c33cf\"\n    },\n    {\n      \"claim\": \"Corrected Manufacturing accounts for only 3.8% of the reported jump\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"6564b5d5d4dc3122942fc2943d7f18daac6ce9771c739767f5c1d66521d6652124ca7d\"\n    }\n  ],\n  \"summary\": \"Each claimed cause is either unsupported by the cited evidence or misstates the data, as demonstrated by the referenced exhibit SHA256 values.\"\n}",
         "tool_calls": [],
         "usage": {
-          "prompt_tokens": 2620,
-          "completion_tokens": 5051
+          "prompt_tokens": 2657,
+          "completion_tokens": 4799
         },
         "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"
       }
     },
     {
       "agent": "SafetyGuard",
-      "request_sha256": "84b37217524270be3a83b32a1a41f105436365fde218b455d095af3112b55a57",
+      "request_sha256": "c0f45c132dfdd68bb62c9e7cffc074ac704f175b5e79654b7533d6585c078ecb",
       "response": {
         "content": "User Safety: safe\nResponse Safety: safe",
         "tool_calls": [],
         "usage": {
-          "prompt_tokens": 872,
+          "prompt_tokens": 889,
           "completion_tokens": 10
         },
         "model": "nvidia/nemotron-3.5-content-safety"
@@ -9377,26 +9377,39 @@
       }
     },
     {
-      "agent": "DefenseCounsel",
-      "request_sha256": "f0fb9873cf005b580884aee70fbebe9285a874537ece88d8e9f3587585ba1a6b",
+      "agent": "SafetyGuard",
+      "request_sha256": "605417d5869948bbe391e4c33dbf411fdde4771e562a47ff6c37531cfa16682a",
       "response": {
-        "content": "{\n  \"objections\": [\n    {\n      \"claim\": \"FY2018 jump is due to filing_year_duplication\",\n      \"severity\": \"high\",\n      \"exhibit_sha256\": \"f0ab60383ba97b9eab89abc8681fa811a6506eea48793ff7a576dff07aa4cab3\"\n    },\n    {\n      \"claim\": \"FY2018 jump is due to concept_switch_missing_history\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"discover_sources:4153389715fd937ccc0d45d6c937e86f1709097f54ca1b29d5e55a372d4de7aa\"\n    },\n    {\n      \"claim\": \"FY2018 jump is due to real_change (1.125x Manufacturing increase)\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"run_sql:c6b11ff304ab9f37bd5ab64118684f6023a75900e24c03d1320a769c9990af8f\"\n    },\n    {\n      \"claim\": \"FY2018 jump is due to single_filer_growth (Tesla 1.737x)\",\n      \"severity\": \"low\",\n      \"exhibit_sha256\": \"second_channel:5170a0f1a6ab171733433d2693f7c29840c2a0e873a453d835835866ae2c33cf\"\n    },\n    {\n      \"claim\": \"FY2018 jump is due to ingestion_gap\",\n      \"severity\": \"low\",\n      \"exhibit_sha256\": \"second_channel:66dc7ed7cdc39fb01011cb2e9659be6cfe979b0f823153358941196e9fbe9a14\"\n    }\n  ],\n  \"summary\": \"Each claimed cause lacks sufficient supporting evidence: duplicate rows exist but are not properly controlled; the replacement revenue concept is not validated against prior periods; the corrected manufacturing increase is minor relative to the reported jump and not substantiated by the annual fact rows; Tesla's growth is not evidenced by the 2017 revenue data; and the ingestion gap claim is contradicted by the SEC companyconcept records showing complete data.\"\n}",
+        "content": "User Safety: safe\nResponse Safety: safe",
         "tool_calls": [],
         "usage": {
-          "prompt_tokens": 2682,
-          "completion_tokens": 6790
+          "prompt_tokens": 900,
+          "completion_tokens": 10
+        },
+        "model": "nvidia/nemotron-3.5-content-safety"
+      }
+    },
+    {
+      "agent": "DefenseCounsel",
+      "request_sha256": "34515a7cf62234ba6e4f50ac53e00a932c1238f66d56d24971ef4b780244797b",
+      "response": {
+        "content": "{\n  \"objections\": [\n    {\n      \"claim\": \"FY2018 contains 322 duplicate rows across 7 source tables.\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"f0ab60383ba97b9eab89abc8681fa811a6506eea48793ff7a576dff07aa4cab3\"\n    },\n    {\n      \"claim\": \"Apple Inc. first appears in fiscal year 2018 and accounts for $1,205.3 B of the revenue jump.\",\n      \"severity\": \"high\",\n      \"exhibit_sha256\": \"4153389715fd937ccc0d45d6c937e86f1709097f54ca1b29d5e55a372d4de7aa\"\n    },\n    {\n      \"claim\": \"Corrected Manufacturing revenue is 1.125× ($49.6 B), representing 3.8 % of the reported jump.\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"3d2bca9bf44f217b4b0463972a693f6e15a8e60b3e922d9c84c59d8cb64925ee\"\n    },\n    {\n      \"claim\": \"Tesla’s growth is eliminated as a cause of the jump.\",\n      \"severity\": \"low\",\n      \"exhibit_sha256\": \"c6b11ff304ab9f37bd5ab64118684f6023a75900e24c03d1320a769c9990af8f\"\n    },\n    {\n      \"claim\": \"No ingestion gaps exist; all Apple Inc. facts are present.\",\n      \"severity\": \"medium\",\n      \"exhibit_sha256\": \"66dc7ed7cdc39fb01011cb2e9659be6cfe979b0f823153358941196e9fbe9a14\"\n    }\n  ],\n  \"summary\": \"Each claimed cause is not fully substantiated by the referenced evidence; duplicate counts, concept switches, corrected values, filer growth, and ingestion gaps lack direct verification.\"\n}",
+        "tool_calls": [],
+        "usage": {
+          "prompt_tokens": 2719,
+          "completion_tokens": 3360
         },
         "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"
       }
     },
     {
       "agent": "SafetyGuard",
-      "request_sha256": "9bbeb29025738417b129181dd052655082ea636ec4b7ed5c00f79d18555a4f63",
+      "request_sha256": "4f2e3cfc8470b5366beec0a8fabaf3d24643f446b877bfa65e7a4978c6fbc374",
       "response": {
         "content": "User Safety: safe\nResponse Safety: safe",
         "tool_calls": [],
         "usage": {
-          "prompt_tokens": 879,
+          "prompt_tokens": 882,
           "completion_tokens": 10
         },
         "model": "nvidia/nemotron-3.5-content-safety"

@@ -355,6 +355,7 @@ export type DiscoveryResult = {
   current_concept: string;
   current_annual_facts: number;
   replacement_concept: string | null;
+  replacement_relation?: "replacement" | "prior_history" | null;
   replacement_reason: string;
   candidates: DiscoveryCandidate[];
   peers: { ticker: string; table: string; sic_division: string }[];

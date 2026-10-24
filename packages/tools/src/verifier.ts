@@ -55,7 +55,7 @@ type ShadowShape = {
   columnsOk: boolean;
 };
 
-const SHADOW_COLUMNS = ["sic_division", "fiscal_year", "revenue_usd"];
+const SHADOW_COLUMNS = ["sic_division", "fiscal_year", "<value column>"];
 const FRAME_TOLERANCE = 0.005;
 
 export function verifyRepair(input: VerifierInput): VerificationResult {
@@ -154,7 +154,11 @@ export function verifyRepair(input: VerifierInput): VerificationResult {
 function readShadow(result: SqlResult): ShadowShape {
   const division = result.columns.indexOf("sic_division");
   const year = result.columns.indexOf("fiscal_year");
-  const value = result.columns.indexOf("revenue_usd");
+  // The value column is the metric's own; it is the column that is neither
+  // the division nor the year.
+  const value = result.columns.findIndex(
+    (column) => column !== "sic_division" && column !== "fiscal_year",
+  );
   if (division < 0 || year < 0 || value < 0) {
     return { rows: [], map: new Map(), duplicateKeys: 0, columnsOk: false };
   }
@@ -249,11 +253,13 @@ function metricSanity(input: VerifierInput): {
   }
   const prior = seriesValue(input.canonicalSeries, onset.segment, `CY${onset.prior_period}`);
   const now = seriesValue(input.canonicalSeries, onset.segment, `CY${onset.period}`);
-  if (prior === undefined || now === undefined || prior <= 0 || now <= 0) {
-    return { ok: false, detail: "corrected onset or prior value is missing or non-positive", numbers: {} };
+  if (prior === undefined || now === undefined || prior === 0) {
+    return { ok: false, detail: "corrected onset or prior value is missing or zero", numbers: {} };
   }
   const delta = now - prior;
-  const ratio = now / prior;
+  // Net measures can be negative; the ratio is taken on magnitudes so a loss
+  // year is still sanity-checked rather than rejected.
+  const ratio = Math.abs(now) / Math.abs(prior);
   const counterfactualDelta = input.counterfactual.corrected_delta;
   const deltaAgrees = Math.abs(delta - counterfactualDelta) <= 1;
   const shareValid =
@@ -293,7 +299,7 @@ export function checkFrames(
     for (const row of frame.result.rows) {
       const value = canonical.byCik.get(row.cik)?.get(frame.result.frame);
       if (value === undefined || row.value_usd === 0) continue;
-      const diff = Math.abs(value - row.value_usd) / row.value_usd;
+      const diff = Math.abs(value - row.value_usd) / Math.abs(row.value_usd);
       maxDiff = Math.max(maxDiff, diff);
       checked += 1;
       if (diff <= FRAME_TOLERANCE) matched += 1;
@@ -317,7 +323,7 @@ function badRepairRejected(
     })
     .filter((row) => windowYears.has(Number(row[1])));
   const formCandidate = readShadow(
-    asSqlResult(SHADOW_COLUMNS, formRows),
+    asSqlResult(["sic_division", "fiscal_year", "value_usd"], formRows),
   );
   const formCheck = checkCells(expected, formCandidate);
 

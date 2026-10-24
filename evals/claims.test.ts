@@ -8,7 +8,7 @@ import type { ClaimCheck } from "./check_claims.ts";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const RESULT = resolve(ROOT, "evals/results/latest.json");
 
-test("the committed eval result has 18 passing claim checks", () => {
+test("the committed eval result has 20 passing claim checks", () => {
   const result = JSON.parse(readFileSync(RESULT, "utf8")) as {
     mode: string;
     cold: { exhibits: number; sample_mode: boolean };
@@ -20,7 +20,7 @@ test("the committed eval result has 18 passing claim checks", () => {
   assert.equal(result.cold.exhibits, 23);
   assert.equal(result.closed.exhibits, 33);
   assert.equal(result.closed.stage, "CLOSED");
-  assert.equal(result.claims.length, 18);
+  assert.equal(result.claims.length, 20);
   assert.deepEqual(
     result.claims.filter((claim) => !claim.ok).map((claim) => claim.id),
     [],

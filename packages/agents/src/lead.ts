@@ -27,6 +27,7 @@ import {
   emitComputedExhibit,
   inferLineage,
   metricHistory,
+  metricSpec,
   nimClientFor,
   readBuckets,
   readCoverage,
@@ -57,8 +58,6 @@ import { runRepair } from "./repair.ts";
 
 export const SAMPLE_EMBED_MODEL = "nvidia/nemotron-3.5-embed-1b";
 
-/** The concept the EDGAR revenue tables are built from. */
-const REVENUE_CONCEPT = "Revenues";
 
 export type ModelRole = "critic" | "safety" | "embed";
 
@@ -87,6 +86,7 @@ export async function runInvestigation(
 ): Promise<CaseState> {
   const rt = input.rt;
   const grain = input.grain ?? "fiscal_year";
+  const spec = metricSpec(input.state.metric);
   const exhibits: Exhibit[] = [];
   let state = advance(input.state, "SCOPING");
 
@@ -149,13 +149,18 @@ export async function runInvestigation(
   });
 
   state = advance(state, "EVIDENCE");
-  const coverageResult = await runSql(rt, companyBucketsSql(), "company coverage by fiscal year");
-  const duplicationResult = await runSql(rt, duplicationSql(), "duplicate rows per company");
-  const bucketResult = await runSql(rt, bucketSql(), "fiscal-year bucket profile");
+  const coverageResult = await runSql(rt, companyBucketsSql(spec.tables), "company coverage by fiscal year");
+  const duplicationResult = await runSql(rt, duplicationSql(spec.tables), "duplicate rows per company");
+  const bucketResult = await runSql(
+    rt,
+    bucketSql(spec.window.from, spec.window.to, spec.tables),
+    "fiscal-year bucket profile",
+  );
   const canonicalResult = await runSql(
     rt,
     canonicalFactsSql(
       rt.sampleMode ? undefined : process.env.ZETARIS_SIC_TABLE || undefined,
+      spec.tables,
     ),
     "annual fact rows for the corrected series",
   );
@@ -187,7 +192,7 @@ export async function runInvestigation(
     input_summary: `${filers.length} filers in coverage; onset ${onset?.period ?? "none"}`,
     output_summary:
       `focus ${focus?.entity_name ?? "none"}` +
-      (selection.concentrated ? ` (all facts in ${onset?.period})` : "") +
+      (selection.newcomer ? ` (first appears in ${onset?.period})` : "") +
       (selection.stopped ? `; history stops: ${selection.stopped.entity_name} (${selection.stopped.last_year})` : ""),
     status: "success",
     latency_ms: 0,
@@ -201,8 +206,9 @@ export async function runInvestigation(
           kind: "sec_companyfacts",
           cik: focus.cik,
           entity_name: focus.entity_name,
-          concept: REVENUE_CONCEPT,
+          concept: spec.concept,
           sic_division: onset.segment,
+          ...(spec.concept === "Revenues" ? {} : { concept_family: spec.concept }),
         })
       : undefined;
   if (discovery) {
@@ -213,7 +219,7 @@ export async function runInvestigation(
   const frames: { period: string; result: SecFramesResult; exhibit: Exhibit }[] = [];
   const cikFilter = filers.map((filer) => filer.cik);
   for (const period of periods) {
-    const channel = await secondChannel(rt, secFramesArgs(period, cikFilter));
+    const channel = await secondChannel(rt, secFramesArgs(period, cikFilter, spec.concept));
     frames.push({
       period,
       result: channel.result as SecFramesResult,
@@ -222,7 +228,7 @@ export async function runInvestigation(
     exhibits.push(channel.exhibit);
   }
   const concept = focus
-    ? await secondChannel(rt, secCompanyConceptArgs(focus.cik, REVENUE_CONCEPT))
+    ? await secondChannel(rt, secCompanyConceptArgs(focus.cik, spec.concept))
     : undefined;
   if (concept) exhibits.push(concept.exhibit);
 

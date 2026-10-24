@@ -10,6 +10,8 @@ Outputs are **data-quality findings on public filings, not investment advice.**
 
 ## The problem and the user
 
+In October 2020, 15,841 positive COVID tests were left out of England's daily numbers because the case file hit a spreadsheet size limit; an estimated 48,000–50,000 close contacts were never traced. A wrong number on a dashboard is not an abstract risk.
+
 Dana, an analytics engineer, watches Manufacturing revenue double on a dashboard built from seven fragmented SEC-derived tables behind a naive metric view. The CFO meeting is in an hour. Last quarter a number like this went into the board deck; it was a duplicate, and trust in the dashboard has not recovered. The expensive question is not "what is the new number?" It is "is this number real, and which source caused it?" The usual failure modes are duplication, a missing source, a concept/unit/schema change, an ingestion gap, or genuine growth. Most tools return a chart or a fluent paragraph. Exhibit A returns an auditable adjudication and, when the number is wrong, a proven and approved fix.
 
 The primary user is a data-quality or analytics engineer who has to explain a movement to a CFO, a data council, or an incident review. The secondary user is an agent that needs a trustworthy case record to reuse.
@@ -72,7 +74,7 @@ The project was developed in Cursor Agent mode with project rules in `.cursor/ru
 ## What is unique
 
 - **Adjudication, not summarization.** A model can object; code decides. The verdict has shares, onset timing and a gate result.
-- **Suspects come from the data.** The filers blamed or cleared are selected from the coverage rows, so the same investigator runs on a different metric without a code change to the hypotheses.
+- **Suspects come from the data, and it is shown.** The filers blamed or cleared are selected from the coverage rows. A second metric, sector net income from SEC `NetIncomeLoss`, runs on the same investigator and reaches a different verdict (`DATA_ARTIFACT`, IBM as the late-starting source whose earlier periods were filed under `ProfitLoss`, real change eliminated because the corrected series fell). Only the metric spec differs; the eval checks it.
 - **The independent second channel is part of the verdict.** SEC frames/companyconcept must corroborate the corrected series, or the artifact claim is downgraded.
 - **The repair is proven before it is written.** Shadow view, signed contract, seven verifier invariants and two bad-repair probes come before operator approval.
 - **The writeback is auditable.** The final view and the USL are re-read through a separate session and the original reported view hash must be unchanged; the live close is committed as evidence.

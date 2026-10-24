@@ -30,7 +30,21 @@ const svgEl = (tag, attrs = {}) => {
   return node;
 };
 
+const STATIC = Boolean(window.EXHIBIT_A_STATIC);
+
+/* The static export (GitHub Pages) serves JSON files instead of the API.
+   Re-runs execute tools, so they need the local viewer. */
 async function api(path, options) {
+  if (STATIC) {
+    if (options?.method === "POST") {
+      throw new Error("re-runs execute the recorded tool; run the local viewer (npm run web) to re-run");
+    }
+    const match = path.match(/^\/api\/cases(?:\/([^/]+))?$/);
+    const file = match?.[1] ? `./data/${decodeURIComponent(match[1])}.json` : "./data/cases.json";
+    const response = await fetch(file);
+    if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+    return response.json();
+  }
   const response = await fetch(path, options);
   const body = await response.json();
   if (!response.ok) throw new Error(body.error || `${response.status} ${response.statusText}`);
@@ -96,6 +110,7 @@ function renderCaseList() {
       const button = el("button", "case-item");
       button.type = "button";
       button.append(el("span", "q", item.question));
+      button.append(el("span", "metric", item.metric));
       const meta = el("span", "m");
       meta.append(
         pill(item.verdict || item.stage, verdictClass(item.verdict)),
@@ -143,7 +158,7 @@ function render() {
   const s = state.current;
   if (!s) return;
   const mode = $("mode-badge");
-  mode.textContent = s.sample_mode ? "SAMPLE_MODE replay" : "live Zetaris";
+  mode.textContent = STATIC ? "static export · read-only" : s.sample_mode ? "SAMPLE_MODE replay" : "live Zetaris";
   mode.className = `pill ${s.sample_mode ? "info" : "good"}`;
 
   $("case-id").textContent = s.id;
@@ -216,7 +231,7 @@ function historySeries(s) {
   if (!exhibit?.result?.columns) return null;
   const cols = exhibit.result.columns;
   const gi = cols.indexOf(grain);
-  const vi = cols.findIndex((c) => /revenue|value|amount|total|usd/i.test(c) && c !== grain);
+  const vi = cols.findIndex((c) => /revenue|income|value|amount|total|usd/i.test(c) && c !== grain);
   const si = cols.findIndex((c, i) => i !== gi && i !== vi);
   if (gi < 0 || vi < 0) return null;
   const bySegment = new Map();

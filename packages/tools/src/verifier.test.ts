@@ -131,6 +131,7 @@ const counterfactual: CounterfactualResult = {
   corrected_delta: 10,
   explained_share: 0.5,
   unexplained_share: 0.5,
+      corrected_direction: "same",
   rule: "test",
 };
 

@@ -26,7 +26,7 @@ import {
 } from "@exhibit-a/core";
 import type { MemoryEmbedder } from "@exhibit-a/engines";
 import { NimClient, SAMPLE_SAFETY_MODEL, type ChatRequest, type EmbedRequest } from "@exhibit-a/llm";
-import { createRuntime, repairContractSecret } from "@exhibit-a/tools";
+import { REVENUE_METRIC, createRuntime, metricSpec, repairContractSecret } from "@exhibit-a/tools";
 import {
   SAMPLE_CRITIC_MODEL,
   SAMPLE_EMBED_MODEL,
@@ -37,10 +37,12 @@ import {
 } from "../packages/agents/src/index.ts";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const CASSETTE_PATH = resolve(ROOT, "fixtures/cassettes/d2-edgar-investigation.json");
-const VIEW_SQL = readFileSync(resolve(ROOT, "analytics/sector_revenue_by_year.sql"), "utf8").trim();
-const QUESTION = "is the FY2018 jump real?";
-const METRIC = "analytics.sector_revenue_by_year";
+// npm run record:nim [-- <metric view> ["<question>"]]
+const METRIC = process.argv[2] ?? REVENUE_METRIC.view;
+const SPEC = metricSpec(METRIC);
+const CASSETTE_PATH = resolve(ROOT, SPEC.paths.cassette);
+const VIEW_SQL = readFileSync(resolve(ROOT, SPEC.paths.viewSql), "utf8").trim();
+const QUESTION = process.argv[3] ?? SPEC.sampleQuestion;
 
 loadEnv(ROOT);
 process.env.EXHIBIT_A_QUIET = "1";

@@ -16,10 +16,8 @@ import {
 } from "./counterfactual.ts";
 import { executeSqlTool, emitComputedExhibit, nimClientFor, type ToolRuntime } from "./runtime.ts";
 import { secondChannel, type SecondChannelArgs, type SecFramesResult } from "./second-channel.ts";
-import {
-  CORRECTED_METRIC,
-  repairContractSecret,
-} from "./repair.ts";
+import { repairContractSecret } from "./repair.ts";
+import { REVENUE_METRIC, metricNames, specForScope } from "./metrics.ts";
 import {
   assertFinalContract,
   parseUslModel,
@@ -154,11 +152,12 @@ export async function rerunExhibit(rt: ToolRuntime, exhibit: Exhibit): Promise<R
       sample_mode: boolean;
       note?: string;
     };
+    const names = metricNames(specForScope(args.contract.scope) ?? REVENUE_METRIC);
     verifyContract(args.contract, repairContractSecret(args.sample_mode), {
       requireApproved: true,
-      scope: CORRECTED_METRIC,
+      scope: names.correctedMetric,
     });
-    assertFinalContract(args.contract);
+    assertFinalContract(args.contract, names);
     again = emitComputedExhibit({
       rt,
       tool: "writeback",
@@ -201,9 +200,12 @@ export async function rerunExhibit(rt: ToolRuntime, exhibit: Exhibit): Promise<R
     const resultOf = (id?: string): SqlResult | undefined =>
       get(id)?.result as SqlResult | undefined;
     const uslLoad = resultOf(args.usl_load_exhibit_id);
+    const written = (exhibit.args as { written_metric?: string }).written_metric;
+    const names = metricNames(specForScope(written ? [written] : []) ?? REVENUE_METRIC);
     const verification = verifyWriteback({
+      names,
       contractId: args.contract_id,
-      writtenMetric: CORRECTED_METRIC,
+      writtenMetric: names.correctedMetric,
       contractOk: true,
       writeExecuted: args.write_executed ?? true,
       caseId: exhibit.case_id,

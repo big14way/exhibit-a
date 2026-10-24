@@ -1,0 +1,53 @@
+{
+  "company": "International Business Machines Corporation",
+  "cik": "0000051143",
+  "current_concept": "NetIncomeLoss",
+  "current_annual_facts": 11,
+  "replacement_concept": "ProfitLoss",
+  "replacement_relation": "prior_history",
+  "replacement_reason": "NetIncomeLoss has 11 annual 10-K facts starting 2015-12-31; ProfitLoss has 16 annual 10-K facts starting 2007-12-31, so the earlier periods were filed under a different concept, not lost.",
+  "candidates": [
+    {
+      "concept": "NetIncomeLoss",
+      "annual_facts": 11,
+      "first_period": "2015-12-31",
+      "last_period": "2025-12-31",
+      "continuous": true,
+      "latest_forms": [
+        "10-K"
+      ],
+      "score": 35
+    },
+    {
+      "concept": "ProfitLoss",
+      "annual_facts": 16,
+      "first_period": "2007-12-31",
+      "last_period": "2022-12-31",
+      "continuous": false,
+      "latest_forms": [
+        "10-K"
+      ],
+      "score": 34
+    },
+    {
+      "concept": "SalesTypeLeaseSellingProfitLoss",
+      "annual_facts": 7,
+      "first_period": "2019-12-31",
+      "last_period": "2025-12-31",
+      "continuous": true,
+      "latest_forms": [
+        "10-K"
+      ],
+      "score": 23
+    }
+  ],
+  "peers": [
+    {
+      "ticker": "ORCL",
+      "table": "edgar.oracle_revenue_table",
+      "sic_division": "Services"
+    }
+  ],
+  "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000051143.json",
+  "rule": "NetIncomeLoss family concept must have USD annual 10-K facts (330-400 days) and either extend the current chain (ending within 421 days) or precede it"
+}

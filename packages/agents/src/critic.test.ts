@@ -32,6 +32,7 @@ function fixture() {
       result: {
         explained_share: 0.96168,
         unexplained_share: 0.03832,
+    corrected_direction: "same",
       },
       case_id: caseId,
       agent: "LeadInvestigator",
@@ -93,6 +94,7 @@ function fixture() {
     segment: "Manufacturing",
     prior_period: 2017,
     onset_period: 2018,
+    corrected_direction: "same",
     naive_delta: 1294999084000,
     corrected_prior: 1455942689000,
     corrected_now: 1511000000000,

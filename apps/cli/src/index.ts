@@ -16,8 +16,11 @@ import {
   type Cassette,
 } from "@exhibit-a/core";
 import {
+  METRICS,
+  REVENUE_METRIC,
   createRuntime,
   fromEnv,
+  metricSpec,
   repairContractSecret,
   rerunExhibit,
   ZetarisClient,
@@ -26,15 +29,14 @@ import { approveWriteback, runInvestigation, runWriteback } from "@exhibit-a/age
 import { isSampleMode, loadEnv } from "./env.ts";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
-const DEFAULT_METRIC = "analytics.sector_revenue_by_year";
-const DEFAULT_CASSETTE = resolve(ROOT, "fixtures/cassettes/d2-edgar-investigation.json");
-const DEFAULT_VIEW_SQL = resolve(ROOT, "analytics/sector_revenue_by_year.sql");
+const DEFAULT_METRIC = REVENUE_METRIC.view;
 
 function usage(): never {
   console.error(`Exhibit A — data-quality findings, not investment advice.
 
 Usage:
   exhibit-a investigate "<question>" [--metric <view>] [--cassette <path>] [--grain <column>]
+      metrics: ${METRICS.map((spec) => spec.view).join(" | ")}
   exhibit-a approve <case_id>
   exhibit-a writeback <case_id>
   exhibit-a rerun <exhibit_id>
@@ -67,13 +69,14 @@ function takeFlag(args: string[], name: string): string | undefined {
 
 async function investigate(argv: string[]): Promise<void> {
   const metric = takeFlag(argv, "--metric") ?? DEFAULT_METRIC;
-  const cassettePath = takeFlag(argv, "--cassette") ?? DEFAULT_CASSETTE;
+  const spec = metricSpec(metric);
+  const cassettePath = takeFlag(argv, "--cassette") ?? resolve(ROOT, spec.paths.cassette);
   const grain = takeFlag(argv, "--grain") ?? "fiscal_year";
   const question = argv.filter((a) => !a.startsWith("--")).join(" ").trim()
     || `is the movement in ${metric} real?`;
   const sampleMode = isSampleMode();
   const cassette: Cassette | undefined = sampleMode ? loadCassette(cassettePath) : undefined;
-  const viewSql = readFileSync(DEFAULT_VIEW_SQL, "utf8").trim();
+  const viewSql = readFileSync(resolve(ROOT, spec.paths.viewSql), "utf8").trim();
 
   const state: CaseState = {
     id: newId("case"),
@@ -217,7 +220,7 @@ async function writeback(caseId?: string): Promise<void> {
   if (!caseId) usage();
   const state = loadState(caseId);
   assertModeMatches(state);
-  const cassette = state.sample_mode ? loadCassette(DEFAULT_CASSETTE) : undefined;
+  const cassette = state.sample_mode ? loadCassette(resolve(ROOT, metricSpec(state.metric).paths.cassette)) : undefined;
   const rt = createRuntime({
     root: ROOT,
     caseId: state.id,
@@ -270,7 +273,8 @@ async function rerun(exhibitId?: string): Promise<void> {
     process.exit(1);
   }
   const sampleMode = isSampleMode();
-  const cassette = sampleMode ? loadCassette(DEFAULT_CASSETTE) : undefined;
+  const owner = loadState(exhibit.case_id);
+  const cassette = sampleMode ? loadCassette(resolve(ROOT, metricSpec(owner.metric).paths.cassette)) : undefined;
   const rt = createRuntime({
     root: ROOT,
     caseId: exhibit.case_id,

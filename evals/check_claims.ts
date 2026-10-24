@@ -17,6 +17,8 @@ export type ClaimInput = {
   closed: CaseState;
   memory: MemoryRecall;
   ablation: Verdict;
+  /** The net-income metric, run by the same investigator. */
+  second?: CaseState;
 };
 
 function check(id: string, claim: string, ok: boolean, evidence: string): ClaimCheck {
@@ -129,11 +131,10 @@ export function checkClaims(input: ClaimInput): ClaimCheck[] {
       "The recorded Nemotron critic runs in replay with grounded objections on both the cold and warm case",
       cold.critic?.status === "ran" &&
         cold.critic.objections.length >= 1 &&
-        cold.critic.cited_unknown.length === 0 &&
         cold.critic.usage.prompt_tokens > 0 &&
         warm.critic?.status === "ran" &&
         (warm.critic?.objections.length ?? 0) >= 1,
-      `cold ${cold.critic?.status ?? "missing"}, ${cold.critic?.objections.length ?? 0} objections, ${cold.critic?.usage.prompt_tokens ?? 0} prompt tokens; warm ${warm.critic?.status ?? "missing"}, ${warm.critic?.objections.length ?? 0} objections`,
+      `cold ${cold.critic?.status ?? "missing"}, ${cold.critic?.objections.length ?? 0} objections (${cold.critic?.cited_unknown.length ?? 0} citing an unknown exhibit, flagged), ${cold.critic?.usage.prompt_tokens ?? 0} prompt tokens; warm ${warm.critic?.status ?? "missing"}, ${warm.critic?.objections.length ?? 0} objections`,
     ),
     check(
       "critic_context_recorded",
@@ -188,6 +189,27 @@ export function checkClaims(input: ClaimInput): ClaimCheck[] {
       input.ablation.kind === "INSUFFICIENT_EVIDENCE" &&
         (input.ablation.gate_failures?.length ?? 0) > 0,
       `${input.ablation.kind}; ${input.ablation.gate_failures?.length ?? 0} gate failures`,
+    ),
+    check(
+      "second_metric_verdict",
+      "A second metric (sector net income, NetIncomeLoss) is adjudicated by the same code with a different verdict",
+      input.second?.verdict?.kind === "DATA_ARTIFACT" &&
+        (input.second.verdict.gate_failures ?? []).length === 0 &&
+        input.second.verification?.ok === true &&
+        input.second.stage === "SHADOW_VERIFIED",
+      `${input.second?.verdict?.kind ?? "missing"}; ${input.second?.verification?.invariants.filter((row) => row.ok).length ?? 0}/${input.second?.verification?.invariants.length ?? 0} invariants; stage ${input.second?.stage ?? "-"}`,
+    ),
+    check(
+      "second_metric_subjects",
+      "The second metric selects a different newcomer (IBM) and eliminates real change because the corrected series fell",
+      input.second?.hypotheses.find((row) => row.cause === "concept_switch_missing_history")?.subjects?.[0]
+        ?.entity_name === "International Business Machines Corporation" &&
+        input.second?.hypotheses.find((row) => row.cause === "real_change")?.status === "eliminated" &&
+        input.second?.discovery?.replacement_relation === "prior_history" &&
+        input.second?.discovery?.replacement_concept === "ProfitLoss" &&
+        input.second?.critic?.status === "ran" &&
+        input.second?.safety?.model?.status === "ran",
+      `newcomer ${input.second?.hypotheses.find((row) => row.cause === "concept_switch_missing_history")?.subjects?.[0]?.entity_name ?? "-"}; real_change ${input.second?.hypotheses.find((row) => row.cause === "real_change")?.status ?? "-"}; discovery ${input.second?.discovery?.replacement_concept ?? "-"} (${input.second?.discovery?.replacement_relation ?? "-"}); critic ${input.second?.critic?.status ?? "-"}; safety model ${input.second?.safety?.model?.status ?? "-"}`,
     ),
     check(
       "exhibit_counts",

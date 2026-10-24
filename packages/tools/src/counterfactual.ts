@@ -22,6 +22,7 @@ export type CounterfactualResult = {
   corrected_delta: number;
   explained_share: number;
   unexplained_share: number;
+  corrected_direction: "same" | "opposite";
   rule: string;
 };
 
@@ -33,10 +34,15 @@ export function computeCounterfactual(
   const now = seriesValue(series, args.segment, `CY${args.onset_period}`);
   if (prior === undefined || now === undefined) return null;
   const correctedDelta = now - prior;
+  // When the corrected series moves the other way (or not at all), the
+  // reported move is entirely artifact: the share is clamped to 1 and the
+  // direction is recorded so the finding can say the real move was a decline.
+  const opposite = args.naive_delta !== 0 && correctedDelta * args.naive_delta <= 0;
   const explained =
-    args.naive_delta === 0 ? 0 : 1 - correctedDelta / args.naive_delta;
-  const explainedShare = round(explained);
+    args.naive_delta === 0 ? 0 : opposite ? 1 : 1 - correctedDelta / args.naive_delta;
+  const explainedShare = round(Math.max(0, Math.min(1, explained)));
   return {
+    corrected_direction: opposite ? "opposite" : "same",
     metric: args.view,
     segment: args.segment,
     prior_period: args.prior_period,
@@ -47,7 +53,7 @@ export function computeCounterfactual(
     corrected_delta: correctedDelta,
     explained_share: explainedShare,
     unexplained_share: round(1 - explainedShare),
-    rule: "explained share = 1 - (corrected period delta / reported period delta)",
+    rule: "explained share = 1 - (corrected period delta / reported period delta), clamped to [0, 1]; opposite-direction corrected moves count as fully explained",
   };
 }
 

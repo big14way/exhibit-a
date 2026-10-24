@@ -15,9 +15,11 @@ Every claim carries an *exhibit*: the exact SQL that ran, its result hash, and a
 
 Outputs are **data-quality findings on public filings, not investment advice.**
 
-## Who it is for
+## Why this matters
 
-Dana is an analytics engineer. Her revenue dashboard runs on seven SEC filing tables behind one naive metric view, and Manufacturing revenue just doubled. The CFO meeting is in an hour. Last quarter a number like this went into the board deck; it was a duplicate, and trust in the dashboard has not recovered. Duplication, a missing source, a concept switch, an ingestion gap and real growth look identical on a chart, and a confident paragraph cannot be re-run. Exhibit A gives her a verdict she can defend: the share of the move that is an artifact, the share that is real, the SQL behind each claim, and a proven, approved fix.
+In October 2020, 15,841 positive COVID tests were left out of England's daily case numbers for eight days because the case file hit a spreadsheet size limit. The patients were told; an estimated 48,000–50,000 of their close contacts were never traced ([The Register](https://www.theregister.com/2020/10/05/excel_england_coronavirus_contact_error/), [The Conversation](https://theconversation.com/why-you-should-never-use-excel-to-count-coronavirus-cases-147681)). The number on the dashboard was wrong, nobody could tell from the chart, and people acted on it.
+
+Analytics teams meet the same failure every week at smaller stakes. Dana is an analytics engineer. Her revenue dashboard runs on seven SEC filing tables behind one naive metric view, and Manufacturing revenue just doubled. The CFO meeting is in an hour. Duplication, a missing source, a concept switch, an ingestion gap and real growth look identical on a chart, and a confident paragraph cannot be re-run. Exhibit A gives her a verdict she can defend: the share of the move that is an artifact, the share that is real, the SQL behind each claim, and a proven, approved fix.
 
 ## Quick start (no keys, no GPU)
 
@@ -53,6 +55,24 @@ On the committed sample (`fixtures/cases/sample/case_sample_closed`):
 **Verdict: `MIXED (filing_year_duplication=96.2%, real_change=3.8%)`, gate pass, unexplained 0.0%.**
 
 The investigator walks: H-MEM recall → catalog → describe → `INFER SQLTABLE` lineage → baseline onset → five hypotheses → evidence (coverage, duplication, buckets, canonical facts) → filer selection from the evidence → Scout discovery → SEC second channel → counterfactual → Defense Counsel critique → two-layer content safety → code-gate adjudication → repair plan → signed shadow write → shadow verifier. It writes **23 exhibits**; the close adds the writeback/readback exhibits for **33**.
+
+## A second metric, same code
+
+Generality is demonstrated, not claimed. `analytics.sector_net_income_by_year` sums SEC `NetIncomeLoss` facts the same naive way, from its own fixture (`fixtures/edgar/netincome-facts.json`, `sec-frames-netincome.json`, `ibm-netincome-discovery.json`) and cassette (`fixtures/cassettes/d3-netincome-investigation.json`). The investigator, hypotheses, gate, repair and verifier are unchanged; only the metric spec (`packages/tools/src/metrics.ts`) differs.
+
+```bash
+npm run cli -- investigate "is the FY2017 Services net income jump real?" --metric analytics.sector_net_income_by_year
+```
+
+| Finding | Exhibit |
+|---|---|
+| Services FY2017 is **1.97x** FY2016 (+$63.2B), outside the band | metric history + baseline |
+| The filer that first appears in the onset period is **IBM** (39 facts, none in FY2016); Scout finds its earlier periods under `ProfitLoss` (16 annual 10-K facts), so the history is a concept switch, not a lost source | coverage + SEC companyfacts |
+| The corrected Services series **fell** 0.438x (−$12.0B): the reported jump has no real component; real change is **eliminated** | corrected series + SEC frames 10/10 |
+| Oracle, the fastest-growing filer in the segment, is 7.3% of the jump: eliminated | coverage |
+| Shadow verifier **7/7** | shadow verifier |
+
+**Verdict: `DATA_ARTIFACT (filing_year_duplication=100.0%)`, gate pass.** The same five hypotheses produce a different suspect, a different discovery relation (prior history rather than a forward replacement) and a different verdict, because the suspects are selected from the coverage rows and the shares come from the counterfactual.
 
 ## The viewer
 

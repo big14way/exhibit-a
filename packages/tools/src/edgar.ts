@@ -59,43 +59,53 @@ export const EDGAR_COMPANIES = [
   },
 ] as const;
 
-export function unionFactsSql(): string {
-  return EDGAR_COMPANIES.map((company) => `SELECT * FROM ${company.table}`).join("\n  UNION ALL\n  ");
+export type EdgarCompany = {
+  cik: string;
+  ticker: string;
+  entity_name: string;
+  table: string;
+  sic: string;
+  sic_division: string;
+};
+
+/** The source tables default to the revenue tables; a metric spec passes its own. */
+export function unionFactsSql(tables: readonly EdgarCompany[] = EDGAR_COMPANIES): string {
+  return tables.map((company) => `SELECT * FROM ${company.table}`).join("\n  UNION ALL\n  ");
 }
 
-export function companyBucketsSql(): string {
-  return EDGAR_COMPANIES.map(
+export function companyBucketsSql(tables: readonly EdgarCompany[] = EDGAR_COMPANIES): string {
+  return tables.map(
     (company) =>
       `SELECT '${company.cik}' AS cik, '${company.entity_name}' AS entity_name, fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd FROM ${company.table} GROUP BY fiscal_year`,
   ).join("\n  UNION ALL\n  ") + "\nORDER BY cik, fiscal_year";
 }
 
-export function duplicationSql(): string {
+export function duplicationSql(tables: readonly EdgarCompany[] = EDGAR_COMPANIES): string {
   return `SELECT cik, COUNT(*) AS rows_total, COUNT(DISTINCT period_end) AS distinct_periods, COUNT(*) - COUNT(DISTINCT period_end) AS duplicate_rows
 FROM (
-  ${unionFactsSql()}
+  ${unionFactsSql(tables)}
 ) f
 GROUP BY cik
 ORDER BY cik`;
 }
 
-export function bucketSql(startYear = 2016, endYear = 2019): string {
+export function bucketSql(startYear = 2016, endYear = 2019, tables: readonly EdgarCompany[] = EDGAR_COMPANIES): string {
   return `SELECT fiscal_year, COUNT(*) AS rows_n, COUNT(DISTINCT period_end) AS distinct_periods, SUM(value_usd) AS revenue_usd
 FROM (
-  ${unionFactsSql()}
+  ${unionFactsSql(tables)}
 ) f
 WHERE fiscal_year >= ${startYear} AND fiscal_year <= ${endYear}
 GROUP BY fiscal_year
 ORDER BY fiscal_year`;
 }
 
-export function canonicalFactsSql(sicTable = "sic_edgar_usl"): string {
+export function canonicalFactsSql(sicTable = "sic_edgar_usl", tables: readonly EdgarCompany[] = EDGAR_COMPANIES): string {
   if (!/^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)?$/.test(sicTable)) {
     throw new Error(`invalid SIC table name: ${sicTable}`);
   }
   return `SELECT s.sic_division, f.cik, f.period_start, f.period_end, f.period_frame, f.value_usd, f.filed_date
 FROM (
-  ${unionFactsSql()}
+  ${unionFactsSql(tables)}
 ) f
 LEFT JOIN ${sicTable} s ON s.cik = f.cik
 ORDER BY f.cik, f.period_end, f.filed_date`;

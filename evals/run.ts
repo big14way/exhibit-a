@@ -11,7 +11,7 @@ import {
   type CaseState,
 } from "@exhibit-a/core";
 import { approveWriteback, runInvestigation, runWriteback } from "@exhibit-a/agents";
-import { createRuntime, repairContractSecret } from "@exhibit-a/tools";
+import { NET_INCOME_METRIC, createRuntime, repairContractSecret } from "@exhibit-a/tools";
 import { checkClaims, claimsMarkdown, type ClaimCheck } from "./check_claims.ts";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -101,6 +101,7 @@ function stableJson(payload: unknown): string {
 
 async function main(): Promise<void> {
   const root = mkdtempSync(resolve(tmpdir(), "exhibit-a-eval-"));
+  const extraRoots: string[] = [];
   const cassette = loadCassette(CASSETTE);
   // Keep the question identical to the recorded sample so the committed NIM
   // response is a true replay, not a fabricated answer for a new prompt.
@@ -160,12 +161,32 @@ async function main(): Promise<void> {
       notes: ["ablation: counterfactual and second channel removed"],
     }).verdict;
 
+    // Second metric, same investigator: a different SEC concept, a different
+    // suspect and a different verdict, with no change to the hypothesis code.
+    const secondId = "case_eval_net_income";
+    const secondCassette = loadCassette(resolve(ROOT, NET_INCOME_METRIC.paths.cassette));
+    // Its own log directory: the second metric is a cold case of its own, not a
+    // warm case of the revenue metric.
+    const secondRoot = mkdtempSync(resolve(tmpdir(), "exhibit-a-eval-second-"));
+    extraRoots.push(secondRoot);
+    const second = await runInvestigation({
+      root: secondRoot,
+      state: {
+        ...makeState(secondId, NET_INCOME_METRIC.sampleQuestion),
+        metric: NET_INCOME_METRIC.view,
+      },
+      rt: createRuntime({ root: secondRoot, caseId: secondId, sampleMode: true, cassette: secondCassette }),
+      viewSql: readFileSync(resolve(ROOT, NET_INCOME_METRIC.paths.viewSql), "utf8").trim(),
+      grain: "fiscal_year",
+    });
+
     const claims: ClaimCheck[] = checkClaims({
       cold,
       warm,
       closed,
       memory: cold.memory,
       ablation,
+      second,
     });
 
     const payload = {
@@ -180,6 +201,7 @@ async function main(): Promise<void> {
         kind: ablation.kind,
         gate_failures: ablation.gate_failures ?? [],
       },
+      second_metric: summary(second),
       claims,
     };
     mkdirSync(RESULTS, { recursive: true });
@@ -196,6 +218,7 @@ async function main(): Promise<void> {
     }
   } finally {
     rmSync(root, { recursive: true, force: true });
+    for (const extra of extraRoots) rmSync(extra, { recursive: true, force: true });
   }
 }
 

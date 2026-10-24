@@ -1,0 +1,106 @@
+{
+  "frames": [
+    {
+      "frame": "CY2016",
+      "concept": "NetIncomeLoss",
+      "unit": "USD",
+      "source_url": "https://data.sec.gov/api/xbrl/frames/us-gaap/NetIncomeLoss/USD/CY2016.json",
+      "count": 5,
+      "rows": [
+        {
+          "cik": "0000051143",
+          "entity_name": "INTERNATIONAL BUSINESS MACHINES CORPORATION",
+          "value_usd": 11872000000
+        },
+        {
+          "cik": "0000104169",
+          "entity_name": "Walmart Inc.",
+          "value_usd": 13643000000
+        },
+        {
+          "cik": "0000320193",
+          "entity_name": "Apple Inc.",
+          "value_usd": 45687000000
+        },
+        {
+          "cik": "0001318605",
+          "entity_name": "Tesla, Inc.",
+          "value_usd": -674914000
+        },
+        {
+          "cik": "0001341439",
+          "entity_name": "Oracle Corporation",
+          "value_usd": 9452000000
+        }
+      ]
+    },
+    {
+      "frame": "CY2017",
+      "concept": "NetIncomeLoss",
+      "unit": "USD",
+      "source_url": "https://data.sec.gov/api/xbrl/frames/us-gaap/NetIncomeLoss/USD/CY2017.json",
+      "count": 5,
+      "rows": [
+        {
+          "cik": "0000051143",
+          "entity_name": "INTERNATIONAL BUSINESS MACHINES CORPORATION",
+          "value_usd": 5753000000
+        },
+        {
+          "cik": "0000104169",
+          "entity_name": "Walmart Inc.",
+          "value_usd": 9862000000
+        },
+        {
+          "cik": "0000320193",
+          "entity_name": "Apple Inc.",
+          "value_usd": 48351000000
+        },
+        {
+          "cik": "0001318605",
+          "entity_name": "Tesla, Inc.",
+          "value_usd": -1962000000
+        },
+        {
+          "cik": "0001341439",
+          "entity_name": "Oracle Corporation",
+          "value_usd": 3587000000
+        }
+      ]
+    },
+    {
+      "frame": "CY2018",
+      "concept": "NetIncomeLoss",
+      "unit": "USD",
+      "source_url": "https://data.sec.gov/api/xbrl/frames/us-gaap/NetIncomeLoss/USD/CY2018.json",
+      "count": 5,
+      "rows": [
+        {
+          "cik": "0000051143",
+          "entity_name": "INTERNATIONAL BUSINESS MACHINES CORPORATION",
+          "value_usd": 8728000000
+        },
+        {
+          "cik": "0000104169",
+          "entity_name": "Walmart Inc.",
+          "value_usd": 6670000000
+        },
+        {
+          "cik": "0000320193",
+          "entity_name": "Apple Inc.",
+          "value_usd": 59531000000
+        },
+        {
+          "cik": "0001318605",
+          "entity_name": "Tesla, Inc.",
+          "value_usd": -976000000
+        },
+        {
+          "cik": "0001341439",
+          "entity_name": "Oracle Corporation",
+          "value_usd": 11083000000
+        }
+      ]
+    }
+  ]
+}

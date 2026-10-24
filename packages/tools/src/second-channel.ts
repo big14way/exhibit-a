@@ -78,10 +78,10 @@ export async function secGet(url: string): Promise<unknown> {
   throw new Error(`SEC rate-limited or unavailable: ${url}`);
 }
 
-export function secFramesArgs(period: string, cikFilter: string[]): SecFramesArgs {
+export function secFramesArgs(period: string, cikFilter: string[], concept = "Revenues"): SecFramesArgs {
   return {
     kind: "sec_frames",
-    concept: "Revenues",
+    concept,
     unit: "USD",
     period,
     cik_filter: cikFilter.map(normalizeCik),

@@ -80,8 +80,8 @@ export function profileFilers(coverage: CoverageRow[]): FilerProfile[] {
 }
 
 export type FilerSelection = {
-  /** Every fact the filer has lands in the onset year. */
-  concentrated?: FilerProfile;
+  /** The filer first appears in the onset period (absent from the prior one). */
+  newcomer?: FilerProfile;
   /** The filer's history stops before the prior period. */
   stopped?: FilerProfile;
   /** The filer that contributes most to the reported delta. */
@@ -90,9 +90,9 @@ export type FilerSelection = {
 
 /**
  * Pick the filers the evidence points at. No company is named in code: the
- * concentrated filer is whoever has every fact in the onset year, the stopped
- * filer is whoever disappears before the prior period, and the focus filer is
- * the largest contributor to the reported delta.
+ * newcomer is whoever first appears in the onset period, the stopped filer is
+ * whoever disappears before the prior period, and the focus filer is the
+ * largest contributor to the reported delta.
  */
 export function selectFilers(
   filers: FilerProfile[],
@@ -101,20 +101,20 @@ export function selectFilers(
 ): FilerSelection {
   const revenueAt = (filer: FilerProfile, year: number): number =>
     filer.revenue_by_year.get(year) ?? 0;
-  const concentrated = filers
-    .filter((filer) => filer.years.length > 0 && filer.years.every((year) => year === onsetYear))
-    .sort((a, b) => revenueAt(b, onsetYear) - revenueAt(a, onsetYear))[0];
+  const newcomer = filers
+    .filter((filer) => filer.first_year === onsetYear && filer.years.includes(onsetYear))
+    .sort((a, b) => Math.abs(revenueAt(b, onsetYear)) - Math.abs(revenueAt(a, onsetYear)))[0];
   const stopped = filers
     .filter((filer) => filer.last_year < priorYear)
     .sort((a, b) => b.last_year - a.last_year)[0];
   const focus =
-    concentrated ??
+    newcomer ??
     [...filers].sort(
       (a, b) =>
-        revenueAt(b, onsetYear) - revenueAt(b, priorYear) -
-        (revenueAt(a, onsetYear) - revenueAt(a, priorYear)),
+        Math.abs(revenueAt(b, onsetYear) - revenueAt(b, priorYear)) -
+        Math.abs(revenueAt(a, onsetYear) - revenueAt(a, priorYear)),
     )[0];
-  return { concentrated, stopped, focus };
+  return { newcomer, stopped, focus };
 }
 
 /**
@@ -220,14 +220,14 @@ export function assessHypotheses(hypotheses: Hypothesis[], evidence: Evidence): 
   const bucket = evidence.buckets.find((row) => row.fiscal_year === onsetYear);
   const duplicateTotal = evidence.duplication.reduce((sum, row) => sum + row.duplicate_rows, 0);
   const filers = profileFilers(evidence.coverage);
-  const { concentrated, stopped, focus } = selectFilers(filers, onsetYear, priorYear);
+  const { newcomer, stopped, focus } = selectFilers(filers, onsetYear, priorYear);
   const grower = selectGrowthFiler(
     filers,
     evidence.segmentOf,
     onset.segment,
     onsetYear,
     priorYear,
-    concentrated?.cik,
+    newcomer?.cik,
   );
   const correctedNow = seriesValue(evidence.canonical, onset.segment, `CY${onsetYear}`);
   const correctedPrior = seriesValue(evidence.canonical, onset.segment, `CY${priorYear}`);
@@ -264,8 +264,9 @@ export function assessHypotheses(hypotheses: Hypothesis[], evidence: Evidence): 
         };
       }
       case "concept_switch_missing_history": {
-        const confirmed = concentrated !== undefined;
+        const confirmed = newcomer !== undefined;
         const replacement = evidence.discovery?.replacement_concept;
+        const relation = evidence.discovery?.replacement_relation ?? null;
         const replacementFacts = evidence.discovery?.candidates.find(
           (candidate) => candidate.concept === replacement,
         )?.annual_facts;
@@ -274,40 +275,46 @@ export function assessHypotheses(hypotheses: Hypothesis[], evidence: Evidence): 
           status: confirmed ? "confirmed" : "open",
           blamed: withIds([
             ...hypothesis.blamed,
-            ...(concentrated ? [`cik:${concentrated.cik}`] : []),
+            ...(newcomer ? [`cik:${newcomer.cik}`] : []),
             ...(stopped ? [`cik:${stopped.cik}`] : []),
           ]),
-          subjects: [...subject(concentrated, "concentrated in onset year"), ...subject(stopped, "history stops")],
+          subjects: [...subject(newcomer, "first appears in onset period"), ...subject(stopped, "history stops")],
           exhibit_ids: withIds([
             evidence.refs.companyBuckets,
             evidence.refs.concept,
             evidence.refs.discovery,
           ]),
           note: confirmed
-            ? `${concentrated.entity_name} has ${concentrated.rows_total} Revenues facts, all in fiscal_year ${onsetYear}; that contributes ${formatUsd(
-                (concentrated.revenue_by_year.get(onsetYear) ?? 0) -
-                  (concentrated.revenue_by_year.get(priorYear) ?? 0),
+            ? `${newcomer.entity_name} first appears in fiscal_year ${onsetYear} (${newcomer.rows_total} facts across ${newcomer.years.length} fiscal year${newcomer.years.length === 1 ? "" : "s"}, none in FY${priorYear}); that contributes ${formatUsd(
+                (newcomer.revenue_by_year.get(onsetYear) ?? 0) -
+                  (newcomer.revenue_by_year.get(priorYear) ?? 0),
               )} of the ${formatUsd(onset.delta)} jump.` +
               (stopped
-                ? ` ${stopped.entity_name} has no Revenues fact after fiscal_year ${stopped.last_year}.`
+                ? ` ${stopped.entity_name} has no fact after fiscal_year ${stopped.last_year}.`
                 : "") +
               (replacement
-                ? ` Scout found the replacement concept ${replacement} with ${replacementFacts ?? "more"} annual 10-K facts.`
-                : "")
-            : "no filer has its whole fact history inside the onset year",
+                ? relation === "prior_history"
+                  ? ` Scout found the earlier periods under ${replacement} (${replacementFacts ?? "more"} annual 10-K facts).`
+                  : ` Scout found the replacement concept ${replacement} with ${replacementFacts ?? "more"} annual 10-K facts.`
+                : evidence.discovery
+                  ? " Scout found no related concept covering the missing periods."
+                  : "")
+            : "no filer first appears in the onset period",
         };
       }
       case "real_change": {
+        const parityOk = parity.checked > 0 && parity.matched === parity.checked;
         const confirmed =
           correctedDelta !== undefined &&
           correctedDelta > 0 &&
           correctedRatio !== undefined &&
-          parity.checked > 0 &&
-          parity.matched === parity.checked;
+          parityOk;
+        const eliminated =
+          !confirmed && correctedDelta !== undefined && correctedDelta <= 0 && parityOk;
         return {
           ...hypothesis,
-          status: confirmed ? "confirmed" : "open",
-          share: realShare,
+          status: confirmed ? "confirmed" : eliminated ? "eliminated" : "open",
+          share: confirmed ? realShare : eliminated ? 0 : realShare,
           exhibit_ids: [
             evidence.refs.canonical,
             ...Object.values(evidence.refs.frames),
@@ -315,7 +322,9 @@ export function assessHypotheses(hypotheses: Hypothesis[], evidence: Evidence): 
           ],
           note: confirmed
             ? `Corrected ${onset.segment} is ${correctedRatio?.toFixed(3)}x (${formatUsd(correctedDelta)}); that is ${(100 * (realShare ?? 0)).toFixed(1)}% of the reported jump. SEC frames parity ${parity.matched}/${parity.checked}.`
-            : "corrected series did not survive with SEC frames parity",
+            : eliminated
+              ? `Corrected ${onset.segment} moved the other way (${formatUsd(correctedDelta)}, ${correctedRatio?.toFixed(3)}x); the reported jump has no real component. SEC frames parity ${parity.matched}/${parity.checked}.`
+              : "corrected series did not survive with SEC frames parity",
         };
       }
       case "single_filer_growth": {
@@ -385,7 +394,7 @@ export function checkParity(
     for (const row of frame.result.rows) {
       const value = canonical.byCik.get(row.cik)?.get(frame.result.frame);
       if (value === undefined || row.value_usd === 0) continue;
-      const diff = Math.abs(value - row.value_usd) / row.value_usd;
+      const diff = Math.abs(value - row.value_usd) / Math.abs(row.value_usd);
       maxDiff = Math.max(maxDiff, diff);
       checked += 1;
       if (diff <= 0.005) matched += 1;

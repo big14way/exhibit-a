@@ -1,5 +1,6 @@
 import type { DiscoveryCandidate, DiscoveryResult, Exhibit } from "@exhibit-a/core";
 import { EDGAR_COMPANIES } from "./edgar.ts";
+import { conceptFamily } from "./metrics.ts";
 import { executeFactTool, type ToolRuntime } from "./runtime.ts";
 import { fetchCompanyFacts, type CompanyFacts, type CompanyFact } from "./second-channel.ts";
 
@@ -9,11 +10,10 @@ export type DiscoverSourcesArgs = {
   entity_name: string;
   concept: string;
   sic_division: string;
+  /** Concept family label, so a non-revenue metric searches its own family. */
+  concept_family?: string;
 };
 
-const REVENUE_CONCEPT = /revenue|salesrevenue|contractwithcustomer/i;
-const NOT_REVENUE_CONCEPT =
-  /liability|deferred|increase|decrease|cost|obligation|remainingperformance|allowance/i;
 const ANNUAL_MIN_DAYS = 330;
 const ANNUAL_MAX_DAYS = 400;
 const STALE_DAYS = 421;
@@ -53,13 +53,11 @@ export function buildDiscoveryResult(
   args: Omit<DiscoverSourcesArgs, "kind">,
 ): DiscoveryResult {
   const usGaap = facts.facts["us-gaap"] ?? {};
+  const { family, exclude } = conceptFamily(args.concept);
+  const inFamily = (concept: string, label: string): boolean =>
+    family.test(concept) && !exclude.test(concept) && (family.test(label) || family.test(concept));
   const revenueFacts = Object.entries(usGaap)
-    .filter(
-      ([concept, item]) =>
-        REVENUE_CONCEPT.test(item.label ?? "") &&
-        REVENUE_CONCEPT.test(concept) &&
-        !NOT_REVENUE_CONCEPT.test(concept),
-    )
+    .filter(([concept, item]) => inFamily(concept, item.label ?? ""))
     .flatMap(([, item]) =>
       Object.entries(item.units ?? {})
         .filter(([unit]) => unit === "USD")
@@ -75,16 +73,11 @@ export function buildDiscoveryResult(
     (usGaap[args.concept]?.units?.USD ?? []) as CompanyFact[],
   );
   const currentLast = currentRows.at(-1)?.end ?? null;
+  const currentFirst = currentRows[0]?.end ?? null;
 
   const candidates: DiscoveryCandidate[] = [];
   for (const [concept, item] of Object.entries(usGaap)) {
-    if (
-      !REVENUE_CONCEPT.test(item.label ?? "") ||
-      !REVENUE_CONCEPT.test(concept) ||
-      NOT_REVENUE_CONCEPT.test(concept)
-    ) {
-      continue;
-    }
+    if (!inFamily(concept, item.label ?? "")) continue;
     const rows = annualRows((item.units?.USD ?? []) as CompanyFact[]);
     if (rows.length === 0) continue;
     const last = rows.at(-1)?.end ?? null;
@@ -93,11 +86,15 @@ export function buildDiscoveryResult(
     const extendsChain =
       last !== null &&
       (currentLast === null || new Date(last).getTime() >= new Date(currentLast).getTime());
+    const precedesChain =
+      first !== null &&
+      (currentFirst === null || new Date(first).getTime() < new Date(currentFirst).getTime());
     const score =
       rows.length * 2 +
       (continuous(rows, reference) ? 5 : 0) +
       (extendsChain ? 4 : 0) +
-      (concept.startsWith("Revenue") ? 3 : 0) +
+      (precedesChain ? 2 : 0) +
+      (concept.startsWith(args.concept.replace(/s$/, "")) ? 3 : 0) +
       (concept === args.concept ? 1 : 0);
     candidates.push({
       concept,
@@ -116,7 +113,10 @@ export function buildDiscoveryResult(
       a.concept.localeCompare(b.concept),
   );
 
-  const replacement =
+  // A replacement either extends the chain after the current concept stops
+  // (the current concept went dark) or covers the periods before it starts
+  // (the filer arrived late under this concept). Both explain missing history.
+  const forward =
     candidates.find(
       (candidate) =>
         candidate.concept !== args.concept &&
@@ -125,6 +125,23 @@ export function buildDiscoveryResult(
         (currentLast === null ||
           new Date(candidate.last_period).getTime() > new Date(currentLast).getTime()),
     ) ?? null;
+  const prior =
+    forward ??
+    candidates.find(
+      (candidate) =>
+        candidate.concept !== args.concept &&
+        candidate.first_period !== null &&
+        currentFirst !== null &&
+        new Date(candidate.first_period).getTime() < new Date(currentFirst).getTime() &&
+        candidate.annual_facts >= 2,
+    ) ??
+    null;
+  const replacement = forward ?? prior;
+  const relation: "replacement" | "prior_history" | null = forward
+    ? "replacement"
+    : prior
+      ? "prior_history"
+      : null;
 
   const peers = EDGAR_COMPANIES.filter(
     (company) =>
@@ -136,13 +153,17 @@ export function buildDiscoveryResult(
   }));
 
   const reason =
-    replacement && currentLast
+    replacement && currentLast && relation === "replacement"
       ? `${args.concept} has ${currentRows.length} annual 10-K facts ending ${currentLast}; ` +
         `${replacement.concept} has ${replacement.annual_facts} annual 10-K facts ending ${replacement.last_period} ` +
         `and a continuous chain, so the missing history is a concept switch, not a lost source.`
-      : currentLast
-        ? `${args.concept} has annual 10-K facts ending ${currentLast}; no replacement concept with a longer continuous chain was found.`
-        : `No annual 10-K facts found for ${args.concept}.`;
+      : replacement && relation === "prior_history"
+        ? `${args.concept} has ${currentRows.length} annual 10-K facts starting ${currentFirst}; ` +
+          `${replacement.concept} has ${replacement.annual_facts} annual 10-K facts starting ${replacement.first_period}, ` +
+          `so the earlier periods were filed under a different concept, not lost.`
+        : currentLast
+          ? `${args.concept} has annual 10-K facts ending ${currentLast}; no related concept with a longer chain was found.`
+          : `No annual 10-K facts found for ${args.concept}.`;
 
   return {
     company: args.entity_name,
@@ -150,12 +171,13 @@ export function buildDiscoveryResult(
     current_concept: args.concept,
     current_annual_facts: currentRows.length,
     replacement_concept: replacement?.concept ?? null,
+    replacement_relation: relation,
     replacement_reason: reason,
     candidates: candidates.slice(0, 8),
     peers,
     source_url: facts.source_url,
     rule:
-      "revenue concept must have USD annual 10-K facts (330-400 days), a chain ending within 421 days, and extend the stopped concept",
+      `${args.concept} family concept must have USD annual 10-K facts (330-400 days) and either extend the current chain (ending within 421 days) or precede it`,
   };
 }
 

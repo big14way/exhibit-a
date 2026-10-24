@@ -11,11 +11,9 @@ import {
 } from "@exhibit-a/core";
 import { auditMemory, rememberCase } from "@exhibit-a/engines";
 import {
-  CORRECTED_METRIC,
-  SHADOW_METRIC,
-  USL_ROW_RULE,
-  USL_TABLE_PATH,
   assertFinalContract,
+  metricNames,
+  metricSpec,
   buildFinalWriteContract,
   emitComputedExhibit,
   executeSqlTool,
@@ -31,6 +29,7 @@ import {
   uslRowDqSql,
   verifyWriteback,
   ZetarisClient,
+  type MetricNames,
   type ToolRuntime,
 } from "@exhibit-a/tools";
 
@@ -81,9 +80,11 @@ export function approveWriteback(input: ApprovalOptions): CaseState {
   if (!state.repair) {
     throw new Error("cannot approve a writeback without a repair plan");
   }
+  const spec = metricSpec(state.metric);
+  const names = metricNames(spec);
   if (state.contract) {
     verifyContract(state.contract, input.secret, {
-      scope: SHADOW_METRIC,
+      scope: names.shadowMetric,
       ignoreExpiry: true,
     });
   }
@@ -92,10 +93,11 @@ export function approveWriteback(input: ApprovalOptions): CaseState {
     secret: input.secret,
     sampleMode: input.sampleMode,
     approvedBy: input.approvedBy,
+    spec,
   });
   verifyContract(contract, input.secret, {
     requireApproved: true,
-    scope: CORRECTED_METRIC,
+    scope: names.correctedMetric,
   });
   // FAILED is normally terminal. This is the one explicit recovery path: the
   // operator re-approves after a catalog-only verifier failure, and the
@@ -148,10 +150,12 @@ export async function runWriteback(input: {
     throw new Error(`writeback needs AWAITING_APPROVAL; case is ${state.stage}`);
   }
   if (!state.repair) throw new Error("case has no repair plan");
-  assertFinalContract(contract);
+  const spec = metricSpec(state.metric);
+  const names = metricNames(spec);
+  assertFinalContract(contract, names);
   verifyContract(contract, secret, {
     requireApproved: true,
-    scope: CORRECTED_METRIC,
+    scope: names.correctedMetric,
   });
 
   const note =
@@ -179,7 +183,7 @@ export async function runWriteback(input: {
             throw err;
           }
         },
-        { requireApproved: true, scope: CORRECTED_METRIC },
+        { requireApproved: true, scope: names.correctedMetric },
       );
       writeExecuted = true;
     } catch (err) {
@@ -244,11 +248,11 @@ export async function runWriteback(input: {
     rowDq: ReadResult;
     views: ReadResult;
   } = rt.sampleMode
-    ? sampleReadbacks({ shadow, originalHistory, note, uniqueFacts })
-    : await liveReadbacks(rt);
+    ? sampleReadbacks({ shadow, originalHistory, note, uniqueFacts, names })
+    : await liveReadbacks(rt, names);
 
   if (rt.sampleMode) {
-    emitSampleReadbacks(rt, readbacks);
+    emitSampleReadbacks(rt, readbacks, names);
   }
   for (const read of Object.values(readbacks)) {
     if (read.exhibit) exhibits.push(read.exhibit);
@@ -259,8 +263,9 @@ export async function runWriteback(input: {
     : undefined;
 
   const verification = verifyWriteback({
+    names,
     contractId: contract.id,
-    writtenMetric: CORRECTED_METRIC,
+    writtenMetric: names.correctedMetric,
     contractOk: true,
     writeExecuted: rt.sampleMode || writeExecuted,
     caseId: state.id,
@@ -286,9 +291,10 @@ export async function runWriteback(input: {
     rt,
     tool: "write_verified",
     kind: "test",
-    title: `writeback verifier ${CORRECTED_METRIC}`,
+    title: `writeback verifier ${names.correctedMetric}`,
     args: {
       contract_id: contract.id,
+      written_metric: names.correctedMetric,
       note,
       write_executed: rt.sampleMode || writeExecuted,
       shadow_exhibit_id: shadowExhibit.id,
@@ -334,7 +340,7 @@ export async function runWriteback(input: {
     rt,
     tool: "memory",
     kind: "memory",
-    title: `catalog memory ${USL_TABLE_PATH}`,
+    title: `catalog memory ${names.uslTablePath}`,
     args: {
       case_id: state.id,
       verdict: state.verdict,
@@ -342,7 +348,7 @@ export async function runWriteback(input: {
       note,
     },
     result: {
-      table: USL_TABLE_PATH,
+      table: names.uslTablePath,
       description: note,
       readback: verification.ok ? "verified" : "failed",
       memory_kind: "USL table description",
@@ -365,7 +371,7 @@ export async function runWriteback(input: {
     case_id: state.id,
     agent_name: "Verifier",
     action: "writeback.verify",
-    input_summary: `${CORRECTED_METRIC}, ${verification.checks.length} checks`,
+    input_summary: `${names.correctedMetric}, ${verification.checks.length} checks`,
     output_summary: verification.ok
       ? `WRITE_VERIFIED ${verification.checks.filter((row) => row.ok).length}/${verification.checks.length}`
       : `writeback failed: ${verification.checks.filter((row) => !row.ok).map((row) => row.name).join(", ")}`,
@@ -394,6 +400,7 @@ export async function runWriteback(input: {
 function emitSampleReadbacks(
   rt: ToolRuntime,
   readbacks: Record<string, ReadResult>,
+  names: MetricNames,
 ): void {
   const emit = (
     key: string,
@@ -417,7 +424,7 @@ function emitSampleReadbacks(
     "finalRead",
     "write_read",
     "writeback",
-    `final view ${CORRECTED_METRIC}`,
+    `final view ${names.correctedMetric}`,
     readbacks.finalRead?.result,
   );
   emit(
@@ -431,7 +438,7 @@ function emitSampleReadbacks(
     "uslLoad",
     "write_usl",
     "metadata",
-    `LOAD USL ${USL_TABLE_PATH}`,
+    `LOAD USL ${names.uslTablePath}`,
     readbacks.uslLoad?.result,
   );
   emit(
@@ -464,7 +471,7 @@ function emitSampleReadbacks(
   );
 }
 
-async function liveReadbacks(rt: ToolRuntime): Promise<{
+async function liveReadbacks(rt: ToolRuntime, names: MetricNames): Promise<{
   finalRead: ReadResult;
   originalReread: ReadResult;
   uslLoad: ReadResult;
@@ -501,25 +508,25 @@ async function liveReadbacks(rt: ToolRuntime): Promise<{
   return {
     finalRead: await read(
       "write_read",
-      `verify-after-write ${CORRECTED_METRIC}`,
-      finalReadSql(CORRECTED_METRIC),
+      `verify-after-write ${names.correctedMetric}`,
+      finalReadSql(names.correctedMetric, names.valueColumn),
     ),
     originalReread: await read(
       "write_original",
       `reported view reread ${rt.caseId}`,
-      "SELECT * FROM analytics.sector_revenue_by_year ORDER BY fiscal_year",
+      `SELECT * FROM ${names.view} ORDER BY fiscal_year`,
     ),
-    uslLoad: await read("write_usl", `LOAD USL ${USL_TABLE_PATH}`, uslLoadSql()),
-    dqList: await read("write_dq_list", `LIST DQ ${USL_TABLE_PATH}`, uslListDqSql()),
+    uslLoad: await read("write_usl", `LOAD USL ${names.uslTablePath}`, uslLoadSql(names)),
+    dqList: await read("write_dq_list", `LIST DQ ${names.uslTablePath}`, uslListDqSql(names)),
     compositeDq: await read(
       "write_dq_composite",
-      `RUN DQ composite key ${USL_TABLE_PATH}`,
-      uslCompositeDqSql(),
+      `RUN DQ composite key ${names.uslTablePath}`,
+      uslCompositeDqSql(names),
     ),
     rowDq: await read(
       "write_dq_row",
-      `RUN DQ ${USL_ROW_RULE} ${USL_TABLE_PATH}`,
-      uslRowDqSql(),
+      `RUN DQ ${names.uslRowRule} ${names.uslTablePath}`,
+      uslRowDqSql(names),
     ),
     views: await read("write_views", "SHOW DATASOURCE VIEWS", showViewsSql()),
   };
@@ -535,6 +542,7 @@ function sampleReadbacks(input: {
   originalHistory: SqlResult;
   note: string;
   uniqueFacts: number;
+  names: MetricNames;
 }): {
   finalRead: ReadResult;
   originalReread: ReadResult;
@@ -552,7 +560,7 @@ function sampleReadbacks(input: {
   );
   const uslModel = {
     namespace: ["metastore", "exhibit_a"],
-    name: "revenue_facts",
+    name: input.names.uslName,
     description: input.note,
     tables: [
       {
@@ -568,7 +576,7 @@ function sampleReadbacks(input: {
         ],
         primaryKey: { columns: ["cik", "period_end"] },
         dqAnnotations: [
-          { name: USL_ROW_RULE, expression: "period_frame IS NOT NULL" },
+          { name: input.names.uslRowRule, expression: "period_frame IS NOT NULL" },
         ],
         activateQuery: "sample replay: canonical-period select",
       },
@@ -586,7 +594,7 @@ function sampleReadbacks(input: {
         [
           ["cik,period_end", "fact", "Primary key constraints", ""],
           [
-            USL_ROW_RULE,
+            input.names.uslRowRule,
             "fact",
             "Custom Data Quality",
             "period_frame IS NOT NULL",
@@ -603,13 +611,13 @@ function sampleReadbacks(input: {
     rowDq: {
       result: asSqlResult(
         ["name", "table", "type", "total_record", "valid_record", "invalid_record"],
-        [[USL_ROW_RULE, "fact", "Custom Data Quality", String(rows), String(rows), "0"]],
+        [[input.names.uslRowRule, "fact", "Custom Data Quality", String(rows), String(rows), "0"]],
       ),
     },
     views: {
       result: asSqlResult(
         ["name", "type", "container"],
-        [["sector_revenue_by_year_v2", "view", "exhibit_a"]],
+        [[input.names.correctedViewName, "view", input.names.correctedContainer]],
       ),
     },
   };

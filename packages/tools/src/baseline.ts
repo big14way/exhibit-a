@@ -121,7 +121,7 @@ export function compareToBaseline(
 }
 
 function pickValueIndex(columns: string[], grain: string): number {
-  const preferred = columns.findIndex((column) => /revenue|value|amount|metric/i.test(column));
+  const preferred = columns.findIndex((column) => /revenue|income|value|amount|metric|usd/i.test(column));
   if (preferred >= 0) return preferred;
   const last = columns.length - 1;
   return columns[last] === grain ? last - 1 : last;

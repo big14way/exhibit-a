@@ -17,7 +17,6 @@
     "rerun": "tsx apps/cli/src/index.ts rerun",
     "replay": "tsx apps/cli/src/index.ts replay",
     "cassette:d1": "tsx scripts/build-d1-cassette.ts",
-    "cassette:d2": "tsx scripts/build-d2-cassette.ts",
     "record:nim": "tsx scripts/record-nim.ts",
     "fixture:edgar": "tsx scripts/build-edgar-fixture.ts",
     "fixture:discovery": "tsx scripts/build-discovery-fixture.ts",
@@ -26,7 +25,9 @@
     "web": "tsx apps/web/src/server.ts",
     "test": "node --import tsx --test packages/core/src/*.test.ts packages/tools/src/*.test.ts packages/agents/src/*.test.ts packages/llm/src/*.test.ts packages/engines/src/*.test.ts evals/*.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "fixture:cases": "tsx scripts/build-sample-cases.ts"
+    "fixture:cases": "tsx scripts/build-sample-cases.ts",
+    "cassette": "tsx scripts/build-cassette.ts",
+    "site": "tsx scripts/build-site.ts"
   },
   "devDependencies": {
     "@types/node": "^24.7.2",

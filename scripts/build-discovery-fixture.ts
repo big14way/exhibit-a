@@ -9,15 +9,20 @@ import {
 } from "@exhibit-a/tools";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const OUT = resolve(ROOT, "fixtures/edgar/apple-discovery.json");
+// TICKER/CONCEPT/OUT parameters allow a discovery fixture per metric.
+const TICKER = process.env.TICKER ?? "AAPL";
+const CONCEPT = process.env.CONCEPT ?? "Revenues";
+const OUT = resolve(ROOT, process.env.OUT ?? "fixtures/edgar/apple-discovery.json");
 loadEnv(ROOT);
 
-const apple = EDGAR_COMPANIES[0];
+const apple = EDGAR_COMPANIES.find((company) => company.ticker === TICKER);
+if (!apple) throw new Error(`unknown ticker ${TICKER}`);
 const facts = await fetchCompanyFacts(apple.cik);
 const result = buildDiscoveryResult(facts, {
   cik: apple.cik,
   entity_name: apple.entity_name,
-  concept: "Revenues",
+  concept: CONCEPT,
+  concept_family: CONCEPT === "Revenues" ? undefined : CONCEPT,
   sic_division: apple.sic_division,
 });
 writeFileSync(OUT, `${JSON.stringify(result, null, 2)}\n`, "utf8");

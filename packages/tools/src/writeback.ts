@@ -8,12 +8,6 @@ import {
   type WritebackResult,
 } from "@exhibit-a/core";
 import {
-  CORRECTED_CONTAINER,
-  CORRECTED_METRIC,
-  CORRECTED_VIEW_NAME,
-  USL_NAMESPACE,
-  USL_ROW_RULE,
-  USL_TABLE_PATH,
   finalReadSql,
   finalViewStatement,
   memoryNote,
@@ -24,6 +18,15 @@ import {
   uslLoadSql,
   uslRowDqSql,
 } from "./repair.ts";
+import {
+  REVENUE_METRIC,
+  metricNames,
+  specForScope,
+  type MetricNames,
+  type MetricSpec,
+} from "./metrics.ts";
+
+const REVENUE = metricNames(REVENUE_METRIC);
 
 export const FINAL_WRITEBACK_TTL_MS = 30 * 60 * 1000;
 export const SAMPLE_WRITEBACK_TTL_MS = 365 * 24 * 60 * 60 * 1000;
@@ -33,10 +36,13 @@ export function finalWriteStatements(input: {
   state: CaseState;
   sicTable?: string;
   note?: string;
+  spec?: MetricSpec;
 }): { statements: string[]; note: string } {
   if (!input.state.repair) {
     throw new Error("cannot approve writeback without a repair plan");
   }
+  const spec = input.spec ?? REVENUE_METRIC;
+  const names = metricNames(spec);
   const sicTable = input.sicTable ?? process.env.ZETARIS_SIC_TABLE ?? "edgar.sic_edgar_usl";
   const note =
     input.note ??
@@ -46,13 +52,13 @@ export function finalWriteStatements(input: {
       exhibitIds: input.state.verdict?.exhibit_ids ?? input.state.exhibits.map((row) => row.id),
     });
   const statements = [
-    `CREATE SCHEMASTORE CONTAINER ${CORRECTED_CONTAINER}`,
-    finalViewStatement(input.state.repair.corrected_sql),
-    `CREATE NAMESPACE IF NOT EXISTS ${USL_NAMESPACE}`,
-    uslDdlStatement(),
-    uslActivationStatement(sicTable),
-    `REGISTER DQ ${USL_ROW_RULE} TABLE ${USL_TABLE_PATH} AS period_frame IS NOT NULL`,
-    uslDescriptionStatement(note),
+    `CREATE SCHEMASTORE CONTAINER ${names.correctedContainer}`,
+    finalViewStatement(input.state.repair.corrected_sql, names),
+    `CREATE NAMESPACE IF NOT EXISTS ${names.uslNamespace}`,
+    uslDdlStatement(names),
+    uslActivationStatement(sicTable, spec),
+    `REGISTER DQ ${names.uslRowRule} TABLE ${names.uslTablePath} AS period_frame IS NOT NULL`,
+    uslDescriptionStatement(note, names),
   ];
   return { statements, note };
 }
@@ -62,16 +68,19 @@ export function buildFinalWriteContract(input: {
   secret: string;
   sampleMode: boolean;
   approvedBy?: string;
+  spec?: MetricSpec;
 }): { contract: WriteContract; note: string } {
-  const { statements, note } = finalWriteStatements({ state: input.state });
+  const spec = input.spec ?? REVENUE_METRIC;
+  const names = metricNames(spec);
+  const { statements, note } = finalWriteStatements({ state: input.state, spec });
   const contract = signContract(
     {
       case_id: input.state.id,
       intent:
-        `Write the verified deduplicating repair to ${CORRECTED_METRIC}, ` +
-        `create the ${USL_TABLE_PATH} composite-key duplicate detector, ` +
+        `Write the verified deduplicating repair to ${names.correctedMetric}, ` +
+        `create the ${names.uslTablePath} composite-key duplicate detector, ` +
         "and record the case in the USL table description. Never touch the reported analytics view.",
-      scope: [CORRECTED_METRIC, USL_NAMESPACE, USL_TABLE_PATH],
+      scope: [names.correctedMetric, names.uslNamespace, names.uslTablePath],
       statements,
       cost_ceiling: 0,
       ttl_ms: input.sampleMode ? SAMPLE_WRITEBACK_TTL_MS : FINAL_WRITEBACK_TTL_MS,
@@ -81,7 +90,7 @@ export function buildFinalWriteContract(input: {
     },
     input.secret,
   );
-  assertFinalContract(contract);
+  assertFinalContract(contract, names);
   return { contract, note };
 }
 
@@ -89,23 +98,24 @@ export function buildFinalWriteContract(input: {
  * The final contract may only write the corrected container/view and the
  * Exhibit A USL. The reported analytics view must never appear in a statement.
  */
-export function assertFinalContract(contract: WriteContract): void {
+export function assertFinalContract(contract: WriteContract, names?: MetricNames): void {
   if (!contract.approved) throw new Error("final write contract is not operator-approved");
-  if (!contract.scope.includes(CORRECTED_METRIC)) {
-    throw new Error(`final contract does not scope ${CORRECTED_METRIC}`);
+  const resolved = names ?? metricNames(specForScope(contract.scope) ?? REVENUE_METRIC);
+  if (!contract.scope.includes(resolved.correctedMetric)) {
+    throw new Error(`final contract does not scope ${resolved.correctedMetric}`);
   }
-  if (!contract.scope.includes(USL_TABLE_PATH)) {
-    throw new Error(`final contract does not scope ${USL_TABLE_PATH}`);
+  if (!contract.scope.includes(resolved.uslTablePath)) {
+    throw new Error(`final contract does not scope ${resolved.uslTablePath}`);
   }
   const finalView = contract.statements.some((statement) =>
     new RegExp(
-      `CREATE\\s+(OR\\s+REPLACE\\s+)?SCHEMASTORE\\s+VIEW\\s+${CORRECTED_VIEW_NAME}\\b`,
+      `CREATE\\s+(OR\\s+REPLACE\\s+)?SCHEMASTORE\\s+VIEW\\s+${resolved.correctedViewName}\\b`,
       "i",
     ).test(statement),
   );
-  if (!finalView) throw new Error(`final contract does not create ${CORRECTED_METRIC}`);
+  if (!finalView) throw new Error(`final contract does not create ${resolved.correctedMetric}`);
   if (!contract.statements.some((statement) => /COMPILE\s+USL\b/i.test(statement))) {
-    throw new Error("final contract does not compile the revenue_facts USL");
+    throw new Error(`final contract does not compile the ${resolved.uslName} USL`);
   }
   if (
     !contract.statements.some((statement) =>
@@ -120,11 +130,11 @@ export function assertFinalContract(contract: WriteContract): void {
     }
     if (
       new RegExp(
-        `CREATE\\s+(OR\\s+REPLACE\\s+)?SCHEMASTORE\\s+VIEW\\s+sector_revenue_by_year(?!_)\\b`,
+        `CREATE\\s+(OR\\s+REPLACE\\s+)?SCHEMASTORE\\s+VIEW\\s+${resolved.viewName}(?!_)\\b`,
         "i",
       ).test(statement)
     ) {
-      throw new Error("final contract must not replace the original sector_revenue_by_year view");
+      throw new Error(`final contract must not replace the original ${resolved.viewName} view`);
     }
   }
 }
@@ -139,7 +149,11 @@ type SeriesShape = {
 function readSeries(result: SqlResult): SeriesShape {
   const division = result.columns.indexOf("sic_division");
   const year = result.columns.indexOf("fiscal_year");
-  const value = result.columns.indexOf("revenue_usd");
+  // The value column is the metric's own (revenue_usd, net_income_usd, ...):
+  // the first column that is neither the division nor the year.
+  const value = result.columns.findIndex(
+    (column) => column !== "sic_division" && column !== "fiscal_year",
+  );
   if (division < 0 || year < 0 || value < 0) {
     return { rows: [], map: new Map(), duplicateKeys: 0, columnsOk: false };
   }
@@ -170,7 +184,7 @@ export function compareFinalRead(
   if (!expected.columnsOk || !actual.columnsOk) {
     return {
       ok: false,
-      detail: "shadow or final read is missing sic_division, fiscal_year, revenue_usd",
+      detail: "shadow or final read is missing sic_division, fiscal_year or the value column",
       numbers: {},
     };
   }
@@ -231,8 +245,9 @@ type UslTable = {
 
 export function checkUslModel(
   model: unknown,
-  input: { caseId: string; note: string },
+  input: { caseId: string; note: string; names?: MetricNames },
 ): VerifierInvariant {
+  const names = input.names ?? REVENUE;
   const record = model as {
     tables?: UslTable[];
     description?: string;
@@ -247,7 +262,7 @@ export function checkUslModel(
     .replace(/^'+|'+$/g, "")
     .trim();
   const keyOk = key.includes("cik") && key.includes("period_end");
-  const ruleOk = rules.includes(USL_ROW_RULE);
+  const ruleOk = rules.includes(names.uslRowRule);
   const activationOk = Boolean(table?.activateQuery);
   const memoryOk = description.includes(input.caseId) || description.includes("Exhibit A");
   const ok = Boolean(record) && keyOk && ruleOk && activationOk && memoryOk;
@@ -255,7 +270,7 @@ export function checkUslModel(
     name: "usl_model",
     ok,
     detail:
-      `LOAD USL ${USL_TABLE_PATH}: key (${key.join(", ") || "missing"}); ` +
+      `LOAD USL ${names.uslTablePath}: key (${key.join(", ") || "missing"}); ` +
       `DQ rules ${rules.join(", ") || "missing"}; ` +
       `activation ${activationOk ? "present" : "missing"}; ` +
       `catalog description ${memoryOk ? "contains the case" : "missing"}`,
@@ -267,17 +282,17 @@ export function checkUslModel(
   };
 }
 
-export function checkDqList(result: SqlResult): VerifierInvariant {
+export function checkDqList(result: SqlResult, metric: MetricNames = REVENUE): VerifierInvariant {
   const nameIndex = result.columns.indexOf("name");
   const names = result.rows.map((row) => String(row[nameIndex >= 0 ? nameIndex : 0] ?? ""));
   const composite = names.some((name) => /cik\s*,\s*period_end/i.test(name));
-  const rowRule = names.includes(USL_ROW_RULE);
+  const rowRule = names.includes(metric.uslRowRule);
   const ok = composite && rowRule;
   return {
     name: "usl_dq_catalog",
     ok,
     detail: `LIST DQ shows ${composite ? "composite key cik,period_end" : "no composite key"}; ` +
-      `${rowRule ? USL_ROW_RULE : "no row rule"}`,
+      `${rowRule ? metric.uslRowRule : "no row rule"}`,
     numbers: { rules: names.length },
   };
 }
@@ -301,11 +316,12 @@ function dqNumbers(result: SqlResult): {
 export function checkDqRun(
   result: SqlResult,
   expectedName: string,
+  names: MetricNames = REVENUE,
 ): VerifierInvariant {
   const numbers = dqNumbers(result);
   const ok = numbers.total > 0 && numbers.invalid === 0;
   return {
-    name: expectedName === USL_ROW_RULE ? "usl_row_rule" : "usl_duplicate_detector",
+    name: expectedName === names.uslRowRule ? "usl_row_rule" : "usl_duplicate_detector",
     ok,
     detail:
       `${numbers.name || expectedName}: ${numbers.total} records, ` +
@@ -318,20 +334,20 @@ export function checkDqRun(
   };
 }
 
-export function checkViewCatalog(result: SqlResult): VerifierInvariant {
+export function checkViewCatalog(result: SqlResult, names: MetricNames = REVENUE): VerifierInvariant {
   // SHOW DATASOURCE VIEWS returns uppercase identifiers on the live build.
   const text = result.rows
     .flat()
     .map((cell) => String(cell ?? ""))
     .join(" ")
     .toLowerCase();
-  const found = text.includes(CORRECTED_VIEW_NAME.toLowerCase());
+  const found = text.includes(names.correctedViewName.toLowerCase());
   return {
     name: "view_catalog",
     ok: found,
     detail: found
-      ? `SHOW DATASOURCE VIEWS lists ${CORRECTED_VIEW_NAME}`
-      : `SHOW DATASOURCE VIEWS does not list ${CORRECTED_VIEW_NAME}`,
+      ? `SHOW DATASOURCE VIEWS lists ${names.correctedViewName}`
+      : `SHOW DATASOURCE VIEWS does not list ${names.correctedViewName}`,
   };
 }
 
@@ -357,9 +373,11 @@ export type WritebackVerificationInput = {
   dqRunError?: string;
   views?: SqlResult;
   viewsError?: string;
+  names?: MetricNames;
 };
 
 export function verifyWriteback(input: WritebackVerificationInput): WritebackResult {
+  const names = input.names ?? REVENUE;
   const checks: VerifierInvariant[] = [];
   checks.push({
     name: "write_contract",
@@ -388,7 +406,7 @@ export function verifyWriteback(input: WritebackVerificationInput): WritebackRes
       detail: input.uslError ?? "LOAD USL returned no model",
     });
   } else {
-    checks.push(checkUslModel(input.uslModel, { caseId: input.caseId, note: input.note }));
+    checks.push(checkUslModel(input.uslModel, { caseId: input.caseId, note: input.note, names }));
   }
 
   if (input.dqListError || !input.dqList) {
@@ -398,7 +416,7 @@ export function verifyWriteback(input: WritebackVerificationInput): WritebackRes
       detail: input.dqListError ?? "LIST DQ returned no result",
     });
   } else {
-    checks.push(checkDqList(input.dqList));
+    checks.push(checkDqList(input.dqList, names));
   }
 
   if (input.dqRunError || !input.compositeDq) {
@@ -408,7 +426,7 @@ export function verifyWriteback(input: WritebackVerificationInput): WritebackRes
       detail: input.dqRunError ?? "RUN DQ composite key returned no result",
     });
   } else {
-    checks.push(checkDqRun(input.compositeDq, "cik,period_end"));
+    checks.push(checkDqRun(input.compositeDq, "cik,period_end", names));
   }
 
   if (input.dqRunError || !input.rowDq) {
@@ -418,7 +436,7 @@ export function verifyWriteback(input: WritebackVerificationInput): WritebackRes
       detail: input.dqRunError ?? "RUN DQ row rule returned no result",
     });
   } else {
-    checks.push(checkDqRun(input.rowDq, USL_ROW_RULE));
+    checks.push(checkDqRun(input.rowDq, names.uslRowRule, names));
   }
 
   if (input.viewsError || !input.views) {
@@ -428,7 +446,7 @@ export function verifyWriteback(input: WritebackVerificationInput): WritebackRes
       detail: input.viewsError ?? "SHOW DATASOURCE VIEWS returned no result",
     });
   } else {
-    checks.push(checkViewCatalog(input.views));
+    checks.push(checkViewCatalog(input.views, names));
   }
 
   if (input.originalError || !input.originalHistory || !input.originalReread) {
@@ -459,16 +477,16 @@ export function verifyWriteback(input: WritebackVerificationInput): WritebackRes
   };
 }
 
-export function writebackReadSql(): {
+export function writebackReadSql(names: MetricNames = REVENUE): {
   finalRead: string;
   uslLoad: string;
   uslCompositeDq: string;
   uslRowDq: string;
 } {
   return {
-    finalRead: finalReadSql(CORRECTED_METRIC),
-    uslLoad: uslLoadSql(),
-    uslCompositeDq: uslCompositeDqSql(),
-    uslRowDq: uslRowDqSql(),
+    finalRead: finalReadSql(names.correctedMetric, names.valueColumn),
+    uslLoad: uslLoadSql(names),
+    uslCompositeDq: uslCompositeDqSql(names),
+    uslRowDq: uslRowDqSql(names),
   };
 }

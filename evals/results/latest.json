@@ -40,18 +40,18 @@
     "critic": {
       "status": "ran",
       "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-      "objections": 5,
-      "cited_unknown": 0,
+      "objections": 3,
+      "cited_unknown": 1,
       "usage": {
-        "prompt_tokens": 2620,
-        "completion_tokens": 5051
+        "prompt_tokens": 2657,
+        "completion_tokens": 4799
       }
     },
     "safety": {
       "ok": true,
       "policy": "data-quality-finding-no-investment-advice",
       "findings": [],
-      "checked_chars": 2668,
+      "checked_chars": 2259,
       "action": "allow",
       "model": {
         "status": "ran",
@@ -62,7 +62,7 @@
         "detail": "user safe, response safe",
         "raw": "User Safety: safe\nResponse Safety: safe",
         "usage": {
-          "prompt_tokens": 872,
+          "prompt_tokens": 889,
           "completion_tokens": 10
         }
       }
@@ -252,18 +252,18 @@
     "critic": {
       "status": "ran",
       "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-      "objections": 5,
-      "cited_unknown": 0,
+      "objections": 3,
+      "cited_unknown": 1,
       "usage": {
-        "prompt_tokens": 2620,
-        "completion_tokens": 5051
+        "prompt_tokens": 2657,
+        "completion_tokens": 4799
       }
     },
     "safety": {
       "ok": true,
       "policy": "data-quality-finding-no-investment-advice",
       "findings": [],
-      "checked_chars": 2668,
+      "checked_chars": 2259,
       "action": "allow",
       "model": {
         "status": "ran",
@@ -274,7 +274,7 @@
         "detail": "user safe, response safe",
         "raw": "User Safety: safe\nResponse Safety: safe",
         "usage": {
-          "prompt_tokens": 872,
+          "prompt_tokens": 889,
           "completion_tokens": 10
         }
       }
@@ -549,17 +549,17 @@
       "status": "ran",
       "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
       "objections": 5,
-      "cited_unknown": 4,
+      "cited_unknown": 0,
       "usage": {
-        "prompt_tokens": 2682,
-        "completion_tokens": 6790
+        "prompt_tokens": 2719,
+        "completion_tokens": 3360
       }
     },
     "safety": {
       "ok": true,
       "policy": "data-quality-finding-no-investment-advice",
       "findings": [],
-      "checked_chars": 2950,
+      "checked_chars": 2718,
       "action": "allow",
       "model": {
         "status": "ran",
@@ -570,7 +570,7 @@
         "detail": "user safe, response safe",
         "raw": "User Safety: safe\nResponse Safety: safe",
         "usage": {
-          "prompt_tokens": 879,
+          "prompt_tokens": 882,
           "completion_tokens": 10
         }
       }
@@ -755,6 +755,201 @@
       }
     ]
   },
+  "second_metric": {
+    "id": "case_eval_net_income",
+    "stage": "SHADOW_VERIFIED",
+    "sample_mode": true,
+    "exhibits": 23,
+    "verdict": "DATA_ARTIFACT",
+    "causes": [
+      {
+        "cause": "filing_year_duplication",
+        "kind": "artifact",
+        "share": 1,
+        "exhibit_ids": [
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>"
+        ]
+      }
+    ],
+    "gate_failures": [],
+    "critic": {
+      "status": "ran",
+      "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "objections": 5,
+      "cited_unknown": 0,
+      "usage": {
+        "prompt_tokens": 2602,
+        "completion_tokens": 6666
+      }
+    },
+    "safety": {
+      "ok": true,
+      "policy": "data-quality-finding-no-investment-advice",
+      "findings": [],
+      "checked_chars": 2949,
+      "action": "allow",
+      "model": {
+        "status": "ran",
+        "model": "nvidia/nemotron-3.5-content-safety",
+        "user_safety": "safe",
+        "response_safety": "safe",
+        "categories": [],
+        "detail": "user safe, response safe",
+        "raw": "User Safety: safe\nResponse Safety: safe",
+        "usage": {
+          "prompt_tokens": 855,
+          "completion_tokens": 10
+        }
+      }
+    },
+    "discovery": {
+      "company": "International Business Machines Corporation",
+      "cik": "0000051143",
+      "current_concept": "NetIncomeLoss",
+      "current_annual_facts": 11,
+      "replacement_concept": "ProfitLoss",
+      "replacement_relation": "prior_history",
+      "replacement_reason": "NetIncomeLoss has 11 annual 10-K facts starting 2015-12-31; ProfitLoss has 16 annual 10-K facts starting 2007-12-31, so the earlier periods were filed under a different concept, not lost.",
+      "candidates": [
+        {
+          "concept": "NetIncomeLoss",
+          "annual_facts": 11,
+          "first_period": "2015-12-31",
+          "last_period": "2025-12-31",
+          "continuous": true,
+          "latest_forms": [
+            "10-K"
+          ],
+          "score": 35
+        },
+        {
+          "concept": "ProfitLoss",
+          "annual_facts": 16,
+          "first_period": "2007-12-31",
+          "last_period": "2022-12-31",
+          "continuous": false,
+          "latest_forms": [
+            "10-K"
+          ],
+          "score": 34
+        },
+        {
+          "concept": "SalesTypeLeaseSellingProfitLoss",
+          "annual_facts": 7,
+          "first_period": "2019-12-31",
+          "last_period": "2025-12-31",
+          "continuous": true,
+          "latest_forms": [
+            "10-K"
+          ],
+          "score": 23
+        }
+      ],
+      "peers": [
+        {
+          "ticker": "ORCL",
+          "table": "edgar.oracle_revenue_table",
+          "sic_division": "Services"
+        }
+      ],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000051143.json",
+      "rule": "NetIncomeLoss family concept must have USD annual 10-K facts (330-400 days) and either extend the current chain (ending within 421 days) or precede it"
+    },
+    "memory": {
+      "storage": "<temp log dir>",
+      "cold_start": true,
+      "query": {
+        "metric": "analytics.sector_net_income_by_year",
+        "question": "is the FY2017 Services net income jump real?"
+      },
+      "records": 0,
+      "hits": [],
+      "audit": {
+        "valid": 0,
+        "malformed": 0,
+        "duplicates": 0
+      },
+      "scoring": "lexical",
+      "embedding": {
+        "status": "skipped",
+        "model": "nvidia/nemotron-3.5-embed-1b",
+        "dims": 0,
+        "texts": 0,
+        "detail": "cold start; nothing to embed",
+        "usage": {
+          "prompt_tokens": 0
+        }
+      }
+    },
+    "verification": {
+      "ok": true,
+      "invariants": [
+        {
+          "name": "row_preservation",
+          "ok": true,
+          "numbers": {
+            "expected_cells": 11,
+            "missing": 0,
+            "mismatched": 0,
+            "extra": 0,
+            "max_diff": 0
+          }
+        },
+        {
+          "name": "uniqueness",
+          "ok": true,
+          "numbers": {
+            "annual_facts": 38,
+            "unique_annual_facts": 18,
+            "declared_duplicates": 20,
+            "shadow_rows": 11,
+            "duplicate_shadow_cells": 0
+          }
+        },
+        {
+          "name": "second_channel_parity",
+          "ok": true,
+          "numbers": {
+            "checked": 10,
+            "matched": 10,
+            "max_diff": 0
+          }
+        },
+        {
+          "name": "history_immutability",
+          "ok": true
+        },
+        {
+          "name": "metric_sanity",
+          "ok": true,
+          "numbers": {
+            "corrected_prior": 21324000000,
+            "corrected_now": 9340000000,
+            "corrected_delta": -11984000000,
+            "corrected_ratio": 0.4380041268054774,
+            "counterfactual_delta": -11984000000
+          }
+        },
+        {
+          "name": "shadow_contract",
+          "ok": true
+        },
+        {
+          "name": "bad_repair_rejected",
+          "ok": true
+        }
+      ]
+    },
+    "writeback": null,
+    "contract": null
+  },
   "claims": [
     {
       "id": "sample_labelled",
@@ -820,7 +1015,7 @@
       "id": "nim_critic",
       "claim": "The recorded Nemotron critic runs in replay with grounded objections on both the cold and warm case",
       "ok": true,
-      "evidence": "cold ran, 5 objections, 2620 prompt tokens; warm ran, 5 objections"
+      "evidence": "cold ran, 3 objections (1 citing an unknown exhibit, flagged), 2657 prompt tokens; warm ran, 5 objections"
     },
     {
       "id": "critic_context_recorded",
@@ -850,13 +1045,25 @@
       "id": "subjects_from_data",
       "claim": "Hypothesis subjects are selected from the coverage rows, not named in code",
       "ok": true,
-      "evidence": "concept_switch_missing_history: Apple Inc. (concentrated in onset year); Target Corporation (history stops) | single_filer_growth: Tesla, Inc. (fastest-growing filer in segment) | ingestion_gap: Apple Inc. (largest contributor to the delta)"
+      "evidence": "concept_switch_missing_history: Apple Inc. (first appears in onset period); Target Corporation (history stops) | single_filer_growth: Tesla, Inc. (fastest-growing filer in segment) | ingestion_gap: Apple Inc. (largest contributor to the delta)"
     },
     {
       "id": "ablation",
       "claim": "Removing the counterfactual/second channel downgrades the verdict",
       "ok": true,
       "evidence": "INSUFFICIENT_EVIDENCE; 2 gate failures"
+    },
+    {
+      "id": "second_metric_verdict",
+      "claim": "A second metric (sector net income, NetIncomeLoss) is adjudicated by the same code with a different verdict",
+      "ok": true,
+      "evidence": "DATA_ARTIFACT; 7/7 invariants; stage SHADOW_VERIFIED"
+    },
+    {
+      "id": "second_metric_subjects",
+      "claim": "The second metric selects a different newcomer (IBM) and eliminates real change because the corrected series fell",
+      "ok": true,
+      "evidence": "newcomer International Business Machines Corporation; real_change eliminated; discovery ProfitLoss (prior_history); critic ran; safety model ran"
     },
     {
       "id": "exhibit_counts",

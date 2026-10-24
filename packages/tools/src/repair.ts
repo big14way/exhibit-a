@@ -8,20 +8,23 @@ import {
   type SqlResult,
   type WriteContract,
 } from "@exhibit-a/core";
-import { canonicalAnnual, readCanonical } from "./edgar.ts";
+import { canonicalAnnual, readCanonical, type EdgarCompany } from "./edgar.ts";
+import { REVENUE_METRIC, metricNames, type MetricNames, type MetricSpec } from "./metrics.ts";
 import type { ToolRuntime } from "./runtime.ts";
 
-export const SHADOW_CONTAINER = "exhibit_a_shadow";
-export const SHADOW_VIEW_NAME = "sector_revenue_by_year";
-export const SHADOW_METRIC = `${SHADOW_CONTAINER}.${SHADOW_VIEW_NAME}`;
-export const CORRECTED_CONTAINER = "exhibit_a";
-export const CORRECTED_VIEW_NAME = "sector_revenue_by_year_v2";
-export const CORRECTED_METRIC = `${CORRECTED_CONTAINER}.${CORRECTED_VIEW_NAME}`;
-export const USL_NAMESPACE = "lightning.metastore.exhibit_a";
-export const USL_NAME = "revenue_facts";
-export const USL_PATH = `${USL_NAMESPACE}.${USL_NAME}`;
-export const USL_TABLE_PATH = `${USL_PATH}.fact`;
-export const USL_ROW_RULE = "annual_has_frame";
+/** Names of the revenue metric, kept as constants for the existing call sites. */
+const REVENUE = metricNames(REVENUE_METRIC);
+export const SHADOW_CONTAINER = REVENUE.shadowContainer;
+export const SHADOW_VIEW_NAME = REVENUE.shadowViewName;
+export const SHADOW_METRIC = REVENUE.shadowMetric;
+export const CORRECTED_CONTAINER = REVENUE.correctedContainer;
+export const CORRECTED_VIEW_NAME = REVENUE.correctedViewName;
+export const CORRECTED_METRIC = REVENUE.correctedMetric;
+export const USL_NAMESPACE = REVENUE.uslNamespace;
+export const USL_NAME = REVENUE.uslName;
+export const USL_PATH = REVENUE.uslPath;
+export const USL_TABLE_PATH = REVENUE.uslTablePath;
+export const USL_ROW_RULE = REVENUE.uslRowRule;
 
 const SAMPLE_CONTRACT_SECRET = "exhibit-a-sample-replay-contract-secret";
 
@@ -41,6 +44,12 @@ function assertIdentifier(value: string, label: string): string {
   return value;
 }
 
+function unionSql(tables: readonly EdgarCompany[]): string {
+  return tables
+    .map((company, index) => `${index ? "    UNION ALL " : "    "}SELECT * FROM ${company.table}`)
+    .join("\n");
+}
+
 /**
  * Corrected metric body. The original view aggregates raw facts by the
  * filing's fiscal_year, so comparatives and later filings are counted again.
@@ -51,6 +60,7 @@ export function correctedViewSql(
   sicTable = "edgar.sic_edgar_usl",
   startYear = 2016,
   endYear = 2019,
+  spec: MetricSpec = REVENUE_METRIC,
 ): string {
   const sic = assertIdentifier(sicTable, "SIC table");
   return `WITH annual AS (
@@ -70,13 +80,7 @@ export function correctedViewSql(
       ORDER BY f.filed_date DESC, f.value_usd DESC
     ) AS rn
   FROM (
-    SELECT * FROM edgar.apple_revenue_table
-    UNION ALL SELECT * FROM edgar.ibm_revenue_table
-    UNION ALL SELECT * FROM edgar.oracle_revenue_table
-    UNION ALL SELECT * FROM edgar.walmart_revenue_table
-    UNION ALL SELECT * FROM edgar.target_revenue_table
-    UNION ALL SELECT * FROM edgar.ford_revenue_table
-    UNION ALL SELECT * FROM edgar.tesla_revenue_table
+${unionSql(spec.tables)}
   ) f
   LEFT JOIN ${sic} s ON s.cik = f.cik
   WHERE DATEDIFF(f.period_end, f.period_start) BETWEEN 330 AND 400
@@ -84,24 +88,25 @@ export function correctedViewSql(
 SELECT
   sic_division,
   period_year AS fiscal_year,
-  SUM(value_usd) AS revenue_usd
+  SUM(value_usd) AS ${spec.valueColumn}
 FROM annual
 WHERE rn = 1
   AND period_year BETWEEN ${startYear} AND ${endYear}
 GROUP BY sic_division, period_year`;
 }
 
-export function shadowViewStatement(body: string): string {
-  return `CREATE OR REPLACE SCHEMASTORE VIEW ${SHADOW_VIEW_NAME} WITH CONTAINER ${SHADOW_CONTAINER} AS ${body}`;
+export function shadowViewStatement(body: string, names: MetricNames = REVENUE): string {
+  return `CREATE OR REPLACE SCHEMASTORE VIEW ${names.shadowViewName} WITH CONTAINER ${names.shadowContainer} AS ${body}`;
 }
 
-export function finalViewStatement(body: string): string {
-  return `CREATE OR REPLACE SCHEMASTORE VIEW ${CORRECTED_VIEW_NAME} WITH CONTAINER ${CORRECTED_CONTAINER} AS ${body}`;
+export function finalViewStatement(body: string, names: MetricNames = REVENUE): string {
+  return `CREATE OR REPLACE SCHEMASTORE VIEW ${names.correctedViewName} WITH CONTAINER ${names.correctedContainer} AS ${body}`;
 }
 
-export function shadowReadSql(view = SHADOW_METRIC): string {
+export function shadowReadSql(view = SHADOW_METRIC, valueColumn = REVENUE.valueColumn): string {
   assertIdentifier(view, "shadow view");
-  return `SELECT sic_division, fiscal_year, revenue_usd FROM ${view} ORDER BY fiscal_year, sic_division`;
+  assertIdentifier(valueColumn, "value column");
+  return `SELECT sic_division, fiscal_year, ${valueColumn} FROM ${view} ORDER BY fiscal_year, sic_division`;
 }
 
 /**
@@ -111,6 +116,7 @@ export function shadowReadSql(view = SHADOW_METRIC): string {
  */
 export function canonicalPeriodSql(
   sicTable = "edgar.sic_edgar_usl",
+  spec: MetricSpec = REVENUE_METRIC,
 ): string {
   const sic = assertIdentifier(sicTable, "SIC table");
   return `WITH annual AS (
@@ -130,13 +136,7 @@ export function canonicalPeriodSql(
       ORDER BY f.filed_date DESC, f.value_usd DESC
     ) AS rn
   FROM (
-    SELECT * FROM edgar.apple_revenue_table
-    UNION ALL SELECT * FROM edgar.ibm_revenue_table
-    UNION ALL SELECT * FROM edgar.oracle_revenue_table
-    UNION ALL SELECT * FROM edgar.walmart_revenue_table
-    UNION ALL SELECT * FROM edgar.target_revenue_table
-    UNION ALL SELECT * FROM edgar.ford_revenue_table
-    UNION ALL SELECT * FROM edgar.tesla_revenue_table
+${unionSql(spec.tables)}
   ) f
   LEFT JOIN ${sic} s ON s.cik = f.cik
   WHERE DATEDIFF(f.period_end, f.period_start) BETWEEN 330 AND 400
@@ -155,12 +155,14 @@ WHERE rn = 1`;
 
 export function uslActivationStatement(
   sicTable = "edgar.sic_edgar_usl",
+  spec: MetricSpec = REVENUE_METRIC,
 ): string {
-  return `ACTIVATE USL TABLE ${USL_TABLE_PATH} AS\n${canonicalPeriodSql(sicTable)}`;
+  const names = metricNames(spec);
+  return `ACTIVATE USL TABLE ${names.uslTablePath} AS\n${canonicalPeriodSql(sicTable, spec)}`;
 }
 
-export function uslDdlStatement(): string {
-  return `COMPILE USL IF NOT EXISTS ${USL_NAME} DEPLOY NAMESPACE ${USL_NAMESPACE} DDL
+export function uslDdlStatement(names: MetricNames = REVENUE): string {
+  return `COMPILE USL IF NOT EXISTS ${names.uslName} DEPLOY NAMESPACE ${names.uslNamespace} DDL
 CREATE TABLE fact (
   cik varchar(10) NOT NULL,
   period_end date NOT NULL,
@@ -173,8 +175,8 @@ CREATE TABLE fact (
 )`;
 }
 
-export function uslRowRuleStatement(): string {
-  return `REGISTER DQ ${USL_ROW_RULE} TABLE ${USL_TABLE_PATH} AS period_frame IS NOT NULL`;
+export function uslRowRuleStatement(names: MetricNames = REVENUE): string {
+  return `REGISTER DQ ${names.uslRowRule} TABLE ${names.uslTablePath} AS period_frame IS NOT NULL`;
 }
 
 export function memoryNote(input: {
@@ -197,32 +199,33 @@ export function memoryNote(input: {
   );
 }
 
-export function uslDescriptionStatement(note: string): string {
+export function uslDescriptionStatement(note: string, names: MetricNames = REVENUE): string {
   // The Zetaris grammar takes the description as the rest of the statement
   // (unquoted); quoting it stores the quote characters in the catalog.
   const text = note.replace(/\s+/g, " ").replace(/;/g, ",").trim();
-  return `UPDATE USL ${USL_TABLE_PATH} SET TABLE DESCRIPTION ${text}`;
+  return `UPDATE USL ${names.uslTablePath} SET TABLE DESCRIPTION ${text}`;
 }
 
-export function finalReadSql(view = CORRECTED_METRIC): string {
+export function finalReadSql(view = CORRECTED_METRIC, valueColumn = REVENUE.valueColumn): string {
   assertIdentifier(view, "corrected view");
-  return `SELECT sic_division, fiscal_year, revenue_usd FROM ${view} ORDER BY fiscal_year, sic_division`;
+  assertIdentifier(valueColumn, "value column");
+  return `SELECT sic_division, fiscal_year, ${valueColumn} FROM ${view} ORDER BY fiscal_year, sic_division`;
 }
 
-export function uslLoadSql(): string {
-  return `LOAD USL ${USL_NAME} NAMESPACE ${USL_NAMESPACE}`;
+export function uslLoadSql(names: MetricNames = REVENUE): string {
+  return `LOAD USL ${names.uslName} NAMESPACE ${names.uslNamespace}`;
 }
 
-export function uslListDqSql(): string {
-  return `LIST DQ USL ${USL_PATH}`;
+export function uslListDqSql(names: MetricNames = REVENUE): string {
+  return `LIST DQ USL ${names.uslPath}`;
 }
 
-export function uslCompositeDqSql(): string {
-  return `RUN DQ \`cik,period_end\` TABLE ${USL_TABLE_PATH}`;
+export function uslCompositeDqSql(names: MetricNames = REVENUE): string {
+  return `RUN DQ \`cik,period_end\` TABLE ${names.uslTablePath}`;
 }
 
-export function uslRowDqSql(): string {
-  return `RUN DQ ${USL_ROW_RULE} TABLE ${USL_TABLE_PATH}`;
+export function uslRowDqSql(names: MetricNames = REVENUE): string {
+  return `RUN DQ ${names.uslRowRule} TABLE ${names.uslTablePath}`;
 }
 
 export function showViewsSql(): string {
@@ -235,18 +238,21 @@ export function buildRepairPlan(input: {
   baseline: BaselineComparison;
   sampleMode: boolean;
   secret: string;
+  spec?: MetricSpec;
 }): { plan: RepairPlan; contract: WriteContract } {
+  const spec = input.spec ?? REVENUE_METRIC;
+  const names = metricNames(spec);
   const sicTable = process.env.ZETARIS_SIC_TABLE || "edgar.sic_edgar_usl";
-  const correctedSql = correctedViewSql(sicTable);
+  const correctedSql = correctedViewSql(sicTable, spec.window.from, spec.window.to, spec);
   const statements = [
-    `CREATE SCHEMASTORE CONTAINER ${SHADOW_CONTAINER}`,
-    shadowViewStatement(correctedSql),
+    `CREATE SCHEMASTORE CONTAINER ${names.shadowContainer}`,
+    shadowViewStatement(correctedSql, names),
   ];
   const contract = signContract(
     {
       case_id: input.stateId,
       intent: `Create a verifier sandbox for ${input.metric}; do not modify the reported view`,
-      scope: [SHADOW_METRIC],
+      scope: [names.shadowMetric],
       statements,
       cost_ceiling: 0,
       ttl_ms: input.sampleMode
@@ -258,8 +264,8 @@ export function buildRepairPlan(input: {
   );
   const plan: RepairPlan = {
     metric: input.metric,
-    shadow_metric: SHADOW_METRIC,
-    corrected_metric: CORRECTED_METRIC,
+    shadow_metric: names.shadowMetric,
+    corrected_metric: names.correctedMetric,
     corrected_sql: correctedSql,
     statements,
     created_at: new Date().toISOString(),
@@ -271,12 +277,13 @@ export function assertShadowContract(contract: WriteContract, plan: RepairPlan):
   if (!contract.scope.includes(plan.shadow_metric)) {
     throw new Error(`shadow contract does not scope ${plan.shadow_metric}`);
   }
+  const container = plan.shadow_metric.split(".")[0] ?? SHADOW_CONTAINER;
   for (const statement of contract.statements) {
     const upper = statement.toUpperCase();
     if (upper.includes("ANALYTICS.")) {
       throw new Error("shadow contract must not touch the reported analytics view");
     }
-    if (!upper.includes(SHADOW_CONTAINER.toUpperCase())) {
+    if (!upper.includes(container.toUpperCase())) {
       throw new Error("shadow contract statement is outside the shadow container");
     }
   }
@@ -309,7 +316,7 @@ export async function ensureShadowView(input: {
         const message = err instanceof Error ? err.message : String(err);
         // The container is idempotent; a second run should be able to replace
         // just the view. Do not swallow any other write error.
-        if (/CREATE\s+SCHEMASTORE\s+CONTAINER/i.test(sql) && /exist/i.test(message)) {
+        if (/CREATE\s+SCHEMASTORE\s+CONTAINER/i.test(sql) && /already\s+exists/i.test(message)) {
           return;
         }
         throw err;
@@ -324,6 +331,7 @@ export function shadowResultFromFacts(
   canonicalFacts: SqlResult,
   startYear = 2016,
   endYear = 2019,
+  valueColumn = REVENUE.valueColumn,
 ): SqlResult {
   const series = canonicalAnnual(readCanonical(canonicalFacts));
   const rows = series.rows
@@ -333,5 +341,5 @@ export function shadowResultFromFacts(
     })
     .filter((row) => Number(row[1]) >= startYear && Number(row[1]) <= endYear)
     .sort((a, b) => Number(a[1]) - Number(b[1]) || String(a[0]).localeCompare(String(b[0])));
-  return asSqlResult(["sic_division", "fiscal_year", "revenue_usd"], rows);
+  return asSqlResult(["sic_division", "fiscal_year", valueColumn], rows);
 }

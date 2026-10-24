@@ -13,6 +13,7 @@ import {
   ensureShadowView,
   executeSqlTool,
   metricHistory,
+  metricSpec,
   repairContractSecret,
   shadowReadSql,
   verifyRepair,
@@ -48,12 +49,14 @@ export type RepairRun = {
 export async function runRepair(input: RepairOptions): Promise<RepairRun> {
   const rt = input.rt;
   const secret = repairContractSecret(rt.sampleMode);
+  const spec = metricSpec(input.metric);
   const { plan, contract } = buildRepairPlan({
     stateId: input.state.id,
     metric: input.metric,
     baseline: input.baseline,
     sampleMode: rt.sampleMode,
     secret,
+    spec,
   });
 
   let state = advance(input.state, "REPAIR_PROPOSED");
@@ -90,7 +93,7 @@ export async function runRepair(input: RepairOptions): Promise<RepairRun> {
   });
 
   rt.agent = "Verifier";
-  const shadowRead = shadowReadSql(plan.shadow_metric);
+  const shadowRead = shadowReadSql(plan.shadow_metric, spec.valueColumn);
   const shadow = await executeSqlTool({
     rt,
     tool: "repair_shadow",
