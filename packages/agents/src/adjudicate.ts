@@ -10,10 +10,7 @@ import {
   type CriticResult,
   type Verdict,
 } from "@exhibit-a/core";
-import {
-  EDGAR_COMPANIES,
-  type CounterfactualResult,
-} from "@exhibit-a/tools";
+import { type CounterfactualResult } from "@exhibit-a/tools";
 
 export type Adjudication = {
   verdict: Verdict;
@@ -24,7 +21,9 @@ export type Adjudication = {
 /**
  * Turn confirmed hypotheses into cause claims for the gate. A cause share has
  * to come from a counterfactual, not from prose: the artifact share is what
- * deduplication removes, the real share is what survives it.
+ * deduplication removes, the real share is what survives it. The blamed
+ * objects come from the case's own lineage graph, so the "located" rule is
+ * checked against what INFER SQLTABLE actually returned.
  */
 export function adjudicate(input: {
   root: string;
@@ -45,34 +44,30 @@ export function adjudicate(input: {
   const byCause = new Map(input.state.hypotheses.map((row) => [row.cause, row]));
   const artifactHypothesis = byCause.get("filing_year_duplication");
   const realHypothesis = byCause.get("real_change");
+  const upstream = (graph?.sources ?? []).map((source) => source.source_table);
 
-  const artifactClaim = {
-    cause: "filing_year_duplication",
-    kind: "artifact" as const,
-    // Live INFER resolves the edgar schema-store views to their raw SEC
-    // tables, while the recorded sample keeps the edgar view names.
-    blamed: [
-      ...EDGAR_COMPANIES.map((company) => company.table),
-      input.state.metric,
-      "SEC_DATA.*",
-    ],
-    exhibit_ids: [
-      ...(artifactHypothesis?.exhibit_ids ?? []),
-      ...secondChannels,
-      ...(counterfactualExhibit ? [counterfactualExhibit.id] : []),
-    ],
-    share: input.counterfactual.explained_share,
-    onset_period: onset?.period,
-    prior_period: onset?.prior_period,
-  };
-
-  const claims: CauseClaim[] = [artifactClaim];
+  const claims: CauseClaim[] = [];
+  if (artifactHypothesis?.status === "confirmed") {
+    claims.push({
+      cause: "filing_year_duplication",
+      kind: "artifact",
+      blamed: [...upstream, ...artifactHypothesis.blamed, input.state.metric],
+      exhibit_ids: [
+        ...artifactHypothesis.exhibit_ids,
+        ...secondChannels,
+        ...(counterfactualExhibit ? [counterfactualExhibit.id] : []),
+      ],
+      share: input.counterfactual.explained_share,
+      onset_period: onset?.period,
+      prior_period: onset?.prior_period,
+    });
+  }
   const realShare = input.counterfactual.unexplained_share;
   if (realShare > 0.005 && realHypothesis?.status === "confirmed") {
     claims.push({
       cause: "real_change",
-      kind: "real" as const,
-      blamed: [input.state.metric, "edgar.*_revenue_table"],
+      kind: "real",
+      blamed: [input.state.metric, ...realHypothesis.blamed],
       exhibit_ids: [
         ...realHypothesis.exhibit_ids,
         ...(counterfactualExhibit ? [counterfactualExhibit.id] : []),
@@ -94,9 +89,33 @@ export function adjudicate(input: {
       : critic?.status === "error"
         ? `Defense Counsel critique failed safely (${critic.detail}); the deterministic code gate is final.`
         : "Defense Counsel model critique was skipped (no NVIDIA_API_KEY/NIM model or no recorded response); the code gate is final and no model prose can promote a cause.";
+
+  // Notes are built from the hypothesis table, never typed in by hand, so a
+  // different metric produces different notes.
+  const claimed = new Set(claims.map((claim) => claim.cause));
+  const confirmedWithoutShare = input.state.hypotheses.filter(
+    (row) => row.status === "confirmed" && !claimed.has(row.cause),
+  );
+  const eliminated = input.state.hypotheses.filter((row) => row.status === "eliminated");
+  const open = input.state.hypotheses.filter((row) => row.status === "open");
   const notes = [
-    "Concept switch / missing history is confirmed as a data-quality finding but carries no separate share: deduplicating by period recovers Apple's prior-year facts, so it does not add to the reported jump.",
-    "Tesla short history and an ingestion gap were eliminated with exhibits, not left as possibilities.",
+    ...confirmedWithoutShare.map((row) => {
+      const who = row.subjects?.map((item) => item.entity_name).join(" and ");
+      return (
+        `${row.cause} is confirmed as a data-quality finding but carries no separate share: ` +
+        `deduplicating to one annual fact per (cik, period_end) recovers ${who ? `${who}'s` : "the affected filer's"} prior-year facts, so it does not add to the reported jump.`
+      );
+    }),
+    ...(eliminated.length
+      ? [
+          `Eliminated with exhibits, not left as possibilities: ${eliminated
+            .map((row) => row.cause)
+            .join(", ")}.`,
+        ]
+      : []),
+    ...(open.length
+      ? [`Still open after the evidence pass: ${open.map((row) => row.cause).join(", ")}.`]
+      : []),
     criticNote,
     input.state.sample_mode
       ? "SAMPLE_MODE: tool results replayed from the labelled cassette; no live inference."

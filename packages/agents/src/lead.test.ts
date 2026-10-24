@@ -68,8 +68,22 @@ test("the D2 sample path reaches a hypothesis table with exhibits", async () => 
     assert.equal(byCause.get("filing_year_duplication")?.status, "confirmed");
     assert.equal(byCause.get("concept_switch_missing_history")?.status, "confirmed");
     assert.equal(byCause.get("real_change")?.status, "confirmed");
-    assert.equal(byCause.get("tesla_short_history")?.status, "eliminated");
+    assert.equal(byCause.get("single_filer_growth")?.status, "eliminated");
     assert.equal(byCause.get("ingestion_gap")?.status, "eliminated");
+
+    // Subjects are selected from the coverage rows, not named in code.
+    assert.equal(
+      byCause.get("concept_switch_missing_history")?.subjects?.[0]?.entity_name,
+      "Apple Inc.",
+    );
+    assert.equal(byCause.get("single_filer_growth")?.subjects?.[0]?.entity_name, "Tesla, Inc.");
+
+    // Three Nemotron roles, all replayed from the cassette.
+    assert.equal(state.safety?.model?.status, "ran");
+    assert.equal(state.safety?.model?.response_safety, "safe");
+    assert.equal(state.memory?.embedding?.status, "skipped"); // cold start: nothing to embed
+    assert.equal(state.critic?.context?.chunk_count, state.critic?.context_chunks);
+    assert.ok((state.critic?.context?.chunks.length ?? 0) > 0);
 
     const real = byCause.get("real_change");
     assert.ok(real?.share !== undefined && Math.abs(real.share - 0.0383) < 0.002);

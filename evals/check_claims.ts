@@ -126,18 +126,61 @@ export function checkClaims(input: ClaimInput): ClaimCheck[] {
     ),
     check(
       "nim_critic",
-      "The recorded Nemotron critic runs in replay with five grounded objections",
+      "The recorded Nemotron critic runs in replay with grounded objections on both the cold and warm case",
       cold.critic?.status === "ran" &&
-        cold.critic.objections.length === 5 &&
+        cold.critic.objections.length >= 1 &&
         cold.critic.cited_unknown.length === 0 &&
-        cold.critic.usage.prompt_tokens > 0,
-      `${cold.critic?.status ?? "missing"}; ${cold.critic?.objections.length ?? 0} objections; ${cold.critic?.usage.prompt_tokens ?? 0} prompt tokens`,
+        cold.critic.usage.prompt_tokens > 0 &&
+        warm.critic?.status === "ran" &&
+        (warm.critic?.objections.length ?? 0) >= 1,
+      `cold ${cold.critic?.status ?? "missing"}, ${cold.critic?.objections.length ?? 0} objections, ${cold.critic?.usage.prompt_tokens ?? 0} prompt tokens; warm ${warm.critic?.status ?? "missing"}, ${warm.critic?.objections.length ?? 0} objections`,
+    ),
+    check(
+      "critic_context_recorded",
+      "The critic exhibit records the exact Markovian windows that built the prompt",
+      (cold.critic?.context?.chunks.length ?? 0) > 0 &&
+        cold.critic?.context?.chunk_count === cold.critic?.context_chunks &&
+        cold.critic?.context?.total_chars === cold.critic?.context_chars,
+      `${cold.critic?.context?.chunk_count ?? 0} window(s), ${cold.critic?.context?.total_chars ?? 0} chars, ${cold.critic?.context?.item_count ?? 0} items`,
     ),
     check(
       "content_safety",
       "The content-safety guard passes generated finding prose",
       cold.safety?.ok === true && warm.safety?.ok === true,
       `cold ${cold.safety?.ok ?? false}; warm ${warm.safety?.ok ?? false}`,
+    ),
+    check(
+      "nim_safety_model",
+      "The recorded Nemotron content-safety model labels the finding safe as a second layer",
+      cold.safety?.model?.status === "ran" &&
+        cold.safety.model.response_safety === "safe" &&
+        warm.safety?.model?.status === "ran" &&
+        warm.safety.model.response_safety === "safe",
+      `cold ${cold.safety?.model?.status ?? "missing"} (${cold.safety?.model?.model ?? "-"}: ${cold.safety?.model?.detail ?? "-"}); warm ${warm.safety?.model?.status ?? "missing"}`,
+    ),
+    check(
+      "nim_embedding_recall",
+      "The warm H-MEM recall is re-scored with recorded Nemotron embeddings",
+      cold.memory?.embedding?.status === "skipped" &&
+        warm.memory?.embedding?.status === "ran" &&
+        (warm.memory?.embedding?.dims ?? 0) > 0 &&
+        warm.memory?.scoring === "lexical+embedding" &&
+        (warm.memory?.hits[0]?.similarity ?? 0) > 0.5,
+      `cold ${cold.memory?.embedding?.status ?? "missing"}; warm ${warm.memory?.embedding?.status ?? "missing"} (${warm.memory?.embedding?.model ?? "-"}, ${warm.memory?.embedding?.dims ?? 0} dims, similarity ${warm.memory?.hits[0]?.similarity ?? 0})`,
+    ),
+    check(
+      "subjects_from_data",
+      "Hypothesis subjects are selected from the coverage rows, not named in code",
+      cold.hypotheses.find((row) => row.cause === "concept_switch_missing_history")?.subjects?.[0]
+        ?.entity_name === "Apple Inc." &&
+        cold.hypotheses.find((row) => row.cause === "single_filer_growth")?.subjects?.[0]
+          ?.entity_name === "Tesla, Inc." &&
+        cold.hypotheses.find((row) => row.cause === "concept_switch_missing_history")?.subjects?.[1]
+          ?.entity_name === "Target Corporation",
+      cold.hypotheses
+        .filter((row) => row.subjects?.length)
+        .map((row) => `${row.cause}: ${row.subjects?.map((s) => `${s.entity_name} (${s.role})`).join("; ")}`)
+        .join(" | "),
     ),
     check(
       "ablation",

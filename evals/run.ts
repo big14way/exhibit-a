@@ -87,6 +87,18 @@ function summary(state: CaseState) {
   };
 }
 
+/**
+ * Random per-run identifiers (exhibit, hypothesis and contract ids, the temp
+ * log directory) are replaced with stable placeholders. Every number in the
+ * file is still the computed value; only the ids are masked.
+ */
+function stableJson(payload: unknown): string {
+  return JSON.stringify(payload, null, 2)
+    .replace(/\b(ex|hyp|contract)_[0-9a-f]{16}\b/g, "$1_<id>")
+    .replace(/"[^"\n]*exhibit-a-eval-[^"\n]*"/g, '"<temp log dir>"')
+    .replace(/"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z"/g, '"<timestamp>"');
+}
+
 async function main(): Promise<void> {
   const root = mkdtempSync(resolve(tmpdir(), "exhibit-a-eval-"));
   const cassette = loadCassette(CASSETTE);
@@ -157,7 +169,9 @@ async function main(): Promise<void> {
     });
 
     const payload = {
-      generated_at: new Date().toISOString(),
+      // Dated by the cassette, not the clock, so a judge's `npm run eval`
+      // reproduces the committed file byte for byte instead of dirtying it.
+      generated_from: `cassette ${cassette.id} recorded ${cassette.recorded_at}`,
       mode: "SAMPLE_MODE replay from the committed cassette",
       cold: summary(cold),
       closed: summary(closed),
@@ -169,7 +183,7 @@ async function main(): Promise<void> {
       claims,
     };
     mkdirSync(RESULTS, { recursive: true });
-    writeFileSync(resolve(RESULTS, "latest.json"), `${JSON.stringify(payload, null, 2)}\n`);
+    writeFileSync(resolve(RESULTS, "latest.json"), `${stableJson(payload)}\n`);
     writeFileSync(resolve(RESULTS, "latest.md"), claimsMarkdown(claims));
 
     console.log(claimsMarkdown(claims));

@@ -1,18 +1,19 @@
 import {
   advance,
   checkContentSafety,
+  combineSafety,
   emitTrace,
   safetyText,
+  summarizeVerdict,
   type CaseState,
-  type CriticResult,
   type Exhibit,
   type MemoryRecall,
   type SafetyResult,
+  type SqlResult,
 } from "@exhibit-a/core";
-import { recallMemory } from "@exhibit-a/engines";
-import { NimClient } from "@exhibit-a/llm";
+import { recallMemorySemantic, type MemoryEmbedder } from "@exhibit-a/engines";
+import { NimClient, SAMPLE_SAFETY_MODEL, runSafetyModel } from "@exhibit-a/llm";
 import {
-  EDGAR_COMPANIES,
   bucketSql,
   canonicalFactsSql,
   canonicalSeries,
@@ -26,6 +27,7 @@ import {
   emitComputedExhibit,
   inferLineage,
   metricHistory,
+  nimClientFor,
   readBuckets,
   readCoverage,
   readDuplication,
@@ -33,6 +35,7 @@ import {
   secCompanyConceptArgs,
   secFramesArgs,
   secondChannel,
+  segmentsByCik,
   type SecCompanyConceptResult,
   type SecFramesResult,
   type ToolRuntime,
@@ -43,11 +46,21 @@ import {
   runCritic,
   type CriticClient,
 } from "./critic.ts";
-import { assessHypotheses, draftHypotheses, type EvidenceRefs } from "./hypotheses.ts";
+import {
+  assessHypotheses,
+  draftHypotheses,
+  profileFilers,
+  selectFilers,
+  type EvidenceRefs,
+} from "./hypotheses.ts";
 import { runRepair } from "./repair.ts";
 
-const CIK_FILTER = EDGAR_COMPANIES.map((company) => company.cik);
-const APPLE = EDGAR_COMPANIES[0];
+export const SAMPLE_EMBED_MODEL = "nvidia/nemotron-3.5-embed-1b";
+
+/** The concept the EDGAR revenue tables are built from. */
+const REVENUE_CONCEPT = "Revenues";
+
+export type ModelRole = "critic" | "safety" | "embed";
 
 export type InvestigationOptions = {
   root: string;
@@ -57,13 +70,17 @@ export type InvestigationOptions = {
   grain?: string;
   /** Test/recording hook. Omit to use the configured NIM client. */
   critic?: { client?: CriticClient | null; model?: string | null };
+  /** Test/recording hook for the content-safety role. */
+  safety?: { client?: CriticClient | null; model?: string | null };
+  /** Test/recording hook for the H-MEM embedding role. */
+  embed?: { client?: MemoryEmbedder | null };
 };
 
 /**
- * Day-2 deterministic investigator. Tool activity drives every state
- * transition; no model prose can create an exhibit or a hypothesis status.
- * The NIM planner attaches at the hypothesis step later without changing this
- * evidence path.
+ * Deterministic investigator. Tool activity drives every state transition;
+ * no model prose can create an exhibit or a hypothesis status. The three
+ * Nemotron roles (embedding recall, Defense Counsel, content safety) attach
+ * at the edges and are replayed from the cassette in SAMPLE_MODE.
  */
 export async function runInvestigation(
   input: InvestigationOptions,
@@ -74,11 +91,12 @@ export async function runInvestigation(
   let state = advance(input.state, "SCOPING");
 
   rt.agent = "LeadInvestigator";
-  const memory = recallMemory(input.root, {
-    metric: state.metric,
-    question: state.question,
-    limit: 5,
-  });
+  const embedder = input.embed ? input.embed.client ?? null : embedderFor(rt);
+  const memory = await recallMemorySemantic(
+    input.root,
+    { metric: state.metric, question: state.question, limit: 5 },
+    embedder,
+  );
   state = { ...state, memory };
   const memoryExhibit = emitMemoryExhibit(rt, memory);
   exhibits.push(memoryExhibit);
@@ -89,10 +107,17 @@ export async function runInvestigation(
     input_summary: `${state.metric}: ${state.question}`,
     output_summary:
       `${memory.records} memories, ${memory.hits.length} hit(s)` +
-      (memory.cold_start ? " (cold start)" : ""),
+      (memory.cold_start ? " (cold start)" : "") +
+      (memory.embedding?.status === "ran"
+        ? `; ${memory.embedding.model} embeddings (${memory.embedding.dims} dims)`
+        : memory.embedding
+          ? `; embeddings ${memory.embedding.status}`
+          : ""),
     status: "success",
     latency_ms: 0,
     exhibit_ids: [memoryExhibit.id],
+    model: memory.embedding?.status === "ran" ? memory.embedding.model : null,
+    tokens_in: memory.embedding?.usage.prompt_tokens ?? 0,
   });
 
   const catalog = await catalogSearch(rt, state.metric);
@@ -103,16 +128,6 @@ export async function runInvestigation(
   rt.agent = "SourceScout";
   const lineage = await inferLineage(rt, state.metric, input.viewSql);
   exhibits.push(...lineage.exhibits);
-
-  const discovery = await discoverSources(rt, {
-    kind: "sec_companyfacts",
-    cik: APPLE.cik,
-    entity_name: APPLE.entity_name,
-    concept: "Revenues",
-    sic_division: APPLE.sic_division,
-  });
-  state = { ...state, discovery: discovery.result };
-  exhibits.push(discovery.exhibit);
 
   state = advance(state, "BASELINED");
   rt.agent = "LeadInvestigator";
@@ -153,14 +168,52 @@ export async function runInvestigation(
     canonical.exhibit,
   );
 
+  // The filers the evidence points at. Nothing here names a company: the
+  // selection is a function of the coverage rows and the onset period.
   const onset = baseline.comparison.onset;
+  const coverage = readCoverage(coverageResult.result);
+  const filers = profileFilers(coverage);
   const periods = onset
     ? [`CY${onset.prior_period}`, `CY${onset.period}`]
-    : ["CY2017", "CY2018"];
+    : lastTwoPeriods(history.result, grain).map((period) => `CY${period}`);
+  const selection = onset
+    ? selectFilers(filers, Number(onset.period), Number(onset.prior_period))
+    : selectFilers(filers, Number(periods[1]?.slice(2)), Number(periods[0]?.slice(2)));
+  const focus = selection.focus;
+  emitTrace(input.root, {
+    case_id: state.id,
+    agent_name: rt.agent,
+    action: "evidence.select_filers",
+    input_summary: `${filers.length} filers in coverage; onset ${onset?.period ?? "none"}`,
+    output_summary:
+      `focus ${focus?.entity_name ?? "none"}` +
+      (selection.concentrated ? ` (all facts in ${onset?.period})` : "") +
+      (selection.stopped ? `; history stops: ${selection.stopped.entity_name} (${selection.stopped.last_year})` : ""),
+    status: "success",
+    latency_ms: 0,
+    exhibit_ids: [coverageResult.exhibit.id],
+  });
+
+  rt.agent = "SourceScout";
+  const discovery =
+    focus && onset
+      ? await discoverSources(rt, {
+          kind: "sec_companyfacts",
+          cik: focus.cik,
+          entity_name: focus.entity_name,
+          concept: REVENUE_CONCEPT,
+          sic_division: onset.segment,
+        })
+      : undefined;
+  if (discovery) {
+    state = { ...state, discovery: discovery.result };
+    exhibits.push(discovery.exhibit);
+  }
+
   const frames: { period: string; result: SecFramesResult; exhibit: Exhibit }[] = [];
+  const cikFilter = filers.map((filer) => filer.cik);
   for (const period of periods) {
-    rt.agent = "SourceScout";
-    const channel = await secondChannel(rt, secFramesArgs(period, [...CIK_FILTER]));
+    const channel = await secondChannel(rt, secFramesArgs(period, cikFilter));
     frames.push({
       period,
       result: channel.result as SecFramesResult,
@@ -168,8 +221,10 @@ export async function runInvestigation(
     });
     exhibits.push(channel.exhibit);
   }
-  const appleConcept = await secondChannel(rt, secCompanyConceptArgs(APPLE.cik));
-  exhibits.push(appleConcept.exhibit);
+  const concept = focus
+    ? await secondChannel(rt, secCompanyConceptArgs(focus.cik, REVENUE_CONCEPT))
+    : undefined;
+  if (concept) exhibits.push(concept.exhibit);
 
   const refs: EvidenceRefs = {
     lineageSources: lineage.exhibits[0]?.id ?? "",
@@ -181,19 +236,20 @@ export async function runInvestigation(
     buckets: bucketResult.exhibit.id,
     canonical: canonical.exhibit.id,
     frames: Object.fromEntries(frames.map((frame) => [frame.period, frame.exhibit.id])),
-    appleConcept: appleConcept.exhibit.id,
-    discovery: discovery.exhibit.id,
+    concept: concept?.exhibit.id,
+    discovery: discovery?.exhibit.id,
   };
 
   hypotheses = assessHypotheses(hypotheses, {
     baseline: baseline.comparison,
-    coverage: readCoverage(coverageResult.result),
+    coverage,
     duplication: readDuplication(duplicationResult.result),
     buckets: readBuckets(bucketResult.result),
     canonical: canonical.series,
     frames: frames.map((frame) => ({ period: frame.period, result: frame.result })),
-    appleConcept: appleConcept.result as SecCompanyConceptResult,
-    discovery: discovery.result,
+    concept: concept?.result as SecCompanyConceptResult | undefined,
+    discovery: discovery?.result,
+    segmentOf: segmentsByCik(canonicalResult.result),
     refs,
   });
 
@@ -217,7 +273,7 @@ export async function runInvestigation(
   if (cf) exhibits.push(cf.exhibit);
 
   state = advance(state, "CRITIQUED");
-  const criticTarget = input.critic ?? criticClientFor(rt);
+  const criticTarget = input.critic ?? modelRoleFor(rt, "critic");
   const critique = await runCritic({
     rt,
     state: { ...state, hypotheses, exhibits, memory },
@@ -267,14 +323,25 @@ export async function runInvestigation(
       notes: ["no onset outside the baseline band; nothing to adjudicate"],
     };
 
+  // Content safety runs twice over the generated finding: the deterministic
+  // lexical guard always, and the Nemotron content-safety model when it is
+  // configured or recorded. Either layer can withhold the finding.
   rt.agent = "SafetyGuard";
-  const safetyInput = safetyText(
-    state.question,
-    ...hypotheses.map((hypothesis) => hypothesis.note ?? hypothesis.statement),
-    ...(verdict.notes ?? []),
-    critique.result.content,
-  );
-  const safety = checkContentSafety(safetyInput);
+  const finding = findingText({
+    verdict: summarizeVerdict(verdict),
+    hypotheses: hypotheses.map((hypothesis) => hypothesis.note ?? hypothesis.statement),
+    notes: verdict.notes ?? [],
+  });
+  const safetyInput = safetyText(state.question, finding, critique.result.content);
+  const lexical = checkContentSafety(safetyInput);
+  const safetyTarget = input.safety ?? modelRoleFor(rt, "safety");
+  const model = await runSafetyModel({
+    client: safetyTarget.client ?? null,
+    model: safetyTarget.model ?? null,
+    question: state.question,
+    finding,
+  });
+  const safety = combineSafety(lexical, model);
   if (!safety.ok) {
     verdict = {
       ...verdict,
@@ -286,8 +353,27 @@ export async function runInvestigation(
       ],
     };
   }
-  const safetyExhibit = emitComputedSafetyExhibit(rt, safety, safetyInput);
+  const safetyExhibit = emitComputedSafetyExhibit(rt, safety, {
+    text: safetyInput,
+    question: state.question,
+    finding,
+  });
   exhibits.push(safetyExhibit);
+  emitTrace(input.root, {
+    case_id: state.id,
+    agent_name: rt.agent,
+    action: "safety.guard",
+    input_summary: `${safetyInput.length} chars`,
+    output_summary:
+      `lexical ${lexical.ok ? "pass" : "block"}; model ${model.status}` +
+      (model.status === "ran" ? ` (${model.detail})` : ""),
+    status: safety.ok ? "success" : "error",
+    latency_ms: 0,
+    exhibit_ids: [safetyExhibit.id],
+    model: model.status === "ran" ? model.model : null,
+    tokens_in: model.usage.prompt_tokens,
+    tokens_out: model.usage.completion_tokens,
+  });
   state = { ...state, safety, verdict };
   state = advance(state, "ADJUDICATED");
 
@@ -338,6 +424,26 @@ export async function runInvestigation(
   };
 }
 
+/** The human-readable finding that the safety layers check. Deterministic. */
+export function findingText(input: {
+  verdict: string;
+  hypotheses: string[];
+  notes: string[];
+}): string {
+  return [
+    `Verdict: ${input.verdict}`,
+    ...input.hypotheses.map((note) => `- ${note}`),
+    ...input.notes.map((note) => `Note: ${note}`),
+  ].join("\n");
+}
+
+function lastTwoPeriods(history: SqlResult, grain: string): (string | number)[] {
+  const index = history.columns.indexOf(grain);
+  if (index < 0) return [];
+  const periods = [...new Set(history.rows.map((row) => String(row[index])))].sort();
+  return periods.slice(-2);
+}
+
 function emitMemoryExhibit(rt: ToolRuntime, memory: MemoryRecall): Exhibit {
   return emitComputedExhibit({
     rt,
@@ -350,6 +456,7 @@ function emitMemoryExhibit(rt: ToolRuntime, memory: MemoryRecall): Exhibit {
       metric: memory.query.metric,
       question: memory.query.question,
       implementation: "packages/engines H-MEM reference",
+      embedding_model: memory.embedding?.model ?? null,
     },
     result: {
       ...memory,
@@ -362,42 +469,52 @@ function emitMemoryExhibit(rt: ToolRuntime, memory: MemoryRecall): Exhibit {
 function emitComputedSafetyExhibit(
   rt: ToolRuntime,
   safety: SafetyResult,
-  checkedText: string,
+  checked: { text: string; question: string; finding: string },
 ): Exhibit {
   return emitComputedExhibit({
     rt,
     tool: "safety",
     kind: "safety",
     title: safety.ok ? "content-safety guard pass" : "content-safety guard blocked prose",
-    args: { policy: safety.policy, text: checkedText },
+    args: {
+      policy: safety.policy,
+      text: checked.text,
+      model: safety.model?.status === "ran" ? safety.model.model : null,
+      question: checked.question,
+      finding: checked.finding,
+    },
     result: safety as unknown as Record<string, unknown>,
-    source: "safety",
+    source: safety.model?.status === "ran" ? "safety+nvidia-nim" : "safety",
   });
 }
 
-function criticClientFor(rt: ToolRuntime): {
-  client: CriticClient | null;
-  model: string | null;
-} {
+/**
+ * Model ids are configured, never guessed. SAMPLE_MODE replays the recorded
+ * responses for the three roles; live mode reads each role's env variable.
+ */
+export function modelRoleFor(
+  rt: ToolRuntime,
+  role: ModelRole,
+): { client: CriticClient | null; model: string | null } {
   if (rt.sampleMode) {
-    if (!rt.cassette?.models?.length) return { client: null, model: null };
-    return {
-      client: new NimClient({
-        apiKey: "sample-replay",
-        baseUrl: "https://sample.invalid/v1",
-        cassette: rt.cassette,
-      }),
-      model: SAMPLE_CRITIC_MODEL,
-    };
+    const client = nimClientFor(rt);
+    const model =
+      role === "critic" ? SAMPLE_CRITIC_MODEL : role === "safety" ? SAMPLE_SAFETY_MODEL : SAMPLE_EMBED_MODEL;
+    return { client, model: client ? model : null };
   }
-  const model = process.env.NIM_CRITIC_MODEL ?? process.env.NIM_LEAD_MODEL ?? null;
-  const apiKey = process.env.NVIDIA_API_KEY;
-  if (!apiKey || !model) return { client: null, model };
-  return {
-    client: new NimClient({
-      apiKey,
-      baseUrl: process.env.NVIDIA_BASE_URL ?? "https://integrate.api.nvidia.com/v1",
-    }),
-    model,
-  };
+  const model =
+    role === "critic"
+      ? process.env.NIM_CRITIC_MODEL ?? process.env.NIM_LEAD_MODEL ?? null
+      : role === "safety"
+        ? process.env.NIM_SAFETY_MODEL ?? null
+        : process.env.NIM_EMBED_MODEL ?? null;
+  const client = model ? nimClientFor(rt) : null;
+  return { client, model: client ? model : null };
+}
+
+function embedderFor(rt: ToolRuntime): MemoryEmbedder | null {
+  const { client, model } = modelRoleFor(rt, "embed");
+  if (!client || !model) return null;
+  const nim = client as NimClient;
+  return { model, embed: (request) => nim.embed(request) };
 }

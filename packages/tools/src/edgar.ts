@@ -183,6 +183,17 @@ export function readBuckets(result: SqlResult): BucketRow[] {
   }));
 }
 
+/** cik -> sic_division as the fact rows declare it; the first non-empty wins. */
+export function segmentsByCik(result: SqlResult): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const row of readCanonical(result)) {
+    if (row.sic_division && row.sic_division !== "null" && !map.has(row.cik)) {
+      map.set(row.cik, row.sic_division);
+    }
+  }
+  return map;
+}
+
 export function readCanonical(result: SqlResult): CanonicalRow[] {
   const division = indexOf(result.columns, "sic_division");
   const cik = indexOf(result.columns, "cik");

@@ -625,7 +625,9 @@ function safeParseUsl(result: SqlResult): unknown {
 
 function isIgnorableWriteError(sql: string, err: unknown): boolean {
   const message = err instanceof Error ? err.message : String(err);
-  if (!/exist/i.test(message)) return false;
+  // Only the idempotent "already exists" case is skipped; "does not exist" or
+  // any other failure must surface so a half-applied contract cannot close.
+  if (!/already\s+exists/i.test(message)) return false;
   if (/CREATE\s+SCHEMASTORE\s+CONTAINER/i.test(sql)) return true;
   if (/CREATE\s+NAMESPACE\s+IF\s+NOT\s+EXISTS/i.test(sql)) return true;
   if (/COMPILE\s+USL/i.test(sql)) return true;

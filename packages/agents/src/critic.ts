@@ -2,13 +2,14 @@ import {
   checkContentSafety,
   type BaselineComparison,
   type CaseState,
+  type ContextWindowSummary,
   type CriticObjection,
   type CriticResult,
   type Exhibit,
   type Hypothesis,
   type MemoryRecall,
 } from "@exhibit-a/core";
-import { chunkContext } from "@exhibit-a/engines";
+import { chunkContext, type ContextPack } from "@exhibit-a/engines";
 import type { ChatRequest, ChatResult } from "@exhibit-a/llm";
 import {
   emitComputedExhibit,
@@ -108,6 +109,37 @@ function evidenceFor(exhibits: Exhibit[]): CriticEvidence[] {
     .sort((a, b) => a.tool.localeCompare(b.tool) || a.title.localeCompare(b.title));
 }
 
+/** The Markovian pack the critic prompt is built from; recorded on the exhibit. */
+export function criticContext(exhibits: Exhibit[]): ContextPack {
+  const evidence = evidenceFor(exhibits);
+  return chunkContext({
+    maxChars: MAX_CONTEXT_CHARS,
+    items: evidence.map((item) => ({
+      id: `${item.tool}:${item.result_sha256.slice(0, 8)}`,
+      kind: item.kind,
+      text: `${item.title} — ${item.summary} — sha256 ${item.result_sha256}`,
+    })),
+  });
+}
+
+export function summarizeContext(pack: ContextPack): ContextWindowSummary {
+  return {
+    mode: pack.mode,
+    max_chars: pack.max_chars,
+    total_chars: pack.total_chars,
+    item_count: pack.item_count,
+    chunk_count: pack.chunk_count,
+    dropped: pack.dropped,
+    chunks: pack.chunks.map((chunk) => ({
+      key: chunk.key,
+      item_ids: chunk.item_ids,
+      chars: chunk.chars,
+      previous: chunk.previous,
+      next: chunk.next,
+    })),
+  };
+}
+
 export function buildCriticRequest(input: {
   state: CaseState;
   baseline: BaselineComparison;
@@ -118,14 +150,7 @@ export function buildCriticRequest(input: {
   model: string;
 }): ChatRequest {
   const evidence = evidenceFor(input.exhibits);
-  const context = chunkContext({
-    maxChars: MAX_CONTEXT_CHARS,
-    items: evidence.map((item) => ({
-      id: `${item.tool}:${item.result_sha256.slice(0, 8)}`,
-      kind: item.kind,
-      text: `${item.title} — ${item.summary} — sha256 ${item.result_sha256}`,
-    })),
-  });
+  const context = criticContext(input.exhibits);
   const payload: CriticPayload = {
     task:
       "Act as Defense Counsel. Attack each claimed cause in this data-quality " +
@@ -316,6 +341,9 @@ export async function runCritic(input: CriticInput): Promise<{
       .map((objection) => objection.exhibit_sha256)
       .filter((sha): sha is string => Boolean(sha) && !known.has(sha!));
     const safety = checkContentSafety(reply.content);
+    // The same pack that built the prompt is what the exhibit records, so the
+    // "bounded context" claim can be checked against the request itself.
+    const pack = criticContext(input.exhibits);
     const result: CriticResult = {
       status: "ran",
       model: reply.model || model,
@@ -330,18 +358,9 @@ export async function runCritic(input: CriticInput): Promise<{
       unresolved: safety.ok ? parsed.objections.length : 0,
       unsafe: !safety.ok,
       safety_findings: safety.findings,
-      context_chunks: chunkContext({
-        maxChars: MAX_CONTEXT_CHARS,
-        items: evidenceFor(input.exhibits).map((item) => ({
-          id: `${item.tool}:${item.result_sha256.slice(0, 8)}`,
-          kind: item.kind,
-          text: item.title,
-        })),
-      }).chunk_count,
-      context_chars: evidenceFor(input.exhibits).reduce(
-        (sum, item) => sum + item.title.length,
-        0,
-      ),
+      context_chunks: pack.chunk_count,
+      context_chars: pack.total_chars,
+      context: summarizeContext(pack),
       usage: reply.usage,
       spend: input.client.spend,
     };

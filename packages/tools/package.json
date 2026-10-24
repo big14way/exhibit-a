@@ -7,6 +7,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@exhibit-a/core": "workspace:*"
+    "@exhibit-a/core": "workspace:*",
+    "@exhibit-a/llm": "workspace:*"
   }
 }

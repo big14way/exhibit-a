@@ -11,6 +11,38 @@ const READ_PREFIXES = [
   "INFER SQLTABLE",
 ];
 
+const READ_PREFIX_PATTERN = new RegExp(
+  `^(?:${READ_PREFIXES.map((prefix) => prefix.replace(/\s+/g, "\\s+")).join("|")})\\b`,
+  "i",
+);
+
+/**
+ * Statement forms that change platform state. A read-only statement may not
+ * contain any of these anywhere, not just at the start: Spark SQL accepts a
+ * CTE before INSERT, and `EXPLAIN`/`WITH` would otherwise smuggle a write
+ * past a prefix check. String literals are blanked before the scan so a
+ * quoted value such as 'create' is not a false positive.
+ */
+const WRITE_FORMS: RegExp[] = [
+  /\bINSERT\s+(?:INTO|OVERWRITE)\b/i,
+  /\bUPDATE\s+[A-Za-z_"`[]/i,
+  /\bDELETE\s+FROM\b/i,
+  /\bMERGE\s+INTO\b/i,
+  /\bCREATE\s+(?:OR\s+REPLACE\s+)?(?:TEMP(?:ORARY)?\s+)?(?:SCHEMASTORE\s+|LIGHTNING\s+|EXTERNAL\s+)?(?:VIEW|TABLE|DATABASE|SCHEMA|CONTAINER|NAMESPACE|FUNCTION|INDEX|DATASOURCE)\b/i,
+  /\bDROP\s+(?:SCHEMASTORE\s+|LIGHTNING\s+)?(?:VIEW|TABLE|DATABASE|SCHEMA|CONTAINER|NAMESPACE|FUNCTION|INDEX|DATASOURCE|USL)\b/i,
+  /\bALTER\s+(?:VIEW|TABLE|DATABASE|SCHEMA)\b/i,
+  /\bTRUNCATE\s+TABLE\b/i,
+  /\bREPLACE\s+(?:INTO|TABLE)\b/i,
+  /\bLOAD\s+DATA\b/i,
+  /\b(?:CACHE|UNCACHE)\s+TABLE\b/i,
+  /\bREFRESH\s+TABLE\b/i,
+  /\b(?:COMPILE|ACTIVATE|UPDATE|REMOVE|DEACTIVATE)\s+USL\b/i,
+  /\b(?:REGISTER|REMOVE|DELETE)\s+DQ\b/i,
+  /\b(?:GRANT|REVOKE)\b/i,
+  /\bSET\s+[A-Za-z_.]+\s*=/i,
+  /\b(?:CALL|EXEC(?:UTE)?)\s+[A-Za-z_]/i,
+];
+
 export type GuardMode = "investigate" | "write";
 
 export class SqlGuardError extends Error {
@@ -25,6 +57,10 @@ function stripComments(sql: string, collapseWhitespace = true): string {
     .replace(/\/\*[\s\S]*?\*\//g, " ")
     .replace(/--[^\n]*/g, " ");
   return collapseWhitespace ? stripped.replace(/\s+/g, " ").trim() : stripped.trim();
+}
+
+function blankStringLiterals(sql: string): string {
+  return sql.replace(/'(?:[^'\\]|\\.)*'/g, "''").replace(/"(?:[^"\\]|\\.)*"/g, '""');
 }
 
 function isCompileUsl(sql: string): boolean {
@@ -67,13 +103,27 @@ export function assertSingleStatement(sql: string): string {
   return normalized;
 }
 
+/** The first write form found in a statement, or undefined when it is clean. */
+export function findWriteForm(sql: string): string | undefined {
+  const scan = blankStringLiterals(sql);
+  for (const form of WRITE_FORMS) {
+    const hit = scan.match(form);
+    if (hit) return hit[0].replace(/\s+/g, " ").toUpperCase();
+  }
+  return undefined;
+}
+
 export function assertReadOnly(sql: string): string {
   const normalized = assertSingleStatement(sql);
-  const upper = normalized.toUpperCase();
-  const ok = READ_PREFIXES.some((prefix) => upper.startsWith(prefix));
-  if (!ok) {
+  if (!READ_PREFIX_PATTERN.test(normalized)) {
     throw new SqlGuardError(
       `investigation mode allows only: ${READ_PREFIXES.join(" | ")}`,
+    );
+  }
+  const writeForm = findWriteForm(normalized);
+  if (writeForm) {
+    throw new SqlGuardError(
+      `investigation mode is read-only; statement contains ${writeForm}`,
     );
   }
   return normalized;

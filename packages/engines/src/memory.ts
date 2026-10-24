@@ -182,7 +182,132 @@ export function recallMemory(
       malformed: audit.malformed,
       duplicates: audit.duplicates,
     },
+    scoring: "lexical",
   };
+}
+
+/** A narrow embedding client so the engine does not depend on the NIM package. */
+export type MemoryEmbedder = {
+  model: string;
+  embed(request: {
+    agent: string;
+    model: string;
+    input: string[];
+    input_type?: "query" | "passage";
+  }): Promise<{ model: string; embeddings: number[][]; usage: { prompt_tokens: number } }>;
+};
+
+export const HMEM_EMBED_AGENT = "HMemEmbed";
+
+/**
+ * The text that represents a memory record for embedding. It deliberately
+ * excludes the case id and timestamps so the same closed case embeds to the
+ * same vector in every run, which keeps the SAMPLE_MODE replay exact.
+ */
+export function memoryRecordText(record: Pick<MemoryRecord, "metric" | "question" | "verdict_kind" | "causes">): string {
+  return `${record.metric}\n${record.question}\n${record.verdict_kind}: ${record.causes.join(", ") || "no causes"}`;
+}
+
+export function memoryQueryText(query: { metric: string; question: string }): string {
+  return `${query.metric}\n${query.question}`;
+}
+
+function cosine(a: number[], b: number[]): number {
+  let dot = 0;
+  let na = 0;
+  let nb = 0;
+  const n = Math.min(a.length, b.length);
+  for (let i = 0; i < n; i += 1) {
+    dot += (a[i] ?? 0) * (b[i] ?? 0);
+    na += (a[i] ?? 0) ** 2;
+    nb += (b[i] ?? 0) ** 2;
+  }
+  if (na === 0 || nb === 0) return 0;
+  return dot / (Math.sqrt(na) * Math.sqrt(nb));
+}
+
+/**
+ * Lexical recall, re-scored with Nemotron embeddings when an embedder is
+ * available. The lexical pass always runs, so a missing key, a cassette miss
+ * or a model error degrades to the deterministic result and says so in the
+ * `embedding` summary rather than failing the investigation.
+ */
+export async function recallMemorySemantic(
+  root: string,
+  query: { metric: string; question: string; limit?: number },
+  embedder?: MemoryEmbedder | null,
+): Promise<MemoryRecall> {
+  const lexical = recallMemory(root, query);
+  const skipped = (detail: string, model: string | null): MemoryRecall => ({
+    ...lexical,
+    embedding: { status: "skipped", model, dims: 0, texts: 0, detail, usage: { prompt_tokens: 0 } },
+  });
+  if (!embedder) return skipped("no embedding model configured; lexical recall only", null);
+  const records = readIndex(root).index.records;
+  if (records.length === 0) {
+    return skipped("cold start; nothing to embed", embedder.model);
+  }
+  try {
+    const queryVector = await embedder.embed({
+      agent: HMEM_EMBED_AGENT,
+      model: embedder.model,
+      input: [memoryQueryText(query)],
+      input_type: "query",
+    });
+    const passages = await embedder.embed({
+      agent: HMEM_EMBED_AGENT,
+      model: embedder.model,
+      input: records.map((record) => memoryRecordText(record)),
+      input_type: "passage",
+    });
+    const q = queryVector.embeddings[0] ?? [];
+    const byCase = new Map(lexical.hits.map((hit) => [hit.case_id, hit]));
+    const hits: MemoryHit[] = records.map((record, index) => {
+      const similarity = Math.round(cosine(q, passages.embeddings[index] ?? []) * 1e4) / 1e4;
+      const base = byCase.get(record.case_id);
+      const semantic = Math.round(similarity * 10);
+      return {
+        case_id: record.case_id,
+        metric: record.metric,
+        question: record.question,
+        verdict_kind: record.verdict_kind,
+        causes: record.causes,
+        closed_at: record.closed_at,
+        score: (base?.score ?? 0) + semantic,
+        match: [...(base?.match ?? []), `embedding similarity ${similarity.toFixed(2)}`],
+        excerpt: record.note,
+        similarity,
+      };
+    });
+    hits.sort((a, b) => b.score - a.score || b.closed_at.localeCompare(a.closed_at));
+    return {
+      ...lexical,
+      hits: hits.filter((hit) => hit.score > 0).slice(0, query.limit ?? 5),
+      scoring: "lexical+embedding",
+      embedding: {
+        status: "ran",
+        model: passages.model || embedder.model,
+        dims: q.length,
+        texts: records.length + 1,
+        detail: `query and ${records.length} record(s) embedded; cosine similarity added to the lexical score`,
+        usage: {
+          prompt_tokens: queryVector.usage.prompt_tokens + passages.usage.prompt_tokens,
+        },
+      },
+    };
+  } catch (err) {
+    return {
+      ...lexical,
+      embedding: {
+        status: "error",
+        model: embedder.model,
+        dims: 0,
+        texts: 0,
+        detail: `embedding unavailable, lexical recall kept: ${err instanceof Error ? err.message : String(err)}`,
+        usage: { prompt_tokens: 0 },
+      },
+    };
+  }
 }
 
 /**

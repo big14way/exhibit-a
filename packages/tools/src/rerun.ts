@@ -1,10 +1,12 @@
 import type { Exhibit, SafetyResult, SqlResult, WriteContract } from "@exhibit-a/core";
 import {
   checkContentSafety,
+  combineSafety,
   loadExhibits,
   sha256Json,
   verifyContract,
 } from "@exhibit-a/core";
+import { runSafetyModel } from "@exhibit-a/llm";
 import { discoverSources, type DiscoverSourcesArgs } from "./discovery.ts";
 import { compareMetricSeries, type Band } from "./baseline.ts";
 import { canonicalSeries } from "./canonical.ts";
@@ -12,7 +14,7 @@ import {
   computeCounterfactual,
   type CounterfactualArgs,
 } from "./counterfactual.ts";
-import { executeSqlTool, emitComputedExhibit, type ToolRuntime } from "./runtime.ts";
+import { executeSqlTool, emitComputedExhibit, nimClientFor, type ToolRuntime } from "./runtime.ts";
 import { secondChannel, type SecondChannelArgs, type SecFramesResult } from "./second-channel.ts";
 import {
   CORRECTED_METRIC,
@@ -241,8 +243,29 @@ export async function rerunExhibit(rt: ToolRuntime, exhibit: Exhibit): Promise<R
       source: "nvidia-nim",
     });
   } else if (tool === "safety") {
-    const args = exhibit.args as { policy?: string; text?: string };
-    const safety: SafetyResult = checkContentSafety(args.text ?? "");
+    const args = exhibit.args as {
+      policy?: string;
+      text?: string;
+      model?: string | null;
+      question?: string;
+      finding?: string;
+    };
+    const lexical: SafetyResult = checkContentSafety(args.text ?? "");
+    // Both layers are re-run: the lexical rules in code and, when the exhibit
+    // recorded a model, the same content-safety request (replayed in
+    // SAMPLE_MODE, live otherwise).
+    const safety: SafetyResult =
+      args.model && args.question !== undefined && args.finding !== undefined
+        ? combineSafety(
+            lexical,
+            await runSafetyModel({
+              client: nimClientFor(rt),
+              model: args.model,
+              question: args.question,
+              finding: args.finding,
+            }),
+          )
+        : lexical;
     again = emitComputedExhibit({
       rt,
       tool: "safety",
@@ -250,7 +273,7 @@ export async function rerunExhibit(rt: ToolRuntime, exhibit: Exhibit): Promise<R
       title: exhibit.title,
       args: exhibit.args,
       result: safety as unknown as Record<string, unknown>,
-      source: "safety",
+      source: safety.model?.status === "ran" ? "safety+nvidia-nim" : "safety",
     });
   } else if (tool === "memory" || tool === "memory_recall") {
     again = emitComputedExhibit({

@@ -1,4 +1,4 @@
-import type { SafetyFinding, SafetyResult } from "./models.ts";
+import type { SafetyFinding, SafetyModelResult, SafetyResult } from "./models.ts";
 
 /**
  * Deterministic content-safety guard for the human-readable finding. This is
@@ -82,6 +82,33 @@ export function safeFindingText(text: string): { text: string; safety: SafetyRes
     };
   }
   return { text: `${text.trim()} ${DISCLAIMER}`.trim(), safety };
+}
+
+/**
+ * Merge the deterministic lexical result with the Nemotron content-safety
+ * model's labels. The model can only add a block: a lexical block stands even
+ * when the model says safe, and a model "unsafe" withholds the finding even
+ * when the lexical rules found nothing.
+ */
+export function combineSafety(lexical: SafetyResult, model: SafetyModelResult): SafetyResult {
+  const modelBlocks = model.status === "ran" && model.response_safety === "unsafe";
+  const ok = lexical.ok && !modelBlocks;
+  return {
+    ...lexical,
+    ok,
+    action: ok ? "allow" : "block",
+    findings: modelBlocks
+      ? [
+          ...lexical.findings,
+          {
+            rule: "nemotron_content_safety",
+            match: model.categories.join(", ") || "unsafe",
+            detail: `The content-safety model labelled the finding ${model.response_safety}.`,
+          },
+        ]
+      : lexical.findings,
+    model,
+  };
 }
 
 export function safetyText(...parts: unknown[]): string {

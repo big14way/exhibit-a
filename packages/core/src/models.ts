@@ -75,6 +75,8 @@ export type Hypothesis = {
   exhibit_ids: string[];
   note?: string;
   share?: number;
+  /** Filers the evidence selected for this hypothesis, by CIK. */
+  subjects?: { cik: string; entity_name: string; role: string }[];
 };
 
 export type LineageSource = {
@@ -227,6 +229,19 @@ export type MemoryHit = {
   score: number;
   match: string[];
   excerpt: string;
+  /** Cosine similarity from the Nemotron embedding role, when it ran. */
+  similarity?: number;
+};
+
+export type ModelRoleStatus = "ran" | "skipped" | "error";
+
+export type EmbeddingSummary = {
+  status: ModelRoleStatus;
+  model: string | null;
+  dims: number;
+  texts: number;
+  detail: string;
+  usage: { prompt_tokens: number };
 };
 
 export type MemoryRecall = {
@@ -236,6 +251,8 @@ export type MemoryRecall = {
   records: number;
   hits: MemoryHit[];
   audit: { valid: number; malformed: number; duplicates: number };
+  scoring: "lexical" | "lexical+embedding";
+  embedding?: EmbeddingSummary;
 };
 
 export type MemoryRecord = {
@@ -259,12 +276,41 @@ export type SafetyFinding = {
   detail: string;
 };
 
+export type SafetyModelResult = {
+  status: ModelRoleStatus;
+  model: string | null;
+  user_safety: string | null;
+  response_safety: string | null;
+  categories: string[];
+  detail: string;
+  raw: string;
+  usage: { prompt_tokens: number; completion_tokens: number };
+};
+
 export type SafetyResult = {
   ok: boolean;
   policy: string;
   findings: SafetyFinding[];
   checked_chars: number;
   action: "allow" | "block";
+  /** Second layer: the Nemotron content-safety model, when configured. */
+  model?: SafetyModelResult;
+};
+
+export type ContextWindowSummary = {
+  mode: string;
+  max_chars: number;
+  total_chars: number;
+  item_count: number;
+  chunk_count: number;
+  dropped: number;
+  chunks: {
+    key: string;
+    item_ids: string[];
+    chars: number;
+    previous: string | null;
+    next: string | null;
+  }[];
 };
 
 export type CriticObjection = {
@@ -287,6 +333,8 @@ export type CriticResult = {
   safety_findings: SafetyFinding[];
   context_chunks: number;
   context_chars: number;
+  /** The exact Markovian windows that were sent to the model. */
+  context?: ContextWindowSummary;
   usage: { prompt_tokens: number; completion_tokens: number };
   spend: { calls: number; input_tokens: number; output_tokens: number; spent_usd: number };
 };

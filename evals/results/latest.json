@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-23T08:31:23.962Z",
+  "generated_from": "cassette cassette_d2_edgar recorded 2026-10-24",
   "mode": "SAMPLE_MODE replay from the committed cassette",
   "cold": {
     "id": "case_eval_cold",
@@ -13,14 +13,14 @@
         "kind": "artifact",
         "share": 0.96168,
         "exhibit_ids": [
-          "ex_71221750ca0b7969",
-          "ex_f96d2b0d318ef09f",
-          "ex_e3a9ee832b8b46e8",
-          "ex_9b0305fa834c13ff",
-          "ex_f2508423a370c490",
-          "ex_679dcefb89ea40e3",
-          "ex_35c2ad0c8bff8199",
-          "ex_3c990ec59a6620fd"
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>"
         ]
       },
       {
@@ -28,11 +28,11 @@
         "kind": "real",
         "share": 0.03832,
         "exhibit_ids": [
-          "ex_0cc2a56e3e33d571",
-          "ex_f2508423a370c490",
-          "ex_679dcefb89ea40e3",
-          "ex_176311b878edc233",
-          "ex_3c990ec59a6620fd"
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>"
         ]
       }
     ],
@@ -43,16 +43,29 @@
       "objections": 5,
       "cited_unknown": 0,
       "usage": {
-        "prompt_tokens": 2599,
-        "completion_tokens": 5562
+        "prompt_tokens": 2620,
+        "completion_tokens": 5051
       }
     },
     "safety": {
       "ok": true,
       "policy": "data-quality-finding-no-investment-advice",
       "findings": [],
-      "checked_chars": 3123,
-      "action": "allow"
+      "checked_chars": 2668,
+      "action": "allow",
+      "model": {
+        "status": "ran",
+        "model": "nvidia/nemotron-3.5-content-safety",
+        "user_safety": "safe",
+        "response_safety": "safe",
+        "categories": [],
+        "detail": "user safe, response safe",
+        "raw": "User Safety: safe\nResponse Safety: safe",
+        "usage": {
+          "prompt_tokens": 872,
+          "completion_tokens": 10
+        }
+      }
     },
     "discovery": {
       "company": "Apple Inc.",
@@ -113,7 +126,7 @@
       "rule": "revenue concept must have USD annual 10-K facts (330-400 days), a chain ending within 421 days, and extend the stopped concept"
     },
     "memory": {
-      "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-eval-ChuBhb/logs/memory/index.json",
+      "storage": "<temp log dir>",
       "cold_start": true,
       "query": {
         "metric": "analytics.sector_revenue_by_year",
@@ -125,6 +138,17 @@
         "valid": 0,
         "malformed": 0,
         "duplicates": 0
+      },
+      "scoring": "lexical",
+      "embedding": {
+        "status": "skipped",
+        "model": "nvidia/nemotron-3.5-embed-1b",
+        "dims": 0,
+        "texts": 0,
+        "detail": "cold start; nothing to embed",
+        "usage": {
+          "prompt_tokens": 0
+        }
       }
     },
     "verification": {
@@ -201,14 +225,14 @@
         "kind": "artifact",
         "share": 0.96168,
         "exhibit_ids": [
-          "ex_71221750ca0b7969",
-          "ex_f96d2b0d318ef09f",
-          "ex_e3a9ee832b8b46e8",
-          "ex_9b0305fa834c13ff",
-          "ex_f2508423a370c490",
-          "ex_679dcefb89ea40e3",
-          "ex_35c2ad0c8bff8199",
-          "ex_3c990ec59a6620fd"
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>"
         ]
       },
       {
@@ -216,11 +240,11 @@
         "kind": "real",
         "share": 0.03832,
         "exhibit_ids": [
-          "ex_0cc2a56e3e33d571",
-          "ex_f2508423a370c490",
-          "ex_679dcefb89ea40e3",
-          "ex_176311b878edc233",
-          "ex_3c990ec59a6620fd"
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>"
         ]
       }
     ],
@@ -231,16 +255,29 @@
       "objections": 5,
       "cited_unknown": 0,
       "usage": {
-        "prompt_tokens": 2599,
-        "completion_tokens": 5562
+        "prompt_tokens": 2620,
+        "completion_tokens": 5051
       }
     },
     "safety": {
       "ok": true,
       "policy": "data-quality-finding-no-investment-advice",
       "findings": [],
-      "checked_chars": 3123,
-      "action": "allow"
+      "checked_chars": 2668,
+      "action": "allow",
+      "model": {
+        "status": "ran",
+        "model": "nvidia/nemotron-3.5-content-safety",
+        "user_safety": "safe",
+        "response_safety": "safe",
+        "categories": [],
+        "detail": "user safe, response safe",
+        "raw": "User Safety: safe\nResponse Safety: safe",
+        "usage": {
+          "prompt_tokens": 872,
+          "completion_tokens": 10
+        }
+      }
     },
     "discovery": {
       "company": "Apple Inc.",
@@ -301,7 +338,7 @@
       "rule": "revenue concept must have USD annual 10-K facts (330-400 days), a chain ending within 421 days, and extend the stopped concept"
     },
     "memory": {
-      "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-eval-ChuBhb/logs/memory/index.json",
+      "storage": "<temp log dir>",
       "cold_start": true,
       "query": {
         "metric": "analytics.sector_revenue_by_year",
@@ -313,6 +350,17 @@
         "valid": 0,
         "malformed": 0,
         "duplicates": 0
+      },
+      "scoring": "lexical",
+      "embedding": {
+        "status": "skipped",
+        "model": "nvidia/nemotron-3.5-embed-1b",
+        "dims": 0,
+        "texts": 0,
+        "detail": "cold start; nothing to embed",
+        "usage": {
+          "prompt_tokens": 0
+        }
       }
     },
     "hmem": {
@@ -321,7 +369,7 @@
       "valid": 1,
       "malformed": 0,
       "duplicates": 0,
-      "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-eval-ChuBhb/logs/memory/index.json",
+      "storage": "<temp log dir>",
       "recalled": 0
     },
     "verification": {
@@ -389,7 +437,7 @@
         {
           "name": "write_contract",
           "ok": true,
-          "detail": "operator-approved contract contract_b088e60934bad33f executed exactly its signed statements"
+          "detail": "operator-approved contract contract_<id> executed exactly its signed statements"
         },
         {
           "name": "final_view_readback",
@@ -456,7 +504,7 @@
       "written_metric": "exhibit_a.sector_revenue_by_year_v2"
     },
     "contract": {
-      "id": "contract_b088e60934bad33f",
+      "id": "contract_<id>",
       "statements": 7,
       "approved": true
     }
@@ -473,14 +521,14 @@
         "kind": "artifact",
         "share": 0.96168,
         "exhibit_ids": [
-          "ex_15444f197cf55f3f",
-          "ex_30717b40abcb8aaf",
-          "ex_1a8a55d2f6f2a8f0",
-          "ex_66278089cb81228f",
-          "ex_f2519492abfdb1ce",
-          "ex_a1b219c995db97d7",
-          "ex_81c02b48a714912f",
-          "ex_fdc8bbeca8ca7797"
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>"
         ]
       },
       {
@@ -488,31 +536,44 @@
         "kind": "real",
         "share": 0.03832,
         "exhibit_ids": [
-          "ex_928ad66e0181c649",
-          "ex_f2519492abfdb1ce",
-          "ex_a1b219c995db97d7",
-          "ex_717d5a732e23bf9d",
-          "ex_fdc8bbeca8ca7797"
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>",
+          "ex_<id>"
         ]
       }
     ],
     "gate_failures": [],
     "critic": {
-      "status": "error",
+      "status": "ran",
       "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-      "objections": 0,
-      "cited_unknown": 0,
+      "objections": 5,
+      "cited_unknown": 4,
       "usage": {
-        "prompt_tokens": 0,
-        "completion_tokens": 0
+        "prompt_tokens": 2682,
+        "completion_tokens": 6790
       }
     },
     "safety": {
       "ok": true,
       "policy": "data-quality-finding-no-investment-advice",
       "findings": [],
-      "checked_chars": 1314,
-      "action": "allow"
+      "checked_chars": 2950,
+      "action": "allow",
+      "model": {
+        "status": "ran",
+        "model": "nvidia/nemotron-3.5-content-safety",
+        "user_safety": "safe",
+        "response_safety": "safe",
+        "categories": [],
+        "detail": "user safe, response safe",
+        "raw": "User Safety: safe\nResponse Safety: safe",
+        "usage": {
+          "prompt_tokens": 879,
+          "completion_tokens": 10
+        }
+      }
     },
     "discovery": {
       "company": "Apple Inc.",
@@ -573,7 +634,7 @@
       "rule": "revenue concept must have USD annual 10-K facts (330-400 days), a chain ending within 421 days, and extend the stopped concept"
     },
     "memory": {
-      "storage": "/var/folders/tg/s7p8x9f10ydbzg5z2yt1lnq80000gn/T/exhibit-a-eval-ChuBhb/logs/memory/index.json",
+      "storage": "<temp log dir>",
       "cold_start": false,
       "query": {
         "metric": "analytics.sector_revenue_by_year",
@@ -590,20 +651,33 @@
             "filing_year_duplication=96.2%",
             "real_change=3.8%"
           ],
-          "closed_at": "2026-10-23T08:31:23.953Z",
-          "score": 14,
+          "closed_at": "<timestamp>",
+          "score": 21,
           "match": [
             "same metric",
             "4 shared terms",
-            "MIXED"
+            "MIXED",
+            "embedding similarity 0.72"
           ],
-          "excerpt": "Exhibit A case_eval_cold verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_71221750ca0b7969, ex_f96d2b0d318ef09f, ex_e3a9ee832b8b46e8, ex_9b0305fa834c13ff, ex_f2508423a370c490, ex_679dcefb89ea40e3, 2026-10-23. Data-quality finding on public filings, not investment advice."
+          "excerpt": "Exhibit A case_eval_cold verdict MIXED (filing_year_duplication=96.2%, real_change=3.8%), exhibits ex_<id>, ex_<id>, ex_<id>, ex_<id>, ex_<id>, ex_<id>, 2026-10-24. Data-quality finding on public filings, not investment advice.",
+          "similarity": 0.7224
         }
       ],
       "audit": {
         "valid": 1,
         "malformed": 0,
         "duplicates": 0
+      },
+      "scoring": "lexical+embedding",
+      "embedding": {
+        "status": "ran",
+        "model": "nvidia/nemotron-3.5-embed-1b",
+        "dims": 2048,
+        "texts": 2,
+        "detail": "query and 1 record(s) embedded; cosine similarity added to the lexical score",
+        "usage": {
+          "prompt_tokens": 63
+        }
       }
     },
     "verification": {
@@ -744,15 +818,39 @@
     },
     {
       "id": "nim_critic",
-      "claim": "The recorded Nemotron critic runs in replay with five grounded objections",
+      "claim": "The recorded Nemotron critic runs in replay with grounded objections on both the cold and warm case",
       "ok": true,
-      "evidence": "ran; 5 objections; 2599 prompt tokens"
+      "evidence": "cold ran, 5 objections, 2620 prompt tokens; warm ran, 5 objections"
+    },
+    {
+      "id": "critic_context_recorded",
+      "claim": "The critic exhibit records the exact Markovian windows that built the prompt",
+      "ok": true,
+      "evidence": "1 window(s), 1606 chars, 12 items"
     },
     {
       "id": "content_safety",
       "claim": "The content-safety guard passes generated finding prose",
       "ok": true,
       "evidence": "cold true; warm true"
+    },
+    {
+      "id": "nim_safety_model",
+      "claim": "The recorded Nemotron content-safety model labels the finding safe as a second layer",
+      "ok": true,
+      "evidence": "cold ran (nvidia/nemotron-3.5-content-safety: user safe, response safe); warm ran"
+    },
+    {
+      "id": "nim_embedding_recall",
+      "claim": "The warm H-MEM recall is re-scored with recorded Nemotron embeddings",
+      "ok": true,
+      "evidence": "cold skipped; warm ran (nvidia/nemotron-3.5-embed-1b, 2048 dims, similarity 0.7224)"
+    },
+    {
+      "id": "subjects_from_data",
+      "claim": "Hypothesis subjects are selected from the coverage rows, not named in code",
+      "ok": true,
+      "evidence": "concept_switch_missing_history: Apple Inc. (concentrated in onset year); Target Corporation (history stops) | single_filer_growth: Tesla, Inc. (fastest-growing filer in segment) | ingestion_gap: Apple Inc. (largest contributor to the delta)"
     },
     {
       "id": "ablation",

@@ -280,7 +280,9 @@ const entries = [
   result: entry.result,
 }));
 
-const cikFilter = fixture.companies.map((company) => company.cik);
+// The investigator derives the frames filter from the coverage rows, sorted
+// by CIK; the cassette key must match that order exactly.
+const cikFilter = fixture.companies.map((company) => company.cik).sort();
 for (const frame of framesFixture.frames) {
   const args = secFramesArgs(frame.frame, cikFilter);
   entries.push({
@@ -303,7 +305,7 @@ const cassette: Cassette = {
   id: "cassette_d2_edgar",
   recorded_at: new Date().toISOString().slice(0, 10),
   label:
-    "labelled SAMPLE_MODE cassette built from a committed SEC companyconcept/frames sample and a recorded Nemotron critic response; replace after the first live Zetaris recording",
+    "labelled SAMPLE_MODE cassette built from a committed SEC companyconcept/frames sample plus recorded Nemotron responses for the critic, content-safety and embedding roles",
   entries,
   models: existingModels,
 };

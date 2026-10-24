@@ -5,7 +5,6 @@ import {
   type Hypothesis,
 } from "@exhibit-a/core";
 import {
-  EDGAR_COMPANIES,
   type BucketRow,
   type CanonicalSeries,
   type CoverageRow,
@@ -25,8 +24,8 @@ export type EvidenceRefs = {
   buckets: string;
   canonical: string;
   frames: Record<string, string>;
-  appleConcept: string;
-  discovery: string;
+  concept?: string;
+  discovery?: string;
 };
 
 export type Evidence = {
@@ -36,14 +35,111 @@ export type Evidence = {
   buckets: BucketRow[];
   canonical: CanonicalSeries;
   frames: { period: string; result: SecFramesResult }[];
-  appleConcept: SecCompanyConceptResult;
+  /** SEC companyconcept for the focus filer, when one was selected. */
+  concept?: SecCompanyConceptResult;
   discovery?: DiscoveryResult;
+  /** cik -> sic_division, read from the canonical fact rows. */
+  segmentOf: Map<string, string>;
   refs: EvidenceRefs;
 };
 
-const APPLE = EDGAR_COMPANIES[0];
-const TESLA = EDGAR_COMPANIES[6];
-const TARGET = EDGAR_COMPANIES[4];
+/** One filer's coverage across fiscal years, derived from the coverage rows. */
+export type FilerProfile = {
+  cik: string;
+  entity_name: string;
+  years: number[];
+  first_year: number;
+  last_year: number;
+  rows_total: number;
+  revenue_by_year: Map<number, number>;
+};
+
+export function profileFilers(coverage: CoverageRow[]): FilerProfile[] {
+  const byCik = new Map<string, FilerProfile>();
+  for (const row of coverage) {
+    const profile = byCik.get(row.cik) ?? {
+      cik: row.cik,
+      entity_name: row.entity_name,
+      years: [],
+      first_year: row.fiscal_year,
+      last_year: row.fiscal_year,
+      rows_total: 0,
+      revenue_by_year: new Map<number, number>(),
+    };
+    profile.years.push(row.fiscal_year);
+    profile.first_year = Math.min(profile.first_year, row.fiscal_year);
+    profile.last_year = Math.max(profile.last_year, row.fiscal_year);
+    profile.rows_total += row.rows_n;
+    profile.revenue_by_year.set(
+      row.fiscal_year,
+      (profile.revenue_by_year.get(row.fiscal_year) ?? 0) + row.revenue_usd,
+    );
+    byCik.set(row.cik, profile);
+  }
+  return [...byCik.values()].sort((a, b) => a.cik.localeCompare(b.cik));
+}
+
+export type FilerSelection = {
+  /** Every fact the filer has lands in the onset year. */
+  concentrated?: FilerProfile;
+  /** The filer's history stops before the prior period. */
+  stopped?: FilerProfile;
+  /** The filer that contributes most to the reported delta. */
+  focus?: FilerProfile;
+};
+
+/**
+ * Pick the filers the evidence points at. No company is named in code: the
+ * concentrated filer is whoever has every fact in the onset year, the stopped
+ * filer is whoever disappears before the prior period, and the focus filer is
+ * the largest contributor to the reported delta.
+ */
+export function selectFilers(
+  filers: FilerProfile[],
+  onsetYear: number,
+  priorYear: number,
+): FilerSelection {
+  const revenueAt = (filer: FilerProfile, year: number): number =>
+    filer.revenue_by_year.get(year) ?? 0;
+  const concentrated = filers
+    .filter((filer) => filer.years.length > 0 && filer.years.every((year) => year === onsetYear))
+    .sort((a, b) => revenueAt(b, onsetYear) - revenueAt(a, onsetYear))[0];
+  const stopped = filers
+    .filter((filer) => filer.last_year < priorYear)
+    .sort((a, b) => b.last_year - a.last_year)[0];
+  const focus =
+    concentrated ??
+    [...filers].sort(
+      (a, b) =>
+        revenueAt(b, onsetYear) - revenueAt(b, priorYear) -
+        (revenueAt(a, onsetYear) - revenueAt(a, priorYear)),
+    )[0];
+  return { concentrated, stopped, focus };
+}
+
+/**
+ * The fastest-growing filer in the moved segment that is present in both
+ * periods. This is the honest version of "one company's growth explains it".
+ */
+export function selectGrowthFiler(
+  filers: FilerProfile[],
+  segmentOf: Map<string, string>,
+  segment: string,
+  onsetYear: number,
+  priorYear: number,
+  excludeCik?: string,
+): (FilerProfile & { ratio: number; delta: number }) | undefined {
+  const candidates = filers
+    .filter((filer) => filer.cik !== excludeCik)
+    .filter((filer) => segmentOf.size === 0 || segmentOf.get(filer.cik) === segment)
+    .map((filer) => {
+      const prior = filer.revenue_by_year.get(priorYear) ?? 0;
+      const now = filer.revenue_by_year.get(onsetYear) ?? 0;
+      return { ...filer, ratio: prior > 0 ? now / prior : 0, delta: now - prior };
+    })
+    .filter((filer) => filer.ratio > 0 && filer.years.includes(onsetYear));
+  return candidates.sort((a, b) => b.ratio - a.ratio)[0];
+}
 
 export function draftHypotheses(
   metric: string,
@@ -67,8 +163,8 @@ export function draftHypotheses(
       id: newId("hyp"),
       cause: "concept_switch_missing_history",
       statement:
-        `The ${period} bucket gains a company that is absent from ${prior}, because a filer's Revenues concept stops after one filing and its whole fact history lands in a single fiscal_year.`,
-      blamed: [`${APPLE.table}`, `${TARGET.table}`],
+        `The ${period} bucket gains a filer that is absent from ${prior}, because a filer's Revenues concept stops after one filing and its whole fact history lands in a single fiscal_year.`,
+      blamed: ["edgar.*_revenue_table"],
       status: "open",
       exhibit_ids: [],
     },
@@ -83,10 +179,10 @@ export function draftHypotheses(
     },
     {
       id: newId("hyp"),
-      cause: "tesla_short_history",
+      cause: "single_filer_growth",
       statement:
-        `Tesla's short filing history explains the ${period} movement in ${segment}.`,
-      blamed: [`${TESLA.table}`],
+        `One fast-growing filer in ${segment} explains the ${period} movement on its own.`,
+      blamed: ["edgar.*_revenue_table"],
       status: "open",
       exhibit_ids: [],
     },
@@ -95,11 +191,19 @@ export function draftHypotheses(
       cause: "ingestion_gap",
       statement:
         `The artifact is an ingestion gap: Zetaris lost facts that the SEC endpoint still returns, so the naive series is missing rows rather than duplicating them.`,
-      blamed: [`${APPLE.table}`, "zetaris.ingest"],
+      blamed: ["edgar.*_revenue_table", "zetaris.ingest"],
       status: "open",
       exhibit_ids: [],
     },
   ];
+}
+
+function subject(filer: FilerProfile | undefined, role: string) {
+  return filer ? [{ cik: filer.cik, entity_name: filer.entity_name, role }] : [];
+}
+
+function withIds(ids: (string | undefined)[]): string[] {
+  return ids.filter((id): id is string => Boolean(id));
 }
 
 export function assessHypotheses(hypotheses: Hypothesis[], evidence: Evidence): Hypothesis[] {
@@ -115,25 +219,16 @@ export function assessHypotheses(hypotheses: Hypothesis[], evidence: Evidence): 
   const priorYear = Number(onset.prior_period);
   const bucket = evidence.buckets.find((row) => row.fiscal_year === onsetYear);
   const duplicateTotal = evidence.duplication.reduce((sum, row) => sum + row.duplicate_rows, 0);
-  const appleRows = evidence.coverage.filter((row) => row.cik === APPLE.cik);
-  const appleYears = appleRows.map((row) => row.fiscal_year);
-  const appleOnset = appleRows.find((row) => row.fiscal_year === onsetYear);
-  const applePrior = appleRows.find((row) => row.fiscal_year === priorYear);
-  const appleDelta = (appleOnset?.revenue_usd ?? 0) - (applePrior?.revenue_usd ?? 0);
-  const targetLast = Math.max(
-    ...evidence.coverage
-      .filter((row) => row.cik === TARGET.cik)
-      .map((row) => row.fiscal_year),
+  const filers = profileFilers(evidence.coverage);
+  const { concentrated, stopped, focus } = selectFilers(filers, onsetYear, priorYear);
+  const grower = selectGrowthFiler(
+    filers,
+    evidence.segmentOf,
+    onset.segment,
+    onsetYear,
+    priorYear,
+    concentrated?.cik,
   );
-  const teslaYears = evidence.coverage
-    .filter((row) => row.cik === TESLA.cik)
-    .map((row) => row.fiscal_year);
-  const teslaDelta =
-    (evidence.coverage.find((row) => row.cik === TESLA.cik && row.fiscal_year === onsetYear)
-      ?.revenue_usd ?? 0) -
-    (evidence.coverage.find((row) => row.cik === TESLA.cik && row.fiscal_year === priorYear)
-      ?.revenue_usd ?? 0);
-
   const correctedNow = seriesValue(evidence.canonical, onset.segment, `CY${onsetYear}`);
   const correctedPrior = seriesValue(evidence.canonical, onset.segment, `CY${priorYear}`);
   const correctedDelta =
@@ -148,6 +243,7 @@ export function assessHypotheses(hypotheses: Hypothesis[], evidence: Evidence): 
     correctedDelta !== undefined && onset.delta !== 0 ? correctedDelta / onset.delta : undefined;
 
   const parity = checkParity(evidence.frames, evidence.canonical);
+  const sourceTables = [...new Set(evidence.coverage.map((row) => row.cik))].length;
 
   return hypotheses.map((hypothesis) => {
     switch (hypothesis.cause) {
@@ -163,28 +259,42 @@ export function assessHypotheses(hypotheses: Hypothesis[], evidence: Evidence): 
             evidence.refs.history,
           ],
           note: confirmed
-            ? `FY${onsetYear} holds ${bucket?.rows_n} rows across ${bucket?.distinct_periods} distinct period_end dates; ${duplicateTotal} duplicate rows across the seven tables.`
+            ? `FY${onsetYear} holds ${bucket?.rows_n} rows across ${bucket?.distinct_periods} distinct period_end dates; ${duplicateTotal} duplicate rows across the ${sourceTables} source tables.`
             : "no duplicate rows or no bucket inflation detected",
         };
       }
       case "concept_switch_missing_history": {
-        const appleOnlyOnset =
-          appleYears.length > 0 && appleYears.every((year) => year === onsetYear);
-        const confirmed = appleOnlyOnset && targetLast < priorYear;
+        const confirmed = concentrated !== undefined;
+        const replacement = evidence.discovery?.replacement_concept;
+        const replacementFacts = evidence.discovery?.candidates.find(
+          (candidate) => candidate.concept === replacement,
+        )?.annual_facts;
         return {
           ...hypothesis,
           status: confirmed ? "confirmed" : "open",
-          exhibit_ids: [
+          blamed: withIds([
+            ...hypothesis.blamed,
+            ...(concentrated ? [`cik:${concentrated.cik}`] : []),
+            ...(stopped ? [`cik:${stopped.cik}`] : []),
+          ]),
+          subjects: [...subject(concentrated, "concentrated in onset year"), ...subject(stopped, "history stops")],
+          exhibit_ids: withIds([
             evidence.refs.companyBuckets,
-            evidence.refs.appleConcept,
+            evidence.refs.concept,
             evidence.refs.discovery,
-          ],
+          ]),
           note: confirmed
-            ? `${APPLE.entity_name} has ${appleRows.reduce((sum, row) => sum + row.rows_n, 0)} Revenues facts, all in fiscal_year ${onsetYear}; that contributes ${formatUsd(appleDelta)} of the ${formatUsd(onset.delta)} jump. ${TARGET.entity_name} has no Revenues fact after fiscal_year ${targetLast}.` +
-              (evidence.discovery?.replacement_concept
-                ? ` Scout found the replacement concept ${evidence.discovery.replacement_concept} with ${evidence.discovery.candidates.find((candidate) => candidate.concept === evidence.discovery?.replacement_concept)?.annual_facts ?? "more"} annual 10-K facts.`
+            ? `${concentrated.entity_name} has ${concentrated.rows_total} Revenues facts, all in fiscal_year ${onsetYear}; that contributes ${formatUsd(
+                (concentrated.revenue_by_year.get(onsetYear) ?? 0) -
+                  (concentrated.revenue_by_year.get(priorYear) ?? 0),
+              )} of the ${formatUsd(onset.delta)} jump.` +
+              (stopped
+                ? ` ${stopped.entity_name} has no Revenues fact after fiscal_year ${stopped.last_year}.`
+                : "") +
+              (replacement
+                ? ` Scout found the replacement concept ${replacement} with ${replacementFacts ?? "more"} annual 10-K facts.`
                 : "")
-            : "no single-year concentration found",
+            : "no filer has its whole fact history inside the onset year",
         };
       }
       case "real_change": {
@@ -208,31 +318,52 @@ export function assessHypotheses(hypotheses: Hypothesis[], evidence: Evidence): 
             : "corrected series did not survive with SEC frames parity",
         };
       }
-      case "tesla_short_history": {
-        const presentInBoth =
-          teslaYears.includes(onsetYear) && teslaYears.includes(priorYear);
-        const small = Math.abs(teslaDelta / (onset.delta || 1)) < 0.1;
-        const eliminated = presentInBoth && small;
+      case "single_filer_growth": {
+        if (!grower) {
+          return {
+            ...hypothesis,
+            status: "open",
+            exhibit_ids: [evidence.refs.companyBuckets, evidence.refs.buckets],
+            note: `no filer in ${onset.segment} is present in both FY${priorYear} and FY${onsetYear}`,
+          };
+        }
+        const share = Math.abs(grower.delta / (onset.delta || 1));
+        const eliminated = share < 0.1;
         return {
           ...hypothesis,
           status: eliminated ? "eliminated" : "open",
+          blamed: [...hypothesis.blamed, `cik:${grower.cik}`],
+          subjects: subject(grower, "fastest-growing filer in segment"),
           exhibit_ids: [evidence.refs.companyBuckets, evidence.refs.buckets],
           note: eliminated
-            ? `${TESLA.entity_name} has rows in both FY${priorYear} and FY${onsetYear}; its share of the reported jump is ${(100 * Math.abs(teslaDelta / (onset.delta || 1))).toFixed(1)}%.`
-            : "short history could still move the bucket",
+            ? `${grower.entity_name} is the fastest-growing filer in ${onset.segment} (${grower.ratio.toFixed(3)}x FY${priorYear} to FY${onsetYear}), but its ${formatUsd(grower.delta)} is only ${(100 * share).toFixed(1)}% of the reported jump.`
+            : `${grower.entity_name} grew ${grower.ratio.toFixed(3)}x and accounts for ${(100 * share).toFixed(1)}% of the reported jump; still a candidate`,
         };
       }
       case "ingestion_gap": {
-        const appleRowsTotal = appleRows.reduce((sum, row) => sum + row.rows_n, 0);
-        const countMatches = appleRowsTotal === evidence.appleConcept.count;
+        if (!focus || !evidence.concept) {
+          return {
+            ...hypothesis,
+            status: "open",
+            exhibit_ids: withIds([evidence.refs.companyBuckets]),
+            note: "no SEC companyconcept comparison available",
+          };
+        }
+        const countMatches = focus.rows_total === evidence.concept.count;
         const eliminated = countMatches && parity.checked > 0 && parity.matched === parity.checked;
         return {
           ...hypothesis,
           status: eliminated ? "eliminated" : "open",
-          exhibit_ids: [evidence.refs.appleConcept, evidence.refs.companyBuckets, ...Object.values(evidence.refs.frames)],
+          blamed: [...hypothesis.blamed, `cik:${focus.cik}`],
+          subjects: subject(focus, "largest contributor to the delta"),
+          exhibit_ids: withIds([
+            evidence.refs.concept,
+            evidence.refs.companyBuckets,
+            ...Object.values(evidence.refs.frames),
+          ]),
           note: eliminated
-            ? `Zetaris holds ${appleRowsTotal} ${APPLE.entity_name} facts; the SEC companyconcept endpoint returns ${evidence.appleConcept.count}. Nothing is missing.`
-            : `row counts disagree: Zetaris ${appleRowsTotal}, SEC ${evidence.appleConcept.count}`,
+            ? `Zetaris holds ${focus.rows_total} ${focus.entity_name} facts; the SEC companyconcept endpoint returns ${evidence.concept.count}. Nothing is missing.`
+            : `row counts disagree: Zetaris ${focus.rows_total}, SEC ${evidence.concept.count}`,
         };
       }
       default:
@@ -263,7 +394,7 @@ export function checkParity(
   return { checked, matched, max_diff: maxDiff };
 }
 
-function formatUsd(value: number): string {
+export function formatUsd(value: number): string {
   const sign = value < 0 ? "-" : "";
   const abs = Math.abs(value);
   if (abs >= 1e9) return `${sign}$${(abs / 1e9).toFixed(1)}B`;

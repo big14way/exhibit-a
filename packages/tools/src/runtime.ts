@@ -10,7 +10,30 @@ import {
   type ExhibitKind,
   type SqlResult,
 } from "@exhibit-a/core";
+import { NimClient } from "@exhibit-a/llm";
 import { fromEnv, ZetarisClient } from "./zetaris.ts";
+
+/**
+ * The NIM client for a runtime. SAMPLE_MODE replays the recorded model
+ * responses from the cassette and never touches the network; live mode needs
+ * NVIDIA_API_KEY. Model ids are chosen per role by the caller.
+ */
+export function nimClientFor(rt: Pick<ToolRuntime, "sampleMode" | "cassette">): NimClient | null {
+  if (rt.sampleMode) {
+    if (!rt.cassette?.models?.length) return null;
+    return new NimClient({
+      apiKey: "sample-replay",
+      baseUrl: "https://sample.invalid/v1",
+      cassette: rt.cassette,
+    });
+  }
+  const apiKey = process.env.NVIDIA_API_KEY;
+  if (!apiKey) return null;
+  return new NimClient({
+    apiKey,
+    baseUrl: process.env.NVIDIA_BASE_URL ?? "https://integrate.api.nvidia.com/v1",
+  });
+}
 
 export type ToolRuntime = {
   root: string;
